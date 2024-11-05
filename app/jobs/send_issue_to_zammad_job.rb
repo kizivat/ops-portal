@@ -1,17 +1,12 @@
 class SendIssueToZammadJob < ApplicationJob
-  def perform(issue)
-    client = ZammadAPI::Client.new(
-      url:        ENV.fetch("OPS_ZAMMAD_URL"),
-      http_token: ENV.fetch("OPS_ZAMMAD_API_TOKEN")
-    )
-
+  def perform(issue, client: TriageZammadEnvironment.client)
     ticket = client.ticket.create(
       title: issue.title,
       state: "new",
       group: "Dobrovoľníci",
       customer: issue.author,
       customer_id: "guess:#{issue.author}",
-      # anonymous: true,
+      # anonymous: true, TODO: allow and handle anonymous issues
       article: {
         content_type: "text/plain", # or text/html, if not given test/plain is used
         body: issue.description,
