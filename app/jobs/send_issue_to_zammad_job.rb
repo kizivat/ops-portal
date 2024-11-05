@@ -1,5 +1,4 @@
 class SendIssueToZammadJob < ApplicationJob
-
   def perform(issue)
     client = ZammadAPI::Client.new(
       url:        ENV.fetch("OPS_ZAMMAD_URL"),
@@ -15,7 +14,7 @@ class SendIssueToZammadJob < ApplicationJob
       article: {
         content_type: "text/plain", # or text/html, if not given test/plain is used
         body: issue.description
-        #attachments can be optional, data needs to be base64 encoded
+        # attachments can be optional, data needs to be base64 encoded
         # attachments: [
         #   'filename' => 'some_file.txt',
         #   'data' => 'dGVzdCAxMjM=',
