@@ -1,4 +1,4 @@
-class WebhooksController < ApplicationController
+class WebhooksController < ActionController::API
   before_action :set_issue, only: %i[ ticket_updated ]
 
   def ticket_updated
