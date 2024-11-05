@@ -24,7 +24,6 @@ class IssuesController < ApplicationController
     @issue = Issue.new(issue_params)
 
     if @issue.save
-      SendIssueToZammadJob.perform_later(@issue)
       redirect_to @issue, notice: "Issue was successfully created."
     else
       render :new, status: :unprocessable_entity

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_05_204523) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_05_204845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,7 +111,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_05_204523) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
-    t.integer "zammad_id"
+    t.integer "triage_external_id"
     t.string "state"
   end
 end

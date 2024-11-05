@@ -10,7 +10,7 @@ class WebhooksController < ActionController::API
   private
 
   def set_issue
-    @issue = Issue.find_by(zammad_id: ticket_params[:id])
+    @issue = Issue.find_by(triage_external_id: ticket_params[:id])
   end
 
   def ticket_params
