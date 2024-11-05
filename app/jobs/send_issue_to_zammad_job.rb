@@ -21,7 +21,7 @@ class SendIssueToZammadJob < ApplicationJob
       },
     )
 
-    issue.last_synced = Time.now
+    issue.last_synced_at = Time.now
     issue.triage_external_id = ticket.id
     issue.save!
   end
