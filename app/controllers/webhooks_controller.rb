@@ -1,5 +1,6 @@
 class WebhooksController < ActionController::API
   before_action :set_issue, only: %i[ ticket_updated ]
+  # TODO: authentication
 
   def ticket_updated
     @issue.state = ticket_params[:state]
