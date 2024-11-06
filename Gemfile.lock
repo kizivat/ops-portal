@@ -346,7 +346,7 @@ DEPENDENCIES
   capybara
   debug
   dotenv
-  good_job (~> 4.4)
+  good_job
   importmap-rails
   jbuilder
   pg (~> 1.1)
