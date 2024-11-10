@@ -15,7 +15,7 @@ class IssuesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should create issue" do
+  test "should create issues" do
     assert_difference("Issue.count") do
       post issues_url, params: { issue: { author: @issue.author, description: @issue.description, reported_at: @issue.reported_at, title: @issue.title } }
     end
@@ -23,7 +23,7 @@ class IssuesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to issue_url(Issue.last)
   end
 
-  test "should show issue" do
+  test "should show issues" do
     get issue_url(@issue)
     assert_response :success
   end
@@ -33,12 +33,12 @@ class IssuesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should update issue" do
+  test "should update issues" do
     patch issue_url(@issue), params: { issue: { author: @issue.author, description: @issue.description, reported_at: @issue.reported_at, title: @issue.title } }
     assert_redirected_to issue_url(@issue)
   end
 
-  test "should destroy issue" do
+  test "should destroy issues" do
     assert_difference("Issue.count", -1) do
       delete issue_url(@issue)
     end
