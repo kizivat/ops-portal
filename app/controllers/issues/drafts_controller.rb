@@ -5,7 +5,7 @@ class Issues::DraftsController < ApplicationController
 
   def create
     @draft = Issues::Draft.new(draft_params)
-    if @draft.save(context: :photos)
+    if @draft.save(context: :photos_step)
       redirect_to issues_draft_suggestions_path(@draft)
     else
       render :new, status: :unprocessable_entity
@@ -16,18 +16,9 @@ class Issues::DraftsController < ApplicationController
     @draft = Issues::Draft.find(params[:id])
   end
 
-  def suggest
-    @draft = Issues::Draft.find(params[:draft_id])
-
-    @suggestions = @draft.calculate_suggestions
-  end
-
-  def submit
-  end
-
   private
 
   def draft_params
-    params.expect(issues_draft: [ :title, :body, photos: [] ])
+    params.expect(issues_draft: [ photos: [] ])
   end
 end
