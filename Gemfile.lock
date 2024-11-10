@@ -361,7 +361,7 @@ DEPENDENCIES
   debug
   dotenv
   exif
-  good_job (~> 4.4)
+  good_job
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
