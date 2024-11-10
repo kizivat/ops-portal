@@ -16,6 +16,6 @@ class Issues::Drafts::DetailsController < ApplicationController
   private
 
   def details_params
-    params.expect(issues_draft: [:title, :description, :author])
+    params.expect(issues_draft: [ :title, :description, :author ])
   end
 end

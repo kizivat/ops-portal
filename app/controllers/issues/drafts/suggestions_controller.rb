@@ -20,6 +20,6 @@ class Issues::Drafts::SuggestionsController < ApplicationController
   private
 
   def suggestions_params
-    params.expect(issues_draft: [:picked_suggestion_index])
+    params.expect(issues_draft: [ :picked_suggestion_index ])
   end
 end
