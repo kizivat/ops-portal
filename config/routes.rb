@@ -1,6 +1,17 @@
 Rails.application.routes.draw do
+  post "webhooks/ticket-updated"
   resources :issues
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  namespace :issues do
+    resources :drafts do
+      scope module: :drafts do
+        resource :suggestions do
+          get :suggest
+        end
+        resource :details
+        resource :geo
+      end
+    end
+  end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
@@ -11,5 +22,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "issues/drafts#new"
 end
