@@ -18,13 +18,10 @@ class WebhooksController < ActionController::API
   end
 
   def authenticate
-    sig_header = x_hub_signature_header
-    signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), ENV.fetch("WEBHOOK_SECRET"), request.body.read)
-    raise ActionController::BadRequest.new("Invalid Signature") unless signature == sig_header
-  end
+    sig_header = request.headers["X-Hub-Signature"]&.gsub("sha1=", "")
+    render status: :unauthorized, json: nil and return unless sig_header.present?
 
-  def x_hub_signature_header
-    raise ActionController::ParameterMissing.new("X-Hub-Signature header") unless request.headers["X-Hub-Signature"]
-    request.headers["X-Hub-Signature"].gsub("sha1=", "")
+    signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), ENV.fetch("WEBHOOK_SECRET"), request.body.read)
+    render status: :forbidden, json: nil if signature != sig_header
   end
 end
