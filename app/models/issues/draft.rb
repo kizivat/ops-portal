@@ -1,6 +1,6 @@
 class Issues::Draft < ApplicationRecord
   has_many_attached :photos do |photo|
-    photo.variant :thumb, resize_to_limit: [320, 240], preprocessed: true
+    photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
   end
 
   validates_presence_of :photos, on: :photos_step

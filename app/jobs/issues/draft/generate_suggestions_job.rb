@@ -73,7 +73,7 @@ class Issues::Draft::GenerateSuggestionsJob < ApplicationJob
                 source: {
                   type: :base64,
                   media_type: photo.blob.content_type,
-                  data: Base64.strict_encode64(photo.variant(resize_to_limit: [800, 600]).processed.download)
+                  data: Base64.strict_encode64(photo.variant(resize_to_limit: [ 800, 600 ]).processed.download)
                 }
               }
             end

@@ -29,6 +29,6 @@ class Issues::DraftsController < ApplicationController
   private
 
   def draft_params
-    params.expect(issues_draft: [photos: []])
+    params.expect(issues_draft: [ photos: [] ])
   end
 end
