@@ -11,7 +11,7 @@
   <%= form.hidden_field :latitude, data: { "geo-target": :latitude } %>
   <%= form.hidden_field :longitude, data: { "geo-target": :longitude } %>
   <%= form.hidden_field :address_house_number, data: { "geo-target": "addressHouseNumber" } %>
-  
+
   <%= form.hidden_field :address_neighbourhood, data: { "geo-target": "addressNeighbourhood" } %>
 
   <%= form.hidden_field :address_suburb, data: { "geo-target": "addressSuburb" } %>
@@ -23,16 +23,16 @@
   <%= form.hidden_field :address_country, data: { "geo-target": "addressCountry" } %>
   <%= form.hidden_field :address_country_code, data: { "geo-target": "addressCountryCode" } %>
 
-  <div class="grid grid-cols-7 gap-3">
-
-    <%= form.text_field :address_city, readonly: :readonly, data: { "geo-target": "addressCity" }, class: "col-span-2 shadow rounded-md border border-gray-400 outline-none px-3 py-2" %>
-
-
-    <%= form.text_field :address_city_district, readonly: :readonly, data: { "geo-target": "addressCityDistrict" }, class: "col-span-2 shadow rounded-md border border-gray-400 outline-none px-3 py-2" %>
-
-
-    <%= form.text_field :address_road, readonly: :readonly, data: { "geo-target": "addressRoad" }, class: "col-span-3 shadow rounded-md border border-gray-400 outline-none px-3 py-2" %>
-
+  <div class="grid md:grid-cols-3 gap-3">
+    <div>
+      <%= form.text_field :address_city, readonly: :readonly, data: { "geo-target": "addressCity" }, class: "shadow rounded-md border border-gray-400 outline-none px-3 py-2 w-full" %>
+    </div>
+    <div>
+      <%= form.text_field :address_city_district, readonly: :readonly, data: { "geo-target": "addressCityDistrict" }, class: "shadow rounded-md border border-gray-400 outline-none px-3 py-2 w-full" %>
+    </div>
+    <div>
+      <%= form.text_field :address_road, readonly: :readonly, data: { "geo-target": "addressRoad" }, class: "shadow rounded-md border border-gray-400 outline-none px-3 py-2 w-full" %>
+    </div>
   </div>
 
   <div class="my-5">
