@@ -1,3 +1,35 @@
+# == Schema Information
+#
+# Table name: issues_drafts
+#
+#  id                      :bigint           not null, primary key
+#  address_city            :string
+#  address_city_district   :string
+#  address_country         :string
+#  address_country_code    :string
+#  address_house_number    :string
+#  address_neighbourhood   :string
+#  address_postcode        :string
+#  address_road            :string
+#  address_state           :string
+#  address_suburb          :string
+#  address_town            :string
+#  address_village         :string
+#  anonymous               :boolean
+#  author                  :string
+#  category                :string
+#  checks                  :jsonb
+#  description             :string
+#  latitude                :float
+#  longitude               :float
+#  picked_suggestion_index :integer
+#  subcategory             :string
+#  subtype                 :string
+#  suggestions             :jsonb
+#  title                   :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#
 class Issues::Draft < ApplicationRecord
   has_many_attached :photos do |photo|
     photo.variant :llm, resize_to_limit: [ 800, 600 ], preprocessed: true
