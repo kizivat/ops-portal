@@ -12,9 +12,9 @@ class Issues::Draft::GenerateChecksJob < ApplicationJob
 
     The problem has a title and description and must be checked with various rules written in Slovak.
 
-    Return JSON array with failing checks as hashes with `title`, `description` and `action` keys. 
+    Return JSON array with failing checks as hashes with `title`, `description` and `action` keys.#{' '}
     Optionally return `explanation` with further guidance how to fix the problem.
-    
+
     Do not return the `rule`.
     Do not return anything else than JSON and if there are no problems return empty array `[]`.
     If the reported problem matches a check with action `back` it takes precedence over other checks.
@@ -60,7 +60,7 @@ class Issues::Draft::GenerateChecksJob < ApplicationJob
              #{draft.description}
 
              Address:
-             #{[draft.address_city, draft.address_city_district, draft.address_road].compact.join(', ')}
+             #{[ draft.address_city, draft.address_city_district, draft.address_road ].compact.join(', ')}
     LLM
 
     Gemini.generate(
