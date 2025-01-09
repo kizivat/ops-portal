@@ -3,10 +3,6 @@ class ZammadApiClient
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
 
-  def client
-    @client
-  end
-
   def get_ticket(ticket_id)
     begin
       ticket = @client.ticket.find(ticket_id)
@@ -48,6 +44,7 @@ class ZammadApiClient
   end
 
   def create_ticket(issue)
+    # TODO: real values from issues
     create_or_find_customer(issue.author)
     ticket = @client.ticket.create(
       title: issue.title,
@@ -74,6 +71,12 @@ class ZammadApiClient
     ticket.id
   end
 
+  def find_ticket_responsible_subject(ticket_id)
+    @client.ticket.find(ticket_id).responsible_subject
+  end
+
+  private
+
   def create_or_find_customer(author_email)
     begin
       @client.user.create(email: author_email)
@@ -83,8 +86,6 @@ class ZammadApiClient
 
     author_email
   end
-
-  private
 
   def get_author(user_id, anonymous: false)
     begin

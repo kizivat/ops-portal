@@ -6,10 +6,6 @@ class Connector::ZammadApiClient
     @client = ZammadAPI::Client.new(url: @url, http_token: @token)
   end
 
-  def client
-    @client
-  end
-
   def create_issue!(issue)
     article = issue["comments"].first
 

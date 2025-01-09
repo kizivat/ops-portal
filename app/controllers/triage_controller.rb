@@ -1,6 +1,6 @@
 class TriageController < ApplicationController
   protect_from_forgery with: :null_session
-  # before_action :authenticate
+  before_action :authenticate
 
   def webhook
     event_type = webhook_params.require :type
