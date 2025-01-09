@@ -20,7 +20,7 @@ class Connector::Api::V1::WebhooksController < Connector::ApplicationController
   private
 
   def webhook_params
-    params.permit(:type, :timestamp, data: [:subject_id, :issue_id, :comment_id])
+    params.permit(:type, :timestamp, data: [ :subject_id, :issue_id, :comment_id ])
   end
 
   def data
