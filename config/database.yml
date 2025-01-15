@@ -22,6 +22,13 @@ default: &default
   password: <%= ENV['DB_PASSWORD'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
+odkaz_pre_starostu:
+  adapter: 'mysql2'
+  host: <%= ENV['OPS_DB_HOST'] %>
+  username: <%= ENV['OPS_DB_USER'] %>
+  password: <%= ENV['OPS_DB_PASSWORD'] %>
+  database: <%= ENV['OPS_DB_NAME'] %>
+  database_tasks: false
 
 development:
   <<: *default
