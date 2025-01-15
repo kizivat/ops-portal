@@ -1,7 +1,8 @@
 module Import
-  class Import::ImportMunicipalitiesJob < ApplicationJob
+  class ImportMunicipalitiesJob < ApplicationJob
     def perform(import_municipality_districts_job: ImportMunicipalityDistrictsJob, chain_import: false)
-      Legacy::Municipality.find_in_batches do |group|
+      Legacy::GenericModel.set_table_name('mesta')
+      Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
           Municipality.find_or_create_by!(
             id: legacy_record.id,

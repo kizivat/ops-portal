@@ -22,12 +22,12 @@ default: &default
   password: <%= ENV['DB_PASSWORD'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-odkaz_pre_starostu:
+legacy_db:
   adapter: 'mysql2'
-  host: <%= ENV['OPS_DB_HOST'] %>
-  username: <%= ENV['OPS_DB_USER'] %>
-  password: <%= ENV['OPS_DB_PASSWORD'] %>
-  database: <%= ENV['OPS_DB_NAME'] %>
+  host: <%= ENV['LEGACY_DB_HOST'] %>
+  username: <%= ENV['LEGACY_DB_USER'] %>
+  password: <%= ENV['LEGACY_DB_PASSWORD'] %>
+  database: <%= ENV['LEGACY_DB_NAME'] %>
   database_tasks: false
 
 development:

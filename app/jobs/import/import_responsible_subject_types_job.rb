@@ -1,7 +1,8 @@
 module Import
   class ImportResponsibleSubjectTypesJob < ApplicationJob
     def perform(import_responsible_subjects_job: ImportResponsibleSubjectsJob, chain_import: false)
-      Legacy::ResponsibleSubjectType.find_in_batches do |group|
+      Legacy::GenericModel.set_table_name('zodpovednost_typy')
+      Legacy::GenericModel..find_in_batches do |group|
         group.each do |legacy_record|
           ResponsibleSubjectType.find_or_create_by!(
             id: legacy_record.id,
