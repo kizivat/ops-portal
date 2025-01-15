@@ -1,4 +1,8 @@
 class Connector::ZammadApiClient
+  attr :client
+
+  ANONYMOUS_USER_ID = 25
+
   def initialize(tenant, token: ENV.fetch("CONNECTOR__ZAMMAD_API_TOKEN"), url: ENV.fetch("CONNECTOR__ZAMMAD_URL"))
     @name = tenant.name
     @token = token
@@ -13,11 +17,11 @@ class Connector::ZammadApiClient
       state: issue["state"],
       group: @name,
       title: issue["title"],
-      origin_by: create_or_find_customer(issue["author"]),
-      customer: create_or_find_customer(issue["author"]),
+      origin_by_id: create_or_find_customer(issue["author"]),
+      customer_id: create_or_find_customer(issue["author"]),
       triage_id: issue["triage_identifier"],
       article: {
-        origin_by: create_or_find_customer(article["author"]),
+        origin_by_id: create_or_find_customer(article["author"]),
         triage_id: article["triage_identifier"],
         content_type: article["content_type"],
         body: article["body"],
@@ -40,7 +44,7 @@ class Connector::ZammadApiClient
 
     issue["comments"][1..-1].each do |comment|
       new_article = new_ticket.article(
-        origin_by: create_or_find_customer(comment["author"]),
+        origin_by_id: create_or_find_customer(comment["author"]),
         triage_id: comment["triage_identifier"],
         content_type: comment["content_type"],
         body: comment["body"],
@@ -60,14 +64,20 @@ class Connector::ZammadApiClient
   end
 
   def create_or_find_customer(author)
-    email = "#{author['email_hash']}@ops.staging.slovensko.digital"
+    return ANONYMOUS_USER_ID unless author
+
     begin
-      @client.user.create(firstname: author["firstname"], lastname: author["lastname"], email: email)
+      user = Connector::User.find_or_initialize_by(uuid: author["uuid"])
+      return user.zammad_identifier unless user.new_record?
+
+      zammad_identifier = @client.user.create(firstname: author["firstname"], lastname: author["lastname"], login: author["uuid"]).id
+      raise unless zammad_identifier
+      user.update(firstname: author["firstname"], lastname: author["lastname"], zammad_identifier: zammad_identifier)
     rescue RuntimeError => e
       raise e unless e.message.include? "is already used for another user."
     end
 
-    email
+    zammad_identifier
   end
 
   def create_comment!

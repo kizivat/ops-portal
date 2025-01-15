@@ -3,9 +3,9 @@ class ApiController < ActionController::API
 
   private
 
-  def authenticate_backoffice_client
-    # @backoffice_client = nil
-    @backoffice_client = BackofficeClient.first
+  def authenticate_client
+    # TODO
+    @client = Client.first
   end
 
   def default_format_json

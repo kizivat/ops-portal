@@ -1,6 +1,6 @@
 class Triage::FireWebhookJob < ApplicationJob
-  def perform(backoffice_client, webhook_id, payload, provider: Faraday)
-    private_key = OpenSSL::PKey::EC.new backoffice_client.webhook_private_key
+  def perform(client, webhook_id, payload, provider: Faraday)
+    private_key = OpenSSL::PKey::EC.new client.webhook_private_key
     attempt_timestamp = Time.now.to_i
 
     hash = OpenSSL::Digest.digest "SHA256", "#{webhook_id}.#{attempt_timestamp}.#{payload.to_json}"
@@ -11,7 +11,7 @@ class Triage::FireWebhookJob < ApplicationJob
       "webhook-signature" => "v1a,#{Base64.strict_encode64 signature}"
     }
 
-    response = provider.post(backoffice_client.url, payload, headers)
+    response = provider.post(client.url, payload, headers)
     raise unless response.status == 204
   end
 end

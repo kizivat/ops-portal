@@ -1,4 +1,6 @@
 class ZammadApiClient
+  attr :client
+
   def initialize(url:, http_token:)
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
@@ -71,6 +73,14 @@ class ZammadApiClient
     ticket.id
   end
 
+  def get_users
+    @client.user.all
+  end
+
+  def get_user(identifier)
+    @client.user.find identifier
+  end
+
   def find_ticket_responsible_subject(ticket_id)
     @client.ticket.find(ticket_id).responsible_subject
   end
@@ -88,16 +98,21 @@ class ZammadApiClient
   end
 
   def get_author(user_id, anonymous: false)
-    begin
-      user_object = @client.user.find(user_id)
-      {
-        firstname: anonymous ? "Anonymous" : user_object.firstname,
-        lastname: anonymous ? "" : user_object.lastname,
-        email_hash: OpenSSL::Digest::SHA256.hexdigest(user_object.email)
-      }
-    rescue => e
-      Rails.logger.debug("Failed to get author info with an error: #{e}")
-      nil
-    end
+    return nil if anonymous
+
+    user = find_or_create_user(user_id)
+    {
+      firstname: user.firstname,
+      lastname: user.lastname,
+      uuid: user.uuid
+    }
+  end
+
+  def find_or_create_user(user_id)
+    user = User.find_by(zammad_identifier: user_id)
+    return user if user
+
+    u = get_user(user_id)
+    User.create!(zammad_identifier: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 end

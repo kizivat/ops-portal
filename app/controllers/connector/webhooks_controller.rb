@@ -1,4 +1,4 @@
-class Connector::Api::V1::WebhooksController < Connector::ApplicationController
+class Connector::WebhooksController < ActionController::API
   before_action :set_tenant
   before_action :authenticate
 

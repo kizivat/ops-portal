@@ -1,21 +1,21 @@
 Rails.application.routes.draw do
-  resources :backoffice_clients
+  resources :clients
 
   namespace :connector do
-    namespace "api" do
-      namespace "v1" do
-        post "webhook" => "webhooks#webhook"
-      end
+    post "webhook" => "webhooks#webhook"
+    namespace :backoffice do
+      post "webhook" => "webhooks#webhook"
     end
   end
 
   namespace :triage do
-    post "webhook"
+    post "webhook" => "webhooks#webhook"
   end
 
   namespace "api" do
     namespace "v1" do
       resources :issues
+      resources :comments
     end
   end
 

@@ -1,5 +1,5 @@
 class Api::V1::IssuesController < ApiController
-  before_action :authenticate_backoffice_client
+  before_action :authenticate_client
   before_action :set_issue, only: [ :show ]
 
   def show
@@ -15,6 +15,6 @@ class Api::V1::IssuesController < ApiController
     puts @ticket
 
     head :not_found unless @ticket
-    # head :not_found unless @ticket["responsible_subject"] == @backoffice_client.responsible_subject_zammad_identifier
+    # head :not_found unless @ticket["responsible_subject"] == @client.responsible_subject_zammad_identifier
   end
 end
