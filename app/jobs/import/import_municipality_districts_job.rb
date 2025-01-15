@@ -1,26 +1,22 @@
 module Import
   class Import::ImportMunicipalityDistrictsJob < ApplicationJob
-    include ImportHelper
-
-    def perform(municipality:, import_streets_job: ImportStreetsJob, chain_import: false)
-      records_array = ImportHelper.with_another_db(ActiveRecord::Base.configurations.configs_for(env_name: 'odkaz_pre_starostu').first) do
-        ActiveRecord::Base.connection.exec_query("SELECT * FROM mestske_casti where mesto = #{municipality.id}")
+    def perform(import_streets_job: ImportStreetsJob, chain_import: false)
+      Legacy::MunicipalityDistrict.find_in_batches do |group|
+        group.each do |legacy_record|
+          MunicipalityDistrict.find_or_create_by!(
+            id: legacy_record.id,
+            alias: legacy_record.alias,
+            description: legacy_record.popis.presence,
+            genitiv: legacy_record.genitiv,
+            logo: legacy_record.logo,
+            lokal: legacy_record.lokal,
+            name: legacy_record.nazov,
+            municipality_id: legacy_record.mesto.nonzero? || nil,
+          )
+        end
       end
 
-      records_array.each do |record|
-        municipality.municipality_districts.find_or_create_by!(
-          id: record['id'],
-          alias: record['alias'],
-          description: record['popis'].presence,
-          genitiv: record['genitiv'],
-          logo: record['logo'],
-          lokal: record['lokal'],
-          name: record['nazov'],
-          municipality_id: record['mesto']
-        )
-      end
-
-      import_streets_job.perform_later(municipality: municipality) if chain_import
+      import_streets_job.perform_later if chain_import
     end
   end
 end

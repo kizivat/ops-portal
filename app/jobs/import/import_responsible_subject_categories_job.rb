@@ -1,17 +1,14 @@
 module Import
   class ImportResponsibleSubjectCategoriesJob < ApplicationJob
-    include ImportHelper
-
-    def perform(responsible_subject:)
-      records_array = ImportHelper.with_another_db(ActiveRecord::Base.configurations.configs_for(env_name: 'odkaz_pre_starostu').first) do
-        ActiveRecord::Base.connection.exec_query("SELECT * FROM zodpovednost_kategorie WHERE id_zodpovednost = #{responsible_subject.id}")
-      end
-
-      records_array.each do |record|
-        responsible_subject.categories.find_or_create_by!(
-          id: record['id'],
-          issue_category_id: record['id_kategoria'],
-        )
+    def perform
+      Legacy::ResponsibleSubjectCategory.find_in_batches do |group|
+        group.each do |legacy_record|
+          ResponsibleSubjectCategory.find_or_create_by!(
+            id: legacy_record.id,
+            responsible_subject: ResponsibleSubject.find_by_id(legacy_record.id_zodpovednost),
+            issue_category_id: legacy_record.id_kategoria,
+          )
+        end
       end
     end
   end

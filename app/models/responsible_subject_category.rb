@@ -6,9 +6,9 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  issue_category_id      :bigint           not null
-#  responsible_subject_id :bigint           not null
+#  responsible_subject_id :bigint
 #
 class ResponsibleSubjectCategory < ApplicationRecord
-  belongs_to :responsible_subject
+  belongs_to :responsible_subject, optional: true
   belongs_to :issue_category, class_name: 'Issue::Category'
 end

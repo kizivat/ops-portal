@@ -1,27 +1,19 @@
 module Import
   class ImportStreetsJob < ApplicationJob
-    include ImportHelper
-
-    def perform(municipality:, batch_size: 100)
-      0.step do |offset|
-        records_array = ImportHelper.with_another_db(ActiveRecord::Base.configurations.configs_for(env_name: 'odkaz_pre_starostu').first) do
-          ActiveRecord::Base.connection.exec_query("SELECT * FROM ulice where mesto = #{municipality.id} LIMIT #{batch_size} OFFSET #{offset * batch_size}")
-        end
-
-        records_array.each do |record|
+    def perform
+      Legacy::Street.find_in_batches do |group|
+        group.each do |legacy_record|
           Street.find_or_create_by!(
-            id: record['id'],
-            latitude: record['geo_y'],
-            longitude: record['geo_x'],
-            name: record['nazov'],
-            place_identifier: record['place_id'],
-            tested: record['tested'],
-            municipality: municipality,
-            municipality_district_id: record['mestska_cast'].nonzero? || nil
+            id: legacy_record.id,
+            latitude: legacy_record.geo_y,
+            longitude: legacy_record.geo_x,
+            name: legacy_record.nazov,
+            place_identifier: legacy_record.place_id,
+            tested: legacy_record.tested,
+            municipality_district_id: legacy_record.mestska_cast.nonzero? || nil,
+            municipality_id: legacy_record.mesto
           )
         end
-
-        break if records_array.count < batch_size
       end
     end
   end
