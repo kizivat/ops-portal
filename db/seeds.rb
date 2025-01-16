@@ -10,6 +10,7 @@
 
 webhook_url = ENV.fetch("CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connector/webhook")
 
+# TODO: only run in development
 [
   { name: "MÚ Staré Mesto", subject: "1", url: webhook_url },
   { name: "MÚ Karlova Ves", subject: "8", url: webhook_url },
