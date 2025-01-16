@@ -29,9 +29,9 @@ class Connector::ZammadApiClient
         triage_created_at: article["created_at"],
         attachments: article["attachments"].map do |attachment|
           {
-            'filename' => attachment["filename"],
-            'mime-type' => attachment["content_type"],
-            'data' => attachment["data64"]
+            "filename" => attachment["filename"],
+            "mime-type" => attachment["content_type"],
+            "data" => attachment["data64"]
           }
         end
       }
@@ -52,9 +52,9 @@ class Connector::ZammadApiClient
         triage_created_at: comment["created_at"],
         attachments: comment["attachments"].map do |attachment|
           {
-            'filename' => attachment["filename"],
-            'mime-type' => attachment["content_type"],
-            'data' => attachment["data64"]
+            "filename" => attachment["filename"],
+            "mime-type" => attachment["content_type"],
+            "data" => attachment["data64"]
           }
         end
       )

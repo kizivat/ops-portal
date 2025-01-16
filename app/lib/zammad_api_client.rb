@@ -63,9 +63,9 @@ class ZammadApiClient
         type: DEFAULT_ARTICLE_TYPE,
         attachments: issue.photos.map do |photo|
           {
-            'filename' => photo.filename.to_s,
-            'data' => Base64.encode64(photo.blob.download),
-            'mime-type' => photo.content_type
+            "filename" => photo.filename.to_s,
+            "data" => Base64.encode64(photo.blob.download),
+            "mime-type" => photo.content_type
           }
         end
       },
