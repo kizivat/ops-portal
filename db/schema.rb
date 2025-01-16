@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_19_141626) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_14_121522) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -40,6 +41,35 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_19_141626) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.string "name"
+    t.string "url"
+    t.string "responsible_subject_zammad_identifier"
+    t.string "api_token_public_key"
+    t.string "webhook_private_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "connector_tenants", force: :cascade do |t|
+    t.string "name"
+    t.string "api_token_private_key"
+    t.integer "api_subject_identifier"
+    t.string "webhook_public_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "connector_users", force: :cascade do |t|
+    t.integer "zammad_identifier"
+    t.uuid "uuid"
+    t.string "firstname"
+    t.string "lastname"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["zammad_identifier"], name: "index_connector_users_on_zammad_identifier", unique: true
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -134,13 +164,22 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_19_141626) do
   create_table "issues", force: :cascade do |t|
     t.string "title", null: false
     t.string "description", null: false
-    t.string "author", null: false
     t.datetime "reported_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
     t.string "state"
+    t.bigint "user_id"
+    t.boolean "anonymous"
+    t.string "address"
+    t.float "latitude"
+    t.float "longitude"
+    t.string "category", null: false
+    t.string "municipality", null: false
+    t.bigint "author_id"
+    t.index ["author_id"], name: "index_issues_on_author_id"
+    t.index ["user_id"], name: "index_issues_on_user_id"
   end
 
   create_table "issues_drafts", force: :cascade do |t|
@@ -172,6 +211,16 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_19_141626) do
     t.string "subtype"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.string "firstname"
+    t.string "lastname"
+    t.integer "zammad_identifier"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["zammad_identifier"], name: "index_users_on_zammad_identifier", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "issues", "users", column: "author_id"
 end
