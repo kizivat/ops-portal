@@ -1,5 +1,4 @@
-class Triage::WebhooksController < ApplicationController
-  protect_from_forgery with: :null_session
+class Triage::WebhooksController < ActionController::API
   before_action :authenticate
 
   def webhook

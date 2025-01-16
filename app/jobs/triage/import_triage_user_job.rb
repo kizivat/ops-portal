@@ -4,7 +4,6 @@ class Triage::ImportTriageUserJob < ApplicationJob
 
     user = User.find_or_initialize_by(zammad_identifier: u.id)
     return unless user.new_record?
-    user.update(email: u.email, firstname: u.firstname, lastname: u.lastname)
-    user.save!
+    user.update!(email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 end

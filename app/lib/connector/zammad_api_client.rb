@@ -1,6 +1,7 @@
 class Connector::ZammadApiClient
   attr :client
 
+  # TODO
   ANONYMOUS_USER_ID = 25
 
   def initialize(tenant, token: ENV.fetch("CONNECTOR__ZAMMAD_API_TOKEN"), url: ENV.fetch("CONNECTOR__ZAMMAD_URL"))
