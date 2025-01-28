@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_18_093741) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,20 +137,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
-  create_table "issue_categories", force: :cascade do |t|
-    t.string "category"
-    t.string "category_hu"
-    t.string "category_alias"
-    t.string "description"
-    t.string "description_hu"
-    t.boolean "catch_all", default: false
-    t.bigint "parent_id"
-    t.integer "weight"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["parent_id"], name: "index_issue_categories_on_parent_id"
-  end
-
   create_table "issues", force: :cascade do |t|
     t.string "title", null: false
     t.string "description", null: false
@@ -162,6 +148,20 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.integer "triage_external_id"
     t.string "state"
     t.jsonb "legacy_data"
+  end
+
+  create_table "issues_categories", force: :cascade do |t|
+    t.string "category"
+    t.string "category_hu"
+    t.string "category_alias"
+    t.string "description"
+    t.string "description_hu"
+    t.boolean "catch_all", default: false
+    t.bigint "parent_id"
+    t.integer "weight"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
   end
 
   create_table "issues_drafts", force: :cascade do |t|
@@ -191,6 +191,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.string "category"
     t.string "subcategory"
     t.string "subtype"
+  end
+
+  create_table "issues_states", force: :cascade do |t|
+    t.string "name"
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -231,26 +238,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.index ["municipality_id"], name: "index_municipality_districts_on_municipality_id"
   end
 
-  create_table "responsible_subject_categories", force: :cascade do |t|
-    t.bigint "responsible_subject_id"
-    t.bigint "issue_category_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["issue_category_id"], name: "index_responsible_subject_categories_on_issue_category_id"
-    t.index ["responsible_subject_id"], name: "index_responsible_subject_categories_on_responsible_subject_id"
-  end
-
-  create_table "responsible_subject_types", force: :cascade do |t|
-    t.string "name"
-    t.boolean "active"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "responsible_subjects", force: :cascade do |t|
     t.bigint "district_id"
     t.bigint "municipality_id"
-    t.bigint "responsible_subject_type_id", null: false
+    t.bigint "responsible_subjects_type_id", null: false
     t.bigint "municipality_district_id"
     t.integer "scope"
     t.string "subject_name"
@@ -264,7 +255,58 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.index ["district_id"], name: "index_responsible_subjects_on_district_id"
     t.index ["municipality_district_id"], name: "index_responsible_subjects_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_responsible_subjects_on_municipality_id"
-    t.index ["responsible_subject_type_id"], name: "index_responsible_subjects_on_responsible_subject_type_id"
+    t.index ["responsible_subjects_type_id"], name: "index_responsible_subjects_on_responsible_subjects_type_id"
+  end
+
+  create_table "responsible_subjects_categories", force: :cascade do |t|
+    t.bigint "responsible_subject_id"
+    t.bigint "issues_category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issues_category_id"], name: "index_responsible_subjects_categories_on_issues_category_id"
+    t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_7ec5499a35"
+  end
+
+  create_table "responsible_subjects_organization_units", force: :cascade do |t|
+    t.bigint "responsible_subject_id", null: false
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_f2ce80d659"
+  end
+
+  create_table "responsible_subjects_types", force: :cascade do |t|
+    t.string "name"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "responsible_subjects_user_roles", force: :cascade do |t|
+    t.string "slug"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "responsible_subjects_users", force: :cascade do |t|
+    t.bigint "responsible_subject_id"
+    t.bigint "role_id", null: false
+    t.string "login"
+    t.string "password"
+    t.string "name"
+    t.string "email"
+    t.string "token"
+    t.string "photo"
+    t.datetime "deleted_at"
+    t.bigint "organization_unit_id"
+    t.boolean "gdpr_accepted"
+    t.boolean "tooltips"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_unit_id"], name: "index_responsible_subjects_users_on_organization_unit_id"
+    t.index ["responsible_subject_id"], name: "index_responsible_subjects_users_on_responsible_subject_id"
+    t.index ["role_id"], name: "index_responsible_subjects_users_on_role_id"
   end
 
   create_table "streets", force: :cascade do |t|
@@ -294,18 +336,17 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
     t.string "email"
     t.string "password"
     t.string "about"
-    t.string "logo"
-    t.string "website"
     t.boolean "organization"
+    t.datetime "timestamp"
     t.boolean "anonymous", default: false
     t.boolean "active"
-    t.bigint "municipality_id", null: false
+    t.bigint "municipality_id"
     t.boolean "created_from_app", default: false
     t.string "verification"
     t.boolean "verified", default: false
     t.string "signature"
     t.integer "city_id"
-    t.bigint "street_id", null: false
+    t.bigint "street_id"
     t.boolean "resident"
     t.integer "sex"
     t.date "birth"
@@ -327,15 +368,19 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_12_157250) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "issue_categories", "issue_categories", column: "parent_id"
+  add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "municipalities", "districts"
   add_foreign_key "municipality_districts", "municipalities"
-  add_foreign_key "responsible_subject_categories", "issue_categories"
-  add_foreign_key "responsible_subject_categories", "responsible_subjects"
   add_foreign_key "responsible_subjects", "districts"
   add_foreign_key "responsible_subjects", "municipalities"
   add_foreign_key "responsible_subjects", "municipality_districts"
-  add_foreign_key "responsible_subjects", "responsible_subject_types"
+  add_foreign_key "responsible_subjects", "responsible_subjects_types"
+  add_foreign_key "responsible_subjects_categories", "issues_categories"
+  add_foreign_key "responsible_subjects_categories", "responsible_subjects"
+  add_foreign_key "responsible_subjects_organization_units", "responsible_subjects"
+  add_foreign_key "responsible_subjects_users", "responsible_subjects"
+  add_foreign_key "responsible_subjects_users", "responsible_subjects_organization_units", column: "organization_unit_id"
+  add_foreign_key "responsible_subjects_users", "responsible_subjects_user_roles", column: "role_id"
   add_foreign_key "streets", "municipalities"
   add_foreign_key "streets", "municipality_districts"
   add_foreign_key "users", "municipalities"

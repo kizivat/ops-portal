@@ -53,6 +53,7 @@
 :additional_file_patterns: []
 :model_dir:
   - app/models
+  - app/models/responsible_subjects
 :require: []
 :root_dir:
   - ''

@@ -1,27 +1,29 @@
 module Import
-  class ImportMunicipalitiesJob < ApplicationJob
+  class Addresses::ImportMunicipalitiesJob < ApplicationJob
     def perform(import_municipality_districts_job: ImportMunicipalityDistrictsJob, chain_import: false)
       Legacy::GenericModel.set_table_name('mesta')
       Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
-          Municipality.find_or_create_by!(
+          Municipality.find_or_initialize_by(
             id: legacy_record.id,
             active: legacy_record.status,
             alias: legacy_record.alias,
             category: legacy_record.city_type,
             email: legacy_record.email,
-            handled_by: legacy_record.spravuje,
             has_municipality_districts: legacy_record.mestske_casti,
             languages: legacy_record.languages,
             latitude: legacy_record.map_y,
-            logo: legacy_record.logo,
             longitude: legacy_record.map_x,
             municipality_type: legacy_record.typ,
             name: legacy_record.nazov,
-            population: legacy_record.pocet_obyvatelov,
             sub: legacy_record.sub,
-            district_id: legacy_record.kraj.nonzero? || nil
-          )
+            district_id: legacy_record.kraj || nil
+          ).tap do |municipality|
+            municipality.handled_by = legacy_record.spravuje
+            municipality.population = legacy_record.pocet_obyvatelov
+            municipality.logo = legacy_record.logo
+            municipality.save!
+          end
         end
       end
 

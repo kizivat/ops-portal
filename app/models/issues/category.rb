@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: issue_categories
+# Table name: issues_categories
 #
 #  id             :bigint           not null, primary key
 #  catch_all      :boolean          default(FALSE)
@@ -14,6 +14,6 @@
 #  updated_at     :datetime         not null
 #  parent_id      :bigint
 #
-class Issue::Category < ApplicationRecord
-  belongs_to :parent, class_name: 'Issue::Category', dependent: :destroy, optional: true
+class Issues::Category < ApplicationRecord
+  belongs_to :parent, class_name: 'Issues::Category', dependent: :destroy, optional: true
 end

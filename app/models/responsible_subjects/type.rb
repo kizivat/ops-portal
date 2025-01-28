@@ -1,6 +1,7 @@
+
 # == Schema Information
 #
-# Table name: responsible_subject_types
+# Table name: responsible_subjects_types
 #
 #  id         :bigint           not null, primary key
 #  active     :boolean
@@ -8,6 +9,6 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-class ResponsibleSubjectType < ApplicationRecord
+class ResponsibleSubjects::Type < ApplicationRecord
 
 end

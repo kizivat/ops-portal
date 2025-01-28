@@ -20,25 +20,24 @@
 #  last_name        :string
 #  legacy_rights    :integer
 #  login            :string
-#  logo             :string
 #  organization     :boolean
 #  password         :string
 #  phone            :string
 #  resident         :boolean
 #  sex              :integer
 #  signature        :string
+#  timestamp        :datetime
 #  verification     :string
 #  verified         :boolean          default(FALSE)
-#  website          :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  city_id          :integer
-#  municipality_id  :bigint           not null
-#  street_id        :bigint           not null
+#  municipality_id  :bigint
+#  street_id        :bigint
 #
 class User < ApplicationRecord
-  belongs_to :municipality
-  belongs_to :street
+  belongs_to :municipality, optional: true
+  belongs_to :street, optional: true
 
   enum :legacy_rights, ops_admin: 1, municipality_admin: 2, user: 3
   enum :sex, m: 1, f: 2

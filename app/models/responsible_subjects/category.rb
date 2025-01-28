@@ -1,14 +1,15 @@
+
 # == Schema Information
 #
-# Table name: responsible_subject_categories
+# Table name: responsible_subjects_categories
 #
 #  id                     :bigint           not null, primary key
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  issue_category_id      :bigint           not null
+#  issues_category_id     :bigint           not null
 #  responsible_subject_id :bigint
 #
-class ResponsibleSubjectCategory < ApplicationRecord
+class ResponsibleSubjects::Category < ApplicationRecord
   belongs_to :responsible_subject, optional: true
-  belongs_to :issue_category, class_name: 'Issue::Category'
+  belongs_to :issues_category, class_name: 'Issues::Category'
 end
