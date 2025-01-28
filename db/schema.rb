@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_28_101339) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_28_142955) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -175,16 +175,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_101339) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.string "state"
     t.jsonb "legacy_data"
     t.boolean "anonymous"
-    t.string "address"
     t.float "latitude"
     t.float "longitude"
-    t.string "category", null: false
-    t.string "municipality", null: false
     t.bigint "author_id"
+    t.bigint "municipality_id", null: false
+    t.bigint "category_id"
+    t.bigint "state_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
+    t.index ["category_id"], name: "index_issues_on_category_id"
+    t.index ["municipality_id"], name: "index_issues_on_municipality_id"
+    t.index ["state_id"], name: "index_issues_on_state_id"
   end
 
   create_table "issues_categories", force: :cascade do |t|
@@ -199,6 +201,51 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_101339) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
+  end
+
+  create_table "issues_comments", force: :cascade do |t|
+    t.bigint "issue_id", null: false
+    t.bigint "author_id"
+    t.string "author_name"
+    t.string "author_email"
+    t.datetime "added_at"
+    t.boolean "state"
+    t.boolean "published"
+    t.string "text"
+    t.string "link"
+    t.string "image"
+    t.string "embed"
+    t.inet "ip"
+    t.integer "verification"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_issues_comments_on_author_id"
+    t.index ["issue_id"], name: "index_issues_comments_on_issue_id"
+  end
+
+  create_table "issues_communications", force: :cascade do |t|
+    t.bigint "issue_id", null: false
+    t.boolean "from_responsible_subject"
+    t.string "subject"
+    t.string "message"
+    t.integer "admin_id"
+    t.integer "person_id"
+    t.integer "user_id"
+    t.string "text"
+    t.string "solved_by"
+    t.string "solved_in"
+    t.boolean "solved"
+    t.boolean "solution_rejected"
+    t.string "email"
+    t.datetime "added_at"
+    t.inet "ip"
+    t.boolean "internal"
+    t.boolean "confirmation_needed"
+    t.string "plain_message"
+    t.string "signature"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issue_id"], name: "index_issues_communications_on_issue_id"
   end
 
   create_table "issues_drafts", force: :cascade do |t|
@@ -401,8 +448,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_101339) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "issues", "issues_categories", column: "category_id"
+  add_foreign_key "issues", "issues_states", column: "state_id"
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
+  add_foreign_key "issues_comments", "issues"
+  add_foreign_key "issues_comments", "users", column: "author_id"
+  add_foreign_key "issues_communications", "issues"
   add_foreign_key "municipalities", "districts"
   add_foreign_key "municipality_districts", "municipalities"
   add_foreign_key "responsible_subjects", "districts"

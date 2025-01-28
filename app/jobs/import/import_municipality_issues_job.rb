@@ -1,32 +1,32 @@
 module Import
-  class ImportIssuesJob < ApplicationJob
+  class ImportMunicipalityIssuesJob < ApplicationJob
     include ImportHelper
 
-    def perform
+    def perform(municipality:, import_comments_job: Issues::ImportIssueCommentsJob, import_communications_job: Issues::ImportIssueCommunicationsJob)
       Legacy::GenericModel.set_table_name("alerts")
-      Legacy::GenericModel.find_in_batches do |group|
+      Legacy::GenericModel.where(mesto: municipality.id).find_in_batches do |group|
         group.each do |legacy_record|
-          Issue.find_or_initialize_by!(
+          Issue.find_or_initialize_by(
             id: legacy_record.id,
             author: User.find_by_id(legacy_record.posted_by),
             reported_at: convert_timestamp_value(legacy_record.posted_time),
+            municipality: Municipality.find_by_id(legacy_record.mesto),
           ).tap do |issue|
+            issue.anonymous = legacy_record.anonymous
+            issue.category = ::Issues::Category.find_by_id(legacy_record.kategoria)
             issue.description = legacy_record.description
+            issue.longitude = legacy_record.map_x
+            issue.latitude = legacy_record.map_y
             issue.state = ::Issues::State.find_by_id(legacy_record.status)
             issue.title = legacy_record.heading
             issue.legacy_data = {
-              municipality_id: Municipality.find_by_id(legacy_record.mesto)&.id,
-              category_id: legacy_record.kategoria,
               embed: legacy_record.embed,
-              longitude: legacy_record.map_x,
-              latitude: legacy_record.map_y,
               map_zoom: legacy_record.map_zoom,
               accuracy: legacy_record.accuracy,
               published_at: legacy_record.published_time,
               front_page: legacy_record.titulka,
               mms: legacy_record.mms,
               soft_reject: legacy_record.soft_reject,
-              anonymous: legacy_record.anonymous,
               owner_id: legacy_record.riesitel, # TODO nevieme referencia na ktory model by toto mala byt
               new_owner_id: legacy_record.riesitel_new, # TODO nevieme referencia na ktory model by toto mala byt
               modified_at: legacy_record.modified_time, # TODO nestaci updated_at?
@@ -61,6 +61,9 @@ module Import
             }
 
             issue.save!
+
+            import_comments_job.perform_later(issue: issue)
+            import_communications_job.perform_later(issue: issue)
           end
         end
       end

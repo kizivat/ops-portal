@@ -1,0 +1,30 @@
+# == Schema Information
+#
+# Table name: issues_communications
+#
+#  id                       :bigint           not null, primary key
+#  added_at                 :datetime
+#  confirmation_needed      :boolean
+#  email                    :string
+#  from_responsible_subject :boolean
+#  internal                 :boolean
+#  ip                       :inet
+#  message                  :string
+#  plain_message            :string
+#  signature                :string
+#  solution_rejected        :boolean
+#  solved                   :boolean
+#  solved_by                :string
+#  solved_in                :string
+#  subject                  :string
+#  text                     :string
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  admin_id                 :integer
+#  issue_id                 :bigint           not null
+#  person_id                :integer
+#  user_id                  :integer
+#
+class Issues::Communication < ApplicationRecord
+  belongs_to :issue
+end

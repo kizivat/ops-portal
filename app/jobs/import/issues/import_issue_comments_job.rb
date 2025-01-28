@@ -1,0 +1,28 @@
+module Import
+  class Issues::ImportIssueCommentsJob < ApplicationJob
+    include ImportHelper
+
+    def perform(issue:)
+      Legacy::GenericModel.set_table_name("comments")
+      Legacy::GenericModel.where(remoteid: issue.id).find_in_batches do |group|
+        group.each do |legacy_record|
+          issue.comments.find_or_create_by!(
+            id: legacy_record.id,
+            added_at: convert_timestamp_value(legacy_record.time),
+            # author_email: legacy_record.email, TODO skip emails for now
+            author_name: legacy_record.meno,
+            embed: legacy_record.embed.presence,
+            image: legacy_record.image.presence,
+            ip: legacy_record.ip,
+            link: legacy_record.link.presence,
+            published: legacy_record.is_published,
+            state: legacy_record.status,
+            text: legacy_record.komentar,
+            verification: legacy_record.verification,
+            author_id: legacy_record.user.to_i.nonzero? || nil
+          )
+        end
+      end
+    end
+  end
+end

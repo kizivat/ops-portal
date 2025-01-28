@@ -11,11 +11,11 @@ module Import
             email: legacy_record.email,
             has_municipality_districts: legacy_record.mestske_casti,
             languages: legacy_record.languages,
-            latitude: legacy_record.map_y.presence || nil,
-            longitude: legacy_record.map_x.presence || nil,
+            latitude: legacy_record.map_y.presence,
+            longitude: legacy_record.map_x.presence,
             municipality_type: legacy_record.typ,
             name: legacy_record.nazov,
-            sub: legacy_record.sub,
+            sub: legacy_record.sub.presence,
             district_id: legacy_record.kraj || nil
           ).tap do |municipality|
             municipality.active =  legacy_record.status
