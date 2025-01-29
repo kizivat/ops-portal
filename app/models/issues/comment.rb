@@ -22,5 +22,5 @@
 class Issues::Comment < ApplicationRecord
   belongs_to :issue
 
-  has_many :images, as: :object
+  has_many :images, class_name: 'Issues::CommentImage'
 end

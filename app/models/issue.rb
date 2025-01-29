@@ -28,7 +28,7 @@ class Issue < ApplicationRecord
   has_many :updates, class_name: "Issues::Update", dependent: :destroy
   has_many :comments, class_name: "Issues::Comment", dependent: :destroy
   has_many :communications, class_name: "Issues::Communication", dependent: :destroy
-  has_many :images, as: :object, class_name: "Issues::Image", dependent: :destroy
+  has_many :images, class_name: "Issues::Image", dependent: :destroy
 
   has_many_attached :photos
 

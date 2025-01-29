@@ -19,5 +19,5 @@ class Issues::Update < ApplicationRecord
   belongs_to :author, optional: true, class_name: 'User'
   belongs_to :confirmed_by, optional: true, class_name: 'User'
 
-  has_many :images, as: :object
+  has_many :images, class_name: 'Issues::UpdateImage', foreign_key: :update_id
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -203,6 +203,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
     t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
   end
 
+  create_table "issues_comment_images", force: :cascade do |t|
+    t.string "path"
+    t.bigint "comment_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_id"], name: "index_issues_comment_images_on_comment_id"
+  end
+
   create_table "issues_comments", force: :cascade do |t|
     t.bigint "issue_id", null: false
     t.bigint "author_id"
@@ -294,12 +302,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
     t.string "path"
     t.string "thumbnail"
     t.string "original"
-    t.string "object_type"
-    t.bigint "object_id"
+    t.bigint "issue_id", null: false
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["object_type", "object_id"], name: "index_issues_images_on_object"
+    t.index ["issue_id"], name: "index_issues_images_on_issue_id"
   end
 
   create_table "issues_states", force: :cascade do |t|
@@ -307,6 +314,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "issues_update_images", force: :cascade do |t|
+    t.string "path"
+    t.bigint "update_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["update_id"], name: "index_issues_update_images_on_update_id"
   end
 
   create_table "issues_updates", force: :cascade do |t|
@@ -494,11 +509,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
   add_foreign_key "issues", "issues_states", column: "state_id"
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
+  add_foreign_key "issues_comment_images", "issues_comments", column: "comment_id"
   add_foreign_key "issues_comments", "issues"
   add_foreign_key "issues_comments", "users", column: "author_id"
   add_foreign_key "issues_communication_attachments", "issues"
   add_foreign_key "issues_communication_attachments", "issues_communications", column: "communication_id"
   add_foreign_key "issues_communications", "issues"
+  add_foreign_key "issues_images", "issues"
+  add_foreign_key "issues_update_images", "issues_updates", column: "update_id"
   add_foreign_key "issues_updates", "issues"
   add_foreign_key "issues_updates", "users", column: "author_id"
   add_foreign_key "issues_updates", "users", column: "confirmed_by_id"
