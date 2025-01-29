@@ -49,11 +49,11 @@ module Import
 
     def convert_legacy_rights_value(value)
       case value
-      when 'A'
+      when "A"
         1
-      when 'Ax'
+      when "Ax"
         2
-      when 'U'
+      when "U"
         3
       end
     end

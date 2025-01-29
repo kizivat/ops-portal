@@ -28,5 +28,5 @@
 class Issues::Communication < ApplicationRecord
   belongs_to :issue
 
-  has_many :attachments, class_name: 'Issues::CommunicationAttachment'
+  has_many :attachments, class_name: "Issues::CommunicationAttachment"
 end

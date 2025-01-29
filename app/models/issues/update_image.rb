@@ -9,5 +9,5 @@
 #  update_id  :bigint           not null
 #
 class Issues::UpdateImage < ApplicationRecord
-  belongs_to :issue_update, class_name: 'Issues::Update', foreign_key: :update_id
+  belongs_to :issue_update, class_name: "Issues::Update", foreign_key: :update_id
 end

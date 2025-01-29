@@ -1,7 +1,7 @@
 module Import
   class ResponsibleSubjects::ImportUsersJob < ApplicationJob
     def perform
-      Legacy::GenericModel.set_table_name('municipality_users')
+      Legacy::GenericModel.set_table_name("municipality_users")
       Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
           ::ResponsibleSubjects::User.find_or_initialize_by(

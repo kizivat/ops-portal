@@ -10,5 +10,4 @@
 #  updated_at :datetime         not null
 #
 class ResponsibleSubjects::Type < ApplicationRecord
-
 end

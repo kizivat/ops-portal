@@ -18,5 +18,5 @@
 #  responsible_subjects_type_id :bigint           not null
 #
 class ResponsibleSubject < ApplicationRecord
-  has_many :categories, class_name: 'ResponsibleSubjectCategory'
+  has_many :categories, class_name: "ResponsibleSubjectCategory"
 end

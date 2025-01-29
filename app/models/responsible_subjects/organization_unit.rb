@@ -10,5 +10,5 @@
 #  responsible_subject_id :bigint           not null
 #
 class ResponsibleSubjects::OrganizationUnit < ApplicationRecord
-
+  belongs_to :responsible_subject
 end

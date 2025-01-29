@@ -15,5 +15,5 @@
 #  parent_id      :bigint
 #
 class Issues::Category < ApplicationRecord
-  belongs_to :parent, class_name: 'Issues::Category', dependent: :destroy, optional: true
+  belongs_to :parent, class_name: "Issues::Category", dependent: :destroy, optional: true
 end
