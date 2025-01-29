@@ -21,4 +21,6 @@
 #
 class Issues::Comment < ApplicationRecord
   belongs_to :issue
+
+  has_many :images, as: :object
 end

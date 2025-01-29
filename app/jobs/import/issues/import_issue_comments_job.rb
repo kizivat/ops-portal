@@ -2,11 +2,11 @@ module Import
   class Issues::ImportIssueCommentsJob < ApplicationJob
     include ImportHelper
 
-    def perform(issue:)
+    def perform(issue:, import_images_job: Issues::ImportIssueCommentImagesJob)
       Legacy::GenericModel.set_table_name("comments")
       Legacy::GenericModel.where(remoteid: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          issue.comments.find_or_create_by!(
+          comment = issue.comments.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.time),
             # author_email: legacy_record.email, TODO skip emails for now
@@ -21,6 +21,8 @@ module Import
             verification: legacy_record.verification,
             author_id: legacy_record.user.to_i.nonzero? || nil
           )
+
+          import_images_job.perform_later(comment: comment)
         end
       end
     end

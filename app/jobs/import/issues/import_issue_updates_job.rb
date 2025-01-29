@@ -2,11 +2,11 @@ module Import
   class Issues::ImportIssueUpdatesJob < ApplicationJob
     include ImportHelper
 
-    def perform(issue:)
+    def perform(issue:, import_images_job: Issues::ImportIssueUpdateImagesJob)
       Legacy::GenericModel.set_table_name("alerts_updates")
       Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          issue.updates.find_or_create_by!(
+          update = issue.updates.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),
             # email: legacy_record.email, TODO skip emails for now
@@ -17,6 +17,8 @@ module Import
             author: User.find_by_id(legacy_record.updated_by),
             confirmed_by: User.find_by_id(legacy_record.confirmed_by)
           )
+
+          import_images_job.perform_later(update: update)
         end
       end
     end

@@ -2,11 +2,11 @@ module Import
   class Issues::ImportIssueCommunicationsJob < ApplicationJob
     include ImportHelper
 
-    def perform(issue:)
+    def perform(issue:, import_attachments_job: Issues::ImportIssueCommunicationAttachmentsJob)
       Legacy::GenericModel.set_table_name("communication")
       Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          issue.communications.find_or_create_by!(
+          communication = issue.communications.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),
             confirmation_needed: legacy_record.need_confirmation,
@@ -27,6 +27,8 @@ module Import
             person_id: legacy_record.person,
             user_id: legacy_record.user
           )
+
+          import_attachments_job.perform_later(communication: communication)
         end
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_28_142955) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_29_074536) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -223,6 +223,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_142955) do
     t.index ["issue_id"], name: "index_issues_comments_on_issue_id"
   end
 
+  create_table "issues_communication_attachments", force: :cascade do |t|
+    t.bigint "communication_id", null: false
+    t.bigint "issue_id", null: false
+    t.string "path"
+    t.string "name"
+    t.string "extension"
+    t.boolean "image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["communication_id"], name: "index_issues_communication_attachments_on_communication_id"
+    t.index ["issue_id"], name: "index_issues_communication_attachments_on_issue_id"
+  end
+
   create_table "issues_communications", force: :cascade do |t|
     t.bigint "issue_id", null: false
     t.boolean "from_responsible_subject"
@@ -277,11 +290,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_142955) do
     t.string "subtype"
   end
 
+  create_table "issues_images", force: :cascade do |t|
+    t.string "path"
+    t.string "thumbnail"
+    t.string "original"
+    t.string "object_type"
+    t.bigint "object_id"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["object_type", "object_id"], name: "index_issues_images_on_object"
+  end
+
   create_table "issues_states", force: :cascade do |t|
     t.string "name"
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "issues_updates", force: :cascade do |t|
+    t.bigint "issue_id", null: false
+    t.bigint "author_id"
+    t.string "name"
+    t.string "email"
+    t.string "text"
+    t.bigint "confirmed_by_id"
+    t.datetime "added_at"
+    t.boolean "published"
+    t.inet "ip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_issues_updates_on_author_id"
+    t.index ["confirmed_by_id"], name: "index_issues_updates_on_confirmed_by_id"
+    t.index ["issue_id"], name: "index_issues_updates_on_issue_id"
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -454,7 +496,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_28_142955) do
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "issues_comments", "issues"
   add_foreign_key "issues_comments", "users", column: "author_id"
+  add_foreign_key "issues_communication_attachments", "issues"
+  add_foreign_key "issues_communication_attachments", "issues_communications", column: "communication_id"
   add_foreign_key "issues_communications", "issues"
+  add_foreign_key "issues_updates", "issues"
+  add_foreign_key "issues_updates", "users", column: "author_id"
+  add_foreign_key "issues_updates", "users", column: "confirmed_by_id"
   add_foreign_key "municipalities", "districts"
   add_foreign_key "municipality_districts", "municipalities"
   add_foreign_key "responsible_subjects", "districts"
