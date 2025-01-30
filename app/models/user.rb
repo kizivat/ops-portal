@@ -43,4 +43,6 @@ class User < ApplicationRecord
 
   enum :legacy_rights, ops_admin: 1, municipality_admin: 2, user: 3
   enum :sex, m: 1, f: 2
+
+  validates :zammad_identifier, uniqueness: true, allow_nil: true
 end

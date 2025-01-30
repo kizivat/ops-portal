@@ -32,7 +32,7 @@ class Issue < ApplicationRecord
 
   has_many_attached :photos
 
-  # validates :triage_external_id, uniqueness: true TODO treba doriesit, aka hodnota tu ma byt pri prvotnom importe, kedze sa vyzaduje unique
+  validates :triage_external_id, uniqueness: true, allow_nil: true
 
   after_create_commit :schedule_send_to_zammad
 
