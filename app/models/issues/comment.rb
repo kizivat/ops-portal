@@ -16,11 +16,10 @@
 #  verification :integer
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  activity_id  :bigint           not null
 #  author_id    :bigint
-#  issue_id     :bigint           not null
 #
 class Issues::Comment < ApplicationRecord
-  belongs_to :issue
-
   has_many :images, class_name: "Issues::CommentImage"
+  belongs_to :activity, class_name: "Issues::Activity"
 end

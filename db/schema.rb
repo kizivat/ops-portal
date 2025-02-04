@@ -180,13 +180,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
+    t.bigint "municipality_id", null: false
     t.bigint "category_id"
     t.bigint "state_id"
-    t.bigint "municipality_id", null: false
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
+  end
+
+  create_table "issues_activities", force: :cascade do |t|
+    t.bigint "issue_id", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issue_id"], name: "index_issues_activities_on_issue_id"
   end
 
   create_table "issues_categories", force: :cascade do |t|
@@ -212,7 +220,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   end
 
   create_table "issues_comments", force: :cascade do |t|
-    t.bigint "issue_id", null: false
+    t.bigint "activity_id", null: false
     t.bigint "author_id"
     t.string "author_name"
     t.string "author_email"
@@ -227,8 +235,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.integer "verification"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["activity_id"], name: "index_issues_comments_on_activity_id"
     t.index ["author_id"], name: "index_issues_comments_on_author_id"
-    t.index ["issue_id"], name: "index_issues_comments_on_issue_id"
   end
 
   create_table "issues_communication_attachments", force: :cascade do |t|
@@ -245,7 +253,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   end
 
   create_table "issues_communications", force: :cascade do |t|
-    t.bigint "issue_id", null: false
+    t.bigint "activity_id", null: false
     t.boolean "from_responsible_subject"
     t.string "subject"
     t.string "message"
@@ -266,7 +274,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["issue_id"], name: "index_issues_communications_on_issue_id"
+    t.index ["activity_id"], name: "index_issues_communications_on_activity_id"
   end
 
   create_table "issues_drafts", force: :cascade do |t|
@@ -325,7 +333,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   end
 
   create_table "issues_updates", force: :cascade do |t|
-    t.bigint "issue_id", null: false
+    t.bigint "activity_id", null: false
     t.bigint "author_id"
     t.string "name"
     t.string "email"
@@ -336,9 +344,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.inet "ip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["activity_id"], name: "index_issues_updates_on_activity_id"
     t.index ["author_id"], name: "index_issues_updates_on_author_id"
     t.index ["confirmed_by_id"], name: "index_issues_updates_on_confirmed_by_id"
-    t.index ["issue_id"], name: "index_issues_updates_on_issue_id"
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -510,16 +518,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
   add_foreign_key "issues", "users", column: "author_id"
+  add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "issues_comment_images", "issues_comments", column: "comment_id"
-  add_foreign_key "issues_comments", "issues"
+  add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
   add_foreign_key "issues_comments", "users", column: "author_id"
   add_foreign_key "issues_communication_attachments", "issues"
   add_foreign_key "issues_communication_attachments", "issues_communications", column: "communication_id"
-  add_foreign_key "issues_communications", "issues"
   add_foreign_key "issues_images", "issues"
   add_foreign_key "issues_update_images", "issues_updates", column: "update_id"
-  add_foreign_key "issues_updates", "issues"
+  add_foreign_key "issues_communications", "issues_activities", column: "activity_id"
+  add_foreign_key "issues_updates", "issues_activities", column: "activity_id"
   add_foreign_key "issues_updates", "users", column: "author_id"
   add_foreign_key "issues_updates", "users", column: "confirmed_by_id"
   add_foreign_key "municipalities", "districts"

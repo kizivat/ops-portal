@@ -1,7 +1,7 @@
 class CreateIssuesUpdates < ActiveRecord::Migration[8.0]
   def change
     create_table :issues_updates do |t|
-      t.references :issue, null: false, foreign_key: true
+      t.references :activity, null: false, foreign_key: { to_table: :issues_activities }
       t.references :author, null: true, foreign_key: { to_table: :users }
       t.string :name
       t.string :email

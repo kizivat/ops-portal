@@ -20,13 +20,12 @@
 #  text                     :string
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  activity_id              :bigint           not null
 #  admin_id                 :integer
-#  issue_id                 :bigint           not null
 #  person_id                :integer
 #  user_id                  :integer
 #
 class Issues::Communication < ApplicationRecord
-  belongs_to :issue
-
   has_many :attachments, class_name: "Issues::CommunicationAttachment"
+  belongs_to :activity, class_name: "Issues::Activity"
 end
