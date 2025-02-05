@@ -6,9 +6,7 @@ module Import
       Legacy::GenericModel.set_table_name("communication")
       Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          communication_activity = issue.activities.create!(
-            type: 'Issues::CommunicationActivity'
-          )
+          communication_activity = issue.communication_activities.create!
           communication = ::Issues::Communication.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),

@@ -6,9 +6,7 @@ module Import
       Legacy::GenericModel.set_table_name("alerts_updates")
       Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          update_activity = issue.activities.create!(
-            type: 'Issues::UpdateActivity'
-          )
+          update_activity = issue.update_activities.create!
           update = ::Issues::Update.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),

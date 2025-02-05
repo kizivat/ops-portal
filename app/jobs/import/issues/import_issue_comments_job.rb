@@ -6,9 +6,7 @@ module Import
       Legacy::GenericModel.set_table_name("comments")
       Legacy::GenericModel.where(remoteid: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
-          comment_activity = issue.activities.create!(
-            type: 'Issues::CommentActivity'
-          )
+          comment_activity = issue.comment_activities.create!
           comment = ::Issues::Comment.find_or_create_by!(
             id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.time),

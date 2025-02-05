@@ -25,8 +25,10 @@ class Issue < ApplicationRecord
   belongs_to :municipality
   belongs_to :state, class_name: "Issues::State", optional: true
 
-  has_many :images, class_name: "Issues::Image", dependent: :destroy
   has_many :activities, class_name: "Issues::Activity", dependent: :destroy
+  has_many :comment_activities, class_name: "Issues::CommentActivity", dependent: :destroy
+  has_many :communication_activities, class_name: "Issues::CommunicationActivity", dependent: :destroy
+  has_many :update_activities, class_name: "Issues::UpdateActivity", dependent: :destroy
 
   has_many_attached :photos
 
