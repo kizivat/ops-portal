@@ -2,7 +2,7 @@ module Import
   class Issues::ImportIssueCommentsJob < ApplicationJob
     include ImportHelper
 
-    def perform(issue:, import_images_job: Issues::ImportIssueCommentImagesJob)
+    def perform(issue:, import_photos_job: Issues::ImportIssueCommentPhotosJob)
       Legacy::GenericModel.set_table_name("comments")
       Legacy::GenericModel.where(remoteid: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
@@ -24,7 +24,7 @@ module Import
             author_id: legacy_record.user.to_i.nonzero? || nil
           )
 
-          import_images_job.perform_later(comment: comment)
+          import_photos_job.perform_later(comment: comment)
         end
       end
     end

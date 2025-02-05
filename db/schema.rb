@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_28_161317) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -211,14 +211,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
   end
 
-  create_table "issues_comment_images", force: :cascade do |t|
-    t.string "path"
-    t.bigint "comment_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["comment_id"], name: "index_issues_comment_images_on_comment_id"
-  end
-
   create_table "issues_comments", force: :cascade do |t|
     t.bigint "activity_id", null: false
     t.bigint "author_id"
@@ -237,19 +229,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.datetime "updated_at", null: false
     t.index ["activity_id"], name: "index_issues_comments_on_activity_id"
     t.index ["author_id"], name: "index_issues_comments_on_author_id"
-  end
-
-  create_table "issues_communication_attachments", force: :cascade do |t|
-    t.bigint "communication_id", null: false
-    t.bigint "issue_id", null: false
-    t.string "path"
-    t.string "name"
-    t.string "extension"
-    t.boolean "image"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["communication_id"], name: "index_issues_communication_attachments_on_communication_id"
-    t.index ["issue_id"], name: "index_issues_communication_attachments_on_issue_id"
   end
 
   create_table "issues_communications", force: :cascade do |t|
@@ -306,30 +285,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
     t.string "subtype"
   end
 
-  create_table "issues_images", force: :cascade do |t|
-    t.string "path"
-    t.string "thumbnail"
-    t.string "original"
-    t.bigint "issue_id", null: false
-    t.integer "position"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["issue_id"], name: "index_issues_images_on_issue_id"
-  end
-
   create_table "issues_states", force: :cascade do |t|
     t.string "name"
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "issues_update_images", force: :cascade do |t|
-    t.string "path"
-    t.bigint "update_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["update_id"], name: "index_issues_update_images_on_update_id"
   end
 
   create_table "issues_updates", force: :cascade do |t|
@@ -520,13 +480,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_29_090214) do
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
-  add_foreign_key "issues_comment_images", "issues_comments", column: "comment_id"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
   add_foreign_key "issues_comments", "users", column: "author_id"
-  add_foreign_key "issues_communication_attachments", "issues"
-  add_foreign_key "issues_communication_attachments", "issues_communications", column: "communication_id"
-  add_foreign_key "issues_images", "issues"
-  add_foreign_key "issues_update_images", "issues_updates", column: "update_id"
   add_foreign_key "issues_communications", "issues_activities", column: "activity_id"
   add_foreign_key "issues_updates", "issues_activities", column: "activity_id"
   add_foreign_key "issues_updates", "users", column: "author_id"

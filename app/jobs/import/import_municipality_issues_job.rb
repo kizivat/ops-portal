@@ -2,7 +2,13 @@ module Import
   class ImportMunicipalityIssuesJob < ApplicationJob
     include ImportHelper
 
-    def perform(municipality:, import_images_job: Issues::ImportIssueImagesJob, import_updates_job: Issues::ImportIssueUpdatesJob, import_comments_job: Issues::ImportIssueCommentsJob, import_communications_job: Issues::ImportIssueCommunicationsJob)
+    def perform(
+      municipality:,
+      import_photos_job: Issues::ImportIssuePhotosJob,
+      import_updates_job: Issues::ImportIssueUpdatesJob,
+      import_comments_job: Issues::ImportIssueCommentsJob,
+      import_communications_job: Issues::ImportIssueCommunicationsJob
+    )
       Legacy::GenericModel.set_table_name("alerts")
       Legacy::GenericModel.where(mesto: municipality.id).find_in_batches do |group|
         group.each do |legacy_record|
@@ -59,8 +65,8 @@ module Import
             municipality: Municipality.find_by_id(legacy_record.mesto),
             state: ::Issues::State.find_by_id(legacy_record.status),
           )
-          
-          import_images_job.perform_later(issue: issue)
+
+          import_photos_job.perform_later(issue: issue)
           import_updates_job.perform_later(issue: issue)
           import_comments_job.perform_later(issue: issue)
           import_communications_job.perform_later(issue: issue)

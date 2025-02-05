@@ -26,6 +26,7 @@
 #  user_id                  :integer
 #
 class Issues::Communication < ApplicationRecord
-  has_many :attachments, class_name: "Issues::CommunicationAttachment"
   belongs_to :activity, class_name: "Issues::Activity"
+
+  has_many_attached :attachments
 end

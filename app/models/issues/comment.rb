@@ -20,6 +20,7 @@
 #  author_id    :bigint
 #
 class Issues::Comment < ApplicationRecord
-  has_many :images, class_name: "Issues::CommentImage"
   belongs_to :activity, class_name: "Issues::Activity"
+
+  has_many_attached :photos
 end

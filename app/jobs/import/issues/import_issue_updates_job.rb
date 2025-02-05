@@ -2,7 +2,7 @@ module Import
   class Issues::ImportIssueUpdatesJob < ApplicationJob
     include ImportHelper
 
-    def perform(issue:, import_images_job: Issues::ImportIssueUpdateImagesJob)
+    def perform(issue:, import_photos_job: Issues::ImportIssueUpdatePhotosJob)
       Legacy::GenericModel.set_table_name("alerts_updates")
       Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
         group.each do |legacy_record|
@@ -20,7 +20,7 @@ module Import
             confirmed_by: User.find_by_id(legacy_record.confirmed_by)
           )
 
-          import_images_job.perform_later(update: update)
+          import_photos_job.perform_later(update: update)
         end
       end
     end
