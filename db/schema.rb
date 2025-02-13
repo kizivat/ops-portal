@@ -194,18 +194,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_11_091245) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.jsonb "legacy_data"
+    t.bigint "user_id"
     t.boolean "anonymous"
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
-    t.bigint "municipality_id", null: false
+    t.jsonb "legacy_data"
     t.bigint "category_id"
     t.bigint "state_id"
+    t.bigint "municipality_id", null: false
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
+    t.index ["user_id"], name: "index_issues_on_user_id"
   end
 
   create_table "issues_activities", force: :cascade do |t|

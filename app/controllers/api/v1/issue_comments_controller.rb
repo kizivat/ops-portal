@@ -6,7 +6,7 @@ class IssueCommentsController < ApiController
   end
 
   def create
-    @comment_id = @zammad_client.create_article(params.require(:issue_id), comment_params)
+    @comment_id = @zammad_client.create_article!(params.require(:issue_id), comment_params)
   end
 
   private

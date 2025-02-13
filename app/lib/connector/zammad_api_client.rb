@@ -6,6 +6,7 @@ class Connector::ZammadApiClient
 
   def initialize(tenant, token: ENV.fetch("CONNECTOR__ZAMMAD_API_TOKEN"), url: ENV.fetch("CONNECTOR__ZAMMAD_URL"))
     @name = tenant.name
+    @triage_user_id = tenant.triage_user_id
     @token = token
     @url = url
     @client = ZammadAPI::Client.new(url: @url, http_token: @token)
@@ -109,6 +110,29 @@ class Connector::ZammadApiClient
   end
 
   def get_comment(ticket_id, comment_id)
-    @client.ticket.find(ticket_id).articles.select { |a| comment_id == a.id }.first&.attributes
+    begin
+      ticket = @client.ticket.find(ticket_id)
+      article = ticket.articles.select { |a| comment_id == a.id }.first&.attributes
+
+      {
+        author: @triage_user_id,
+        content_type: article.content_type,
+        body: article.body,
+        type: article.type,
+        created_at: article.created_at,
+        updated_at: article.updated_at,
+        attachments: article.attachments.map do |attachment|
+          {
+            filename: attachment.filename,
+            content_type: attachment.preferences.dig(:"Mime-Type"),
+            data64: Base64.strict_encode64(attachment.download)
+          }
+        end
+      }
+
+    rescue RuntimeError => e
+      raise e unless e.message.include? "Couldn't find Ticket with"
+    end
+
   end
 end

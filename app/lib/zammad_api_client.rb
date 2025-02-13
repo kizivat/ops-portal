@@ -104,15 +104,14 @@ class ZammadApiClient
     end
   end
 
-  def create_article!(issue_id, comment)
+  def create_article!(issue_id, comment, use_author_id=false)
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(
-      origin_by_id: create_or_find_customer(comment["author"]),
+      origin_by_id: use_author_id ? comment["author"] : create_or_find_customer(comment["author"]),
       content_type: comment["content_type"],
       body: comment["body"],
       type: comment["type"],
-      triage_created_at: comment["created_at"],
       attachments: comment["attachments"].map do |attachment|
         {
           "filename" => attachment["filename"],

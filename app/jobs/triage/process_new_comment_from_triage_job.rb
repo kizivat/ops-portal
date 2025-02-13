@@ -14,7 +14,7 @@ class Triage::ProcessNewCommentFromTriageJob < ApplicationJob
     end
 
     if article[:body].starts_with? PUBLIC_MESSAGE_PREFIX
-      # send to frontend
+      # TODO send to frontend
     end
   end
 end
