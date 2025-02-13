@@ -104,7 +104,7 @@ class ZammadApiClient
     end
   end
 
-  def create_article!(issue_id, comment, use_author_id=false)
+  def create_article!(issue_id, comment, use_author_id = false)
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(

@@ -133,6 +133,5 @@ class Connector::ZammadApiClient
     rescue RuntimeError => e
       raise e unless e.message.include? "Couldn't find Ticket with"
     end
-
   end
 end
