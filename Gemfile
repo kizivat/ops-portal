@@ -78,3 +78,5 @@ end
 gem "good_job"
 
 gem "rack-cors", "~> 2.0"
+
+gem "kamal", "~> 2.5"
