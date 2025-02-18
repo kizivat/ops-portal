@@ -1,0 +1,69 @@
+service: ops-portal
+
+image: sd/ops-portal
+
+servers:
+  web:
+    options:
+      "add-host": host.docker.internal:host-gateway
+  worker:
+    cmd: bundle exec good_job start
+    options:
+      "add-host": host.docker.internal:host-gateway
+
+proxy:
+  ssl: true
+  app_port: 3000
+
+env:
+  secret:
+    - SECRET_KEY_BASE
+    - DEFAULT_USER_EMAIL
+    - DEFAULT_USER_FIRSTNAME
+    - DEFAULT_USER_LASTNAME
+    - DEFAULT_USER_ZAMMAD_IDENTIFIER
+    - LEGACY_PORTAL_URL
+    - CONNECTOR__OPS_API_URL
+    - CONNECTOR_WEBHOOK_URL
+    - CONNECTOR__ZAMMAD_URL
+    - TRIAGE_ZAMMAD_URL
+    - DATABASE_URL
+    - ANTHROPIC_API_KEY
+    - GEMINI_API_KEY
+    - CONNECTOR__ZAMMAD_API_TOKEN
+    - CONNECTOR__ZAMMAD_WEBHOOK_SECRET
+    - TRIAGE_ZAMMAD_API_TOKEN
+    - TRIAGE_ZAMMAD_WEBHOOK_SECRET
+    - LEGACY_DB_URL
+
+  clear:
+    GOOD_JOB_EXECUTION_MODE: external
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+
+registry:
+  server: registry.dev.slovensko.digital
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  remote: ssh://kamal@dev.slovensko.digital
+
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+#
+# asset_path: /app/public/assets
+
+# Configure rolling deploys by setting a wait time between batches of restarts.
+#
+# boot:
+#   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
+#   wait: 2
