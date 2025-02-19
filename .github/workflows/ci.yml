@@ -142,4 +142,8 @@ jobs:
           ssh-private-key: ${{ secrets.DEV_DEPLOY_KEY }}
 
       - name: Run deploy command
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+
         run: kamal deploy -d staging
