@@ -4,11 +4,11 @@ module Import
 
     def perform(issue:, import_photos_job: Issues::ImportIssueUpdatePhotosJob)
       Legacy::GenericModel.set_table_name("alerts_updates")
-      Legacy::GenericModel.where(alert: issue.id).find_in_batches do |group|
+      Legacy::GenericModel.where(alert: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
           update_activity = issue.update_activities.create!
           update = ::Issues::Update.find_or_create_by!(
-            id: legacy_record.id,
+            id: legacy_record.legacy_id,
             added_at: convert_timestamp_value(legacy_record.ts),
             email: generate_dummy_email(legacy_record.updated_by), # TODO skip emails for now
             # email: legacy_record.email, # TODO skip emails for now
@@ -17,8 +17,8 @@ module Import
             published: legacy_record.status,
             text: legacy_record.text,
             activity: update_activity,
-            author: User.find_by_id(legacy_record.updated_by),
-            confirmed_by: User.find_by_id(legacy_record.confirmed_by)
+            author: User.find_by(legacy_id: legacy_record.updated_by),
+            confirmed_by: User.find_by(legacy_id: legacy_record.confirmed_by)
           )
 
           import_photos_job.perform_later(update: update)

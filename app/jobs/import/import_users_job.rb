@@ -7,7 +7,7 @@ module Import
       Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
           User.find_or_create_by!(
-            id: legacy_record.id,
+            legacy_id: legacy_record.id,
             about: legacy_record.about,
             access_token: legacy_record.access_token,
             active: legacy_record.status,
@@ -36,8 +36,8 @@ module Import
             verification: legacy_record.verification,
             verified: legacy_record.verified,
             city_id: legacy_record.cityid,
-            municipality: Municipality.find_by_id(legacy_record.mesto),
-            street: Street.find_by_id(legacy_record.streetid)
+            municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
+            street: Street.find_by(legacy_id: legacy_record.streetid)
           )
         end
       end

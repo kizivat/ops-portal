@@ -22,4 +22,5 @@
 class ResponsibleSubjects::User < ApplicationRecord
   belongs_to :responsible_subject, optional: true
   belongs_to :organization_unit, optional: true
+  belongs_to :role, class_name: "ResponsibleSubjects::UserRole", optional: true
 end

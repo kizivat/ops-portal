@@ -7,7 +7,7 @@ module Import
       Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
           ::ResponsibleSubjects::User.find_or_create_by!(
-            id: legacy_record.id,
+            legacy_id: legacy_record.id,
             deleted_at: legacy_record.deleted_at,
             email: generate_dummy_email(legacy_record.id), # TODO skip emails for now
             # email: legacy_record.email, # TODO skip emails for now
@@ -19,9 +19,9 @@ module Import
             photo: legacy_record.photo,
             token: legacy_record.remember_token,
             tooltips: legacy_record.tooltips,
-            organization_unit: ::ResponsibleSubjects::OrganizationUnit.find_by_id(legacy_record.org_unit_id),
-            responsible_subject: ResponsibleSubject.find_by_id(legacy_record.zodpovednost_id),
-            role_id: legacy_record.role_id,
+            organization_unit: ::ResponsibleSubjects::OrganizationUnit.find_by(legacy_id: legacy_record.org_unit_id),
+            responsible_subject: ::ResponsibleSubject.find_by(legacy_id: legacy_record.zodpovednost_id),
+            role: ::ResponsibleSubjects::UserRole.find_by(legacy_id: legacy_record.role_id)
           )
         end
       end
