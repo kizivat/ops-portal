@@ -73,15 +73,5 @@ module Import
         end
       end
     end
-
-    private
-
-    def find_or_create_user(posted_by)
-      return User.find_by(legacy_id: posted_by) if User.find_by(legacy_id: posted_by)
-
-      Legacy::GenericModel.set_table_name("users")
-      legacy_record = Legacy::GenericModel.find_by_id(posted_by)
-      create_user_from_legacy_record(legacy_record) if legacy_record
-    end
   end
 end

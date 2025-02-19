@@ -22,7 +22,7 @@ module Import
             text: legacy_record.komentar,
             verification: legacy_record.verification,
             activity: comment_activity,
-            author_id: User.find_by(legacy_id: legacy_record.user)
+            author: find_or_create_user(legacy_record.user)
           )
 
           import_photos_job.perform_later(comment: comment)

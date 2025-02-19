@@ -17,8 +17,8 @@ module Import
             published: legacy_record.status,
             text: legacy_record.text,
             activity: update_activity,
-            author: User.find_by(legacy_id: legacy_record.updated_by),
-            confirmed_by: User.find_by(legacy_id: legacy_record.confirmed_by)
+            author: find_or_create_user(legacy_record.updated_by),
+            confirmed_by: find_or_create_user(legacy_record.confirmed_by)
           )
 
           import_photos_job.perform_later(update: update)
