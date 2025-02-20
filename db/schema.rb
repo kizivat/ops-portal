@@ -97,6 +97,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_districts_on_legacy_id", unique: true
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -208,6 +209,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.integer "legacy_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
+    t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
     t.index ["user_id"], name: "index_issues_on_user_id"
@@ -233,6 +235,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_issues_categories_on_legacy_id", unique: true
     t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
   end
 
@@ -255,6 +258,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.integer "legacy_id"
     t.index ["activity_id"], name: "index_issues_comments_on_activity_id"
     t.index ["author_id"], name: "index_issues_comments_on_author_id"
+    t.index ["legacy_id"], name: "index_issues_comments_on_legacy_id", unique: true
   end
 
   create_table "issues_communications", force: :cascade do |t|
@@ -281,6 +285,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.index ["activity_id"], name: "index_issues_communications_on_activity_id"
+    t.index ["legacy_id"], name: "index_issues_communications_on_legacy_id", unique: true
   end
 
   create_table "issues_drafts", force: :cascade do |t|
@@ -318,6 +323,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_issues_states_on_legacy_id", unique: true
   end
 
   create_table "issues_updates", force: :cascade do |t|
@@ -336,6 +342,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.index ["activity_id"], name: "index_issues_updates_on_activity_id"
     t.index ["author_id"], name: "index_issues_updates_on_author_id"
     t.index ["confirmed_by_id"], name: "index_issues_updates_on_confirmed_by_id"
+    t.index ["legacy_id"], name: "index_issues_updates_on_legacy_id", unique: true
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -361,6 +368,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.index ["alias"], name: "index_municipalities_on_alias"
     t.index ["district_id"], name: "index_municipalities_on_district_id"
     t.index ["latitude"], name: "index_municipalities_on_latitude"
+    t.index ["legacy_id"], name: "index_municipalities_on_legacy_id", unique: true
     t.index ["longitude"], name: "index_municipalities_on_longitude"
   end
 
@@ -375,6 +383,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_municipality_districts_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_municipality_districts_on_municipality_id"
   end
 
@@ -394,6 +403,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.index ["district_id"], name: "index_responsible_subjects_on_district_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_on_legacy_id", unique: true
     t.index ["municipality_district_id"], name: "index_responsible_subjects_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_responsible_subjects_on_municipality_id"
     t.index ["responsible_subjects_type_id"], name: "index_responsible_subjects_on_responsible_subjects_type_id"
@@ -406,6 +416,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.index ["issues_category_id"], name: "index_responsible_subjects_categories_on_issues_category_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_categories_on_legacy_id", unique: true
     t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_7ec5499a35"
   end
 
@@ -415,6 +426,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_organization_units_on_legacy_id", unique: true
     t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_f2ce80d659"
   end
 
@@ -424,6 +436,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_types_on_legacy_id", unique: true
   end
 
   create_table "responsible_subjects_user_roles", force: :cascade do |t|
@@ -432,6 +445,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_user_roles_on_legacy_id", unique: true
   end
 
   create_table "responsible_subjects_users", force: :cascade do |t|
@@ -450,6 +464,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_users_on_legacy_id", unique: true
     t.index ["organization_unit_id"], name: "index_responsible_subjects_users_on_organization_unit_id"
     t.index ["responsible_subject_id"], name: "index_responsible_subjects_users_on_responsible_subject_id"
     t.index ["role_id"], name: "index_responsible_subjects_users_on_role_id"
@@ -467,6 +482,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.index ["latitude"], name: "index_streets_on_latitude"
+    t.index ["legacy_id"], name: "index_streets_on_legacy_id", unique: true
     t.index ["longitude"], name: "index_streets_on_longitude"
     t.index ["municipality_district_id"], name: "index_streets_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_streets_on_municipality_id"
@@ -507,6 +523,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_users_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_users_on_municipality_id"
     t.index ["street_id"], name: "index_users_on_street_id"
     t.index ["zammad_identifier"], name: "index_users_on_zammad_identifier", unique: true
