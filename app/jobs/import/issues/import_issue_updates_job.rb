@@ -1,6 +1,6 @@
 module Import
   class Issues::ImportIssueUpdatesJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform(issue:, import_photos_job: Issues::ImportIssueUpdatePhotosJob)
       Legacy::GenericModel.set_table_name("alerts_updates")

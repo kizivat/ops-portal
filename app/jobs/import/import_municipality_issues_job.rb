@@ -1,6 +1,6 @@
 module Import
   class ImportMunicipalityIssuesJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform(
       municipality:,

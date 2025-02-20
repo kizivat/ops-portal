@@ -1,6 +1,6 @@
 module Import
   class ImportUsersJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform
       Legacy::GenericModel.set_table_name("users")

@@ -1,6 +1,6 @@
 module Import
   class Issues::ImportIssueCommunicationAttachmentsJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform(communication:)
       Legacy::GenericModel.set_table_name("communication_attachments")

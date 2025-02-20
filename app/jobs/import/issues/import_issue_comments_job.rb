@@ -1,6 +1,6 @@
 module Import
   class Issues::ImportIssueCommentsJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform(issue:, import_photos_job: Issues::ImportIssueCommentPhotosJob)
       Legacy::GenericModel.set_table_name("comments")

@@ -1,4 +1,4 @@
-module Import
+module ImportMethods
   extend ActiveSupport::Concern
 
   included do

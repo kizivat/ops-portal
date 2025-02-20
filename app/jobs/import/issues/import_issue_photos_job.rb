@@ -1,6 +1,6 @@
 module Import
   class Issues::ImportIssuePhotosJob < ApplicationJob
-    include Import
+    include ImportMethods
 
     def perform(issue:)
       Legacy::GenericModel.set_table_name("media_images")

@@ -1,6 +1,6 @@
 module Legacy
   class User < ::ApplicationRecord
-    include Import
+    include ImportMethods
 
     def self.find_or_create_user(posted_by)
       return ::User.find_by(legacy_id: posted_by) if ::User.find_by(legacy_id: posted_by)
