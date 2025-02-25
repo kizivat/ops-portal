@@ -6,8 +6,7 @@ module Import
       Legacy::GenericModel.set_table_name("alerts_updates")
       Legacy::GenericModel.where(alert: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
-          update_activity = issue.update_activities.create!
-          update = ::Issues::Update.find_or_create_by!(
+          update = ::Issues::Update.find_or_initialize_by(
             legacy_id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),
             email: Legacy::User.generate_dummy_email(legacy_record.updated_by), # TODO skip emails for now
@@ -16,10 +15,11 @@ module Import
             name: legacy_record.meno,
             published: legacy_record.status,
             text: legacy_record.text,
-            activity: update_activity,
             author: Legacy::User.find_or_create_user(legacy_record.updated_by),
             confirmed_by: Legacy::User.find_or_create_user(legacy_record.confirmed_by)
           )
+          update.activity ||= issue.update_activities.create!
+          update.save!
 
           import_photos_job.perform_later(update: update)
         end
