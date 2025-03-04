@@ -3,6 +3,7 @@ class ZammadApiClient
 
   DEFAULT_GROUP = "Incomming"
   DEFAULT_ARTICLE_TYPE = "web"
+  DEFAULT_ARTICLE_CONTENT_TYPE = "text/html"
 
   def initialize(url:, http_token:)
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
@@ -111,12 +112,12 @@ class ZammadApiClient
     end
   end
 
-  def create_article!(issue_id, activity_object, use_author_id = false)
+  def create_article!(issue_id, activity_object)
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(
       origin_by_id: activity_object.author&.zammad_identifier,
-      content_type: "text/html",
+      content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
       body: activity_object.activity_body,
       type: "web",
       attachments: activity_object.attachments.map do |attachment|
@@ -205,9 +206,5 @@ class ZammadApiClient
     else
       issue.municipality&.name
     end
-  end
-
-  def check_import_mode!
-
   end
 end
