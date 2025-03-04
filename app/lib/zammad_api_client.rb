@@ -75,7 +75,7 @@ class ZammadApiClient
             "mime-type" => photo.content_type
           }
         end,
-        created_at: issue.reported_at,
+        created_at: issue.reported_at
       },
     )
 
