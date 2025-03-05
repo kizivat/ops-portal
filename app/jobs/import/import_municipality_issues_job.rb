@@ -12,6 +12,10 @@ module Import
       Legacy::GenericModel.set_table_name("alerts")
       Legacy::GenericModel.where(mesto: municipality.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
+          subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
+          subcategory = subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
+          category = subcategory&.category || ::Issues::Category.find_by(legacy_id: legacy_record.kategoria)
+
           issue = Issue.find_or_create_by!(
             legacy_id: legacy_record.id,
             anonymous: legacy_record.anonymous,
@@ -61,7 +65,9 @@ module Import
             reported_at: convert_timestamp_value(legacy_record.posted_time),
             title: legacy_record.heading,
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
-            category: ::Issues::Category.find_by(legacy_id: legacy_record.kategoria),
+            category: category,
+            subcategory: subcategory,
+            suvtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             state: ::Issues::State.find_by(legacy_id: legacy_record.status),
           )

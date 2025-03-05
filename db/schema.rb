@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_05_111441) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -56,7 +56,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
 
   create_table "connector_comments", force: :cascade do |t|
     t.integer "triage_external_id"
-    t.string "backoffice_external_id"
+    t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["backoffice_external_id"], name: "index_connector_comments_on_backoffice_external_id", unique: true
@@ -65,7 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
 
   create_table "connector_issues", force: :cascade do |t|
     t.integer "triage_external_id"
-    t.string "backoffice_external_id"
+    t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id", unique: true
@@ -197,22 +197,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.bigint "user_id"
+    t.jsonb "legacy_data"
     t.boolean "anonymous"
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
-    t.jsonb "legacy_data"
     t.bigint "category_id"
     t.bigint "state_id"
     t.bigint "municipality_id", null: false
     t.integer "legacy_id"
+    t.bigint "subcategory_id"
+    t.bigint "subtype_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
-    t.index ["user_id"], name: "index_issues_on_user_id"
+    t.index ["subcategory_id"], name: "index_issues_on_subcategory_id"
+    t.index ["subtype_id"], name: "index_issues_on_subtype_id"
   end
 
   create_table "issues_activities", force: :cascade do |t|
@@ -230,13 +232,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.string "description"
     t.string "description_hu"
     t.boolean "catch_all", default: false
-    t.bigint "parent_id"
     t.integer "weight"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.integer "triage_external_id"
     t.index ["legacy_id"], name: "index_issues_categories_on_legacy_id", unique: true
-    t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
   end
 
   create_table "issues_comments", force: :cascade do |t|
@@ -291,7 +292,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
   create_table "issues_drafts", force: :cascade do |t|
     t.string "title"
     t.string "description"
-    t.string "author"
     t.boolean "anonymous"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -312,9 +312,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.string "address_country"
     t.string "address_country_code"
     t.string "address_village"
-    t.string "category"
-    t.string "subcategory"
-    t.string "subtype"
+    t.bigint "category_id"
+    t.bigint "subcategory_id"
+    t.bigint "subtype_id"
+    t.bigint "author_id", null: false
+    t.index ["author_id"], name: "index_issues_drafts_on_author_id"
+    t.index ["category_id"], name: "index_issues_drafts_on_category_id"
+    t.index ["subcategory_id"], name: "index_issues_drafts_on_subcategory_id"
+    t.index ["subtype_id"], name: "index_issues_drafts_on_subtype_id"
   end
 
   create_table "issues_states", force: :cascade do |t|
@@ -324,6 +329,38 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.index ["legacy_id"], name: "index_issues_states_on_legacy_id", unique: true
+  end
+
+  create_table "issues_subcategories", force: :cascade do |t|
+    t.string "name"
+    t.string "name_hu"
+    t.string "alias"
+    t.string "description"
+    t.string "description_hu"
+    t.boolean "catch_all", default: false
+    t.integer "weight"
+    t.bigint "category_id"
+    t.integer "legacy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_issues_subcategories_on_category_id"
+    t.index ["legacy_id"], name: "index_issues_subcategories_on_legacy_id", unique: true
+  end
+
+  create_table "issues_subtypes", force: :cascade do |t|
+    t.string "name"
+    t.string "name_hu"
+    t.string "alias"
+    t.string "description"
+    t.string "description_hu"
+    t.boolean "catch_all", default: false
+    t.integer "weight"
+    t.bigint "subcategory_id", null: false
+    t.integer "legacy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["legacy_id"], name: "index_issues_subtypes_on_legacy_id", unique: true
+    t.index ["subcategory_id"], name: "index_issues_subtypes_on_subcategory_id"
   end
 
   create_table "issues_updates", force: :cascade do |t|
@@ -533,12 +570,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_144430) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
+  add_foreign_key "issues", "issues_subcategories", column: "subcategory_id"
+  add_foreign_key "issues", "issues_subtypes", column: "subtype_id"
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_activities", "issues"
-  add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
   add_foreign_key "issues_comments", "users", column: "author_id"
   add_foreign_key "issues_communications", "issues_activities", column: "activity_id"
+  add_foreign_key "issues_drafts", "issues_categories", column: "category_id"
+  add_foreign_key "issues_drafts", "issues_subcategories", column: "subcategory_id"
+  add_foreign_key "issues_drafts", "issues_subtypes", column: "subtype_id"
+  add_foreign_key "issues_drafts", "users", column: "author_id"
+  add_foreign_key "issues_subcategories", "issues_categories", column: "category_id"
+  add_foreign_key "issues_subtypes", "issues_subcategories", column: "subcategory_id"
   add_foreign_key "issues_updates", "issues_activities", column: "activity_id"
   add_foreign_key "issues_updates", "users", column: "author_id"
   add_foreign_key "issues_updates", "users", column: "confirmed_by_id"
