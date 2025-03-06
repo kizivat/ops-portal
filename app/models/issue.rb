@@ -27,7 +27,7 @@
 #
 class Issue < ApplicationRecord
   belongs_to :author, class_name: "User"
-  belongs_to :owner, class_name: "Agent", optional: true
+  belongs_to :owner, class_name: "Agent", optional: true # TODO drop after legacy import
   belongs_to :category, class_name: "Issues::Category", optional: true
   belongs_to :municipality
   belongs_to :municipality_district, optional: true
