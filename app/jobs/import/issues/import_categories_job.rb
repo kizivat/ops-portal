@@ -28,7 +28,7 @@ module Import
     end
 
     def import_subcategories!
-      Legacy::GenericModel.joins("LEFT JOIN alerts_categories AS pc ON alerts_categories.parent = pc.id")
+      Legacy::GenericModel.joins("INNER JOIN alerts_categories AS pc ON alerts_categories.parent = pc.id")
         .where("pc.parent IS NULL")
         .where.not(parent: nil)
         .find_in_batches do |group|

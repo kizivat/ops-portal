@@ -8,7 +8,7 @@ class CreateIssuesSubcategories < ActiveRecord::Migration[8.0]
       t.string :description_hu
       t.boolean :catch_all, default: false
       t.integer :weight
-      t.references :category, null: true, foreign_key: { to_table: :issues_categories }
+      t.references :category, null: false, foreign_key: { to_table: :issues_categories }
       t.integer :legacy_id
 
       t.timestamps

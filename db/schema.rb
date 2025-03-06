@@ -339,7 +339,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_153541) do
     t.string "description_hu"
     t.boolean "catch_all", default: false
     t.integer "weight"
-    t.bigint "category_id"
+    t.bigint "category_id", null: false
     t.integer "legacy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

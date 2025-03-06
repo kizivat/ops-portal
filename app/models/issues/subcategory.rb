@@ -12,10 +12,10 @@
 #  weight         :integer
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  category_id    :bigint
+#  category_id    :bigint           not null
 #  legacy_id      :integer
 #
 class Issues::Subcategory < ApplicationRecord
-  belongs_to :category, class_name: "Issues::Category", optional: true
+  belongs_to :category, class_name: "Issues::Category"
   has_many :subtypes, class_name: "Issues::Subtype", dependent: :destroy
 end
