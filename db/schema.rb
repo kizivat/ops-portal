@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_27_132100) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -42,6 +42,46 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_27_132100) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "agents", force: :cascade do |t|
+    t.string "email"
+    t.string "firstname"
+    t.string "lastname"
+    t.integer "legacy_id"
+    t.integer "zammad_identifier"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.boolean "banned", default: false
+    t.string "login"
+    t.integer "rights"
+    t.string "admin_name"
+    t.string "phone"
+    t.string "password"
+    t.string "about"
+    t.boolean "organization"
+    t.datetime "timestamp"
+    t.boolean "anonymous", default: false
+    t.boolean "active"
+    t.bigint "municipality_id"
+    t.boolean "created_from_app", default: false
+    t.string "verification"
+    t.boolean "verified", default: false
+    t.string "signature"
+    t.integer "city_id"
+    t.bigint "street_id"
+    t.boolean "resident"
+    t.integer "sex"
+    t.date "birth"
+    t.string "fcm_token"
+    t.boolean "gdpr_accepted"
+    t.string "access_token"
+    t.integer "exp"
+    t.boolean "email_notifiable", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["municipality_id"], name: "index_agents_on_municipality_id"
+    t.index ["street_id"], name: "index_agents_on_street_id"
+    t.index ["zammad_identifier"], name: "index_agents_on_zammad_identifier", unique: true
   end
 
   create_table "clients", force: :cascade do |t|
@@ -507,7 +547,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_27_132100) do
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.boolean "banned", default: false
     t.string "login"
-    t.integer "legacy_rights"
     t.string "admin_name"
     t.string "phone"
     t.string "password"
@@ -542,13 +581,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_27_132100) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "agents", "municipalities"
+  add_foreign_key "agents", "streets"
+  add_foreign_key "issues", "agents", column: "owner_id"
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
   add_foreign_key "issues", "municipality_districts"
   add_foreign_key "issues", "responsible_subjects"
   add_foreign_key "issues", "streets"
   add_foreign_key "issues", "users", column: "author_id"
-  add_foreign_key "issues", "users", column: "owner_id"
   add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
