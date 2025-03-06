@@ -16,19 +16,19 @@
 #  address_town            :string
 #  address_village         :string
 #  anonymous               :boolean
-#  author                  :string
-#  category                :string
 #  checks                  :jsonb
 #  description             :string
 #  latitude                :float
 #  longitude               :float
 #  picked_suggestion_index :integer
-#  subcategory             :string
-#  subtype                 :string
 #  suggestions             :jsonb
 #  title                   :string
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  author_id               :bigint           not null
+#  category_id             :bigint
+#  subcategory_id          :bigint
+#  subtype_id              :bigint
 #
 class Issues::Draft < ApplicationRecord
   has_many_attached :photos do |photo|
@@ -36,35 +36,39 @@ class Issues::Draft < ApplicationRecord
     photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
   end
 
+  belongs_to :category, class_name: "Issues::Category", optional: true
+  belongs_to :subcategory, class_name: "Issues::Subcategory", optional: true
+  belongs_to :subtype, class_name: "Issues::Subtype", optional: true
+  belongs_to :author, class_name: "User", optional: false
+
   validates_presence_of :photos, on: :photos_step
   validates_presence_of :title, :description, on: :details_step
 
-  def confirm
-    # TODO: choose real user
-    user = User.find_or_create_by(
-      email: ENV.fetch("DEFAULT_USER_EMAIL"),
-      zammad_identifier: ENV.fetch("DEFAULT_USER_ZAMMAD_IDENTIFIER"),
-      firstname: ENV.fetch("DEFAULT_USER_FIRSTNAME"),
-      lastname: ENV.fetch("DEFAULT_USER_LASTNAME")
-    )
+  DEFAULT_STATE = Issues::State.find_by(name: "Čakajúci")
 
-    # TODO create issue and delete draft
+  def confirm
     issue = Issue.create!(
-      author: user,
-      municipality: temp_get_municipality(),
       title: title,
       description: description,
-      category: category,
+      author: author,
       anonymous: anonymous,
-      address: address_city,
+      municipality: temp_get_municipality(), # TODO
       latitude: latitude,
       longitude: longitude,
-      reported_at: created_at
+      category: category,
+      subcategory: subcategory,
+      subtype: subtype,
+      reported_at: created_at,
+      state: DEFAULT_STATE
     )
+
+    # TODO delete draft after succes
 
     photos.each do |photo|
       issue.photos.append photo
     end
+
+    issue.schedule_send_to_zammad
   end
 
   def schedule_calculate_suggestions
@@ -103,7 +107,10 @@ class Issues::Draft < ApplicationRecord
       self.title = self.description = nil
       self.category = "1"
     else
-      self.title, self.description, self.category, self.subcategory, self.subtype = suggestions[picked_suggestion_index]&.values_at("title", "description", "category", "subcategory", "subtype")
+      self.title, self.description, category_suggestion, subcategory_suggestion, subtype_suggestion = suggestions[picked_suggestion_index]&.values_at("title", "description", "category", "subcategory", "subtype")
+      self.category = Issues::Category.find_by name: category_suggestion
+      self.subcategory = self.category&.subcategories.find_by name: subcategory_suggestion
+      self.subtype = self.subcategory&.subtypes.find_by name: subtype_suggestion
     end
     save(context: :suggestions_step)
   end
@@ -117,12 +124,6 @@ class Issues::Draft < ApplicationRecord
 
   # TODO: select real municipality
   def temp_get_municipality
-    return "Hlohovec" unless address_city == "Bratislava"
-
-    return "Bratislava::Staré Mesto" if address_city_district == "okres Bratislava I"
-    return "Bratislava::Nové Mesto" if address_city_district == "okres Bratislava III"
-    return "Bratislava::Karlova Ves" if address_city_district == "okres Bratislava IV"
-
-    "Hlohvec"
+    Municipality.first
   end
 end

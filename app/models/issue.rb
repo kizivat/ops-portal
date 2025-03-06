@@ -18,12 +18,15 @@
 #  legacy_id          :integer
 #  municipality_id    :bigint           not null
 #  state_id           :bigint
+#  subcategory_id     :bigint
+#  subtype_id         :bigint
 #  triage_external_id :integer
-#  user_id            :bigint
 #
 class Issue < ApplicationRecord
   belongs_to :author, class_name: "User"
   belongs_to :category, class_name: "Issues::Category", optional: true
+  belongs_to :subcategory, class_name: "Issues::Subcategory", optional: true
+  belongs_to :subtype, class_name: "Issues::Subtype", optional: true
   belongs_to :municipality
   belongs_to :state, class_name: "Issues::State", optional: true
 
@@ -35,8 +38,6 @@ class Issue < ApplicationRecord
   has_many_attached :photos
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
-
-  # after_create_commit :schedule_send_to_zammad
 
   def schedule_send_to_zammad
     SendNewIssueToTriageJob.perform_later self
