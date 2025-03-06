@@ -36,3 +36,7 @@ webhook_url = ENV.fetch("CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connecto
     triage_user_id: data["triage_user_id"]
   )
 end
+
+[ "Zaslaný zodpovednému", "Odstúpený", "Čakajúci", "Vyriešený", "Neriešený", "V riešení", "Neprijatý", "Uzavretý", "Označený za vyriešený" ].each do |state_name|
+  Issues::State.find_or_create_by!(name: state_name)
+end
