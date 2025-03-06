@@ -67,7 +67,7 @@ module Import
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
             category: category,
             subcategory: subcategory,
-            suvtype: subtype,
+            subtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             state: ::Issues::State.find_by(legacy_id: legacy_record.status),
           )
