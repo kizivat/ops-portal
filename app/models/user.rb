@@ -11,7 +11,7 @@
 #  banned            :boolean          default(FALSE)
 #  birth             :date
 #  created_from_app  :boolean          default(FALSE)
-#  email             :string
+#  email             :citext           not null
 #  email_notifiable  :boolean          default(TRUE)
 #  exp               :integer
 #  fcm_token         :string
@@ -21,11 +21,12 @@
 #  legacy_rights     :integer
 #  login             :string
 #  organization      :boolean
-#  password          :string
+#  password_hash     :string
 #  phone             :string
 #  resident          :boolean
 #  sex               :integer
 #  signature         :string
+#  status            :integer          default("unverified"), not null
 #  timestamp         :datetime
 #  uuid              :uuid             not null
 #  verification      :string
@@ -38,11 +39,14 @@
 #  street_id         :bigint
 #
 class User < ApplicationRecord
+  include Rodauth::Rails.model
+
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
 
   enum :legacy_rights, ops_admin: 1, municipality_admin: 2, user: 3
   enum :sex, m: 1, f: 2
+  enum :status, { unverified: 1, verified: 2, closed: 3 }
 
   validates :zammad_identifier, uniqueness: true, allow_nil: true
 

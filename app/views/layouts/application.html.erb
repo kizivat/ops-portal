@@ -24,6 +24,18 @@
   </head>
 
   <body>
+    <%= render "layouts/navbar" %>
+
+    <div class="w-1/2 mt-4 mx-auto">
+      <% if notice %>
+        <%= render "layouts/notice" %>
+      <% end %>
+      
+      <% if alert %>
+        <%= render "layouts/alert" %>
+      <% end %>
+    </div>
+    
     <main class="container mx-auto mt-28 px-5 flex">
       <div class="mx-auto md:w-2/3 w-full">
         <%= yield %>

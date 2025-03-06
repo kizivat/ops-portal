@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
 
@@ -176,18 +177,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.jsonb "legacy_data"
+    t.bigint "user_id"
     t.boolean "anonymous"
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
-    t.bigint "municipality_id", null: false
+    t.jsonb "legacy_data"
     t.bigint "category_id"
     t.bigint "state_id"
+    t.bigint "municipality_id", null: false
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
+    t.index ["user_id"], name: "index_issues_on_user_id"
   end
 
   create_table "issues_activities", force: :cascade do |t|
@@ -435,8 +438,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
     t.index ["municipality_id"], name: "index_streets_on_municipality_id"
   end
 
+  create_table "user_identities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.index ["provider", "uid"], name: "index_user_identities_on_provider_and_uid", unique: true
+    t.index ["user_id"], name: "index_user_identities_on_user_id"
+  end
+
+  create_table "user_login_change_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "login", null: false
+    t.datetime "deadline", null: false
+  end
+
+  create_table "user_password_reset_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "deadline", null: false
+    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
+  create_table "user_remember_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "deadline", null: false
+  end
+
+  create_table "user_verification_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.datetime "requested_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
   create_table "users", force: :cascade do |t|
-    t.string "email"
+    t.citext "email", null: false
     t.string "firstname"
     t.string "lastname"
     t.integer "zammad_identifier"
@@ -446,7 +480,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
     t.integer "legacy_rights"
     t.string "admin_name"
     t.string "phone"
-    t.string "password"
+    t.string "password_hash"
     t.string "about"
     t.boolean "organization"
     t.datetime "timestamp"
@@ -467,11 +501,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
     t.string "access_token"
     t.integer "exp"
     t.boolean "email_notifiable", default: true
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "status", default: 1, null: false
+    t.index ["email"], name: "index_users_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
     t.index ["municipality_id"], name: "index_users_on_municipality_id"
     t.index ["street_id"], name: "index_users_on_street_id"
     t.index ["zammad_identifier"], name: "index_users_on_zammad_identifier", unique: true
+    t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+\\.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -501,6 +538,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_06_092153) do
   add_foreign_key "responsible_subjects_users", "responsible_subjects_user_roles", column: "role_id"
   add_foreign_key "streets", "municipalities"
   add_foreign_key "streets", "municipality_districts"
+  add_foreign_key "user_identities", "users", on_delete: :cascade
+  add_foreign_key "user_login_change_keys", "users", column: "id"
+  add_foreign_key "user_password_reset_keys", "users", column: "id"
+  add_foreign_key "user_remember_keys", "users", column: "id"
+  add_foreign_key "user_verification_keys", "users", column: "id"
   add_foreign_key "users", "municipalities"
   add_foreign_key "users", "streets"
 end
