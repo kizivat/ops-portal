@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: agents
+# Table name: legacy_agents
 #
 #  id                :bigint           not null, primary key
 #  about             :string
@@ -38,7 +38,7 @@
 #  municipality_id   :bigint
 #  street_id         :bigint
 #
-class Agent < ApplicationRecord
+class Legacy::Agent < ApplicationRecord
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
 

@@ -1,6 +1,6 @@
-class CreateAgents < ActiveRecord::Migration[8.0]
+class CreateLegacyAgents < ActiveRecord::Migration[8.0]
   def change
-    create_table :agents do |t|
+    create_table :legacy_agents do |t|
       t.string :email
       t.string :firstname
       t.string :lastname

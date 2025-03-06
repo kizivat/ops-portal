@@ -50,7 +50,7 @@ module Legacy
     end
 
     def self.find_or_create_agent(legacy_id)
-      return ::Agent.find_by(legacy_id: legacy_id) if ::Agent.find_by(legacy_id: legacy_id)
+      return Legacy::Agent.find_by(legacy_id: legacy_id) if Legacy::Agent.find_by(legacy_id: legacy_id)
 
       Legacy::GenericModel.set_table_name("users")
       legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
@@ -62,7 +62,7 @@ module Legacy
     end
 
     def self.create_agent_from_legacy_record(legacy_record)
-      ::Agent.find_or_create_by!(self.user_params(legacy_record).merge!({rights: convert_legacy_rights_value(legacy_record.rights)}))
+      Legacy::Agent.find_or_create_by!(self.user_params(legacy_record).merge!({rights: convert_legacy_rights_value(legacy_record.rights)}))
     end
 
     def self.user_params(legacy_record)
