@@ -218,8 +218,7 @@ class ZammadApiClient
   end
 
   def find_zammad_category(issue_category)
-    # TODO: do something real
-    "1"
+    issue_category.triage_external_id
   end
 
   def build_ticket_municipality(issue)

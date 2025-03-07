@@ -40,6 +40,8 @@
 class User < ApplicationRecord
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
+  has_many :issues
+  has_many :issues_drafts, class_name: "Issues::Draft"
 
   enum :sex, m: 1, f: 2
 

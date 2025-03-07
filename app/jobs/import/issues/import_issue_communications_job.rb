@@ -6,8 +6,7 @@ module Import
       Legacy::GenericModel.set_table_name("communication")
       Legacy::GenericModel.where(alert: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
-          communication_activity = issue.communication_activities.create!
-          communication = ::Issues::Communication.find_or_create_by!(
+          communication = ::Issues::Communication.find_or_initialize_by(
             legacy_id: legacy_record.id,
             added_at: convert_timestamp_value(legacy_record.ts),
             confirmation_needed: legacy_record.need_confirmation,
@@ -25,11 +24,12 @@ module Import
             solved_in: legacy_record.solution_when,
             subject: legacy_record.subject,
             text: legacy_record.text,
-            activity: communication_activity,
             admin_id: legacy_record.admin,
             person_id: legacy_record.person,
             user_id: legacy_record.user
           )
+          communication.activity ||= issue.communication_activities.create!
+          communication.save!
 
           import_attachments_job.perform_later(communication: communication)
         end

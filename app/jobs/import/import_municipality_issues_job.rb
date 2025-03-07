@@ -14,6 +14,10 @@ module Import
       Legacy::GenericModel.set_table_name("alerts")
       Legacy::GenericModel.where(mesto: municipality.legacy_id).where(mestska_cast: municipality_district&.legacy_id).where("posted_time >= ?", import_since.to_i).find_in_batches do |group|
         group.each do |legacy_record|
+          subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
+          subcategory = subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
+          category = subcategory&.category || ::Issues::Category.find_by(legacy_id: legacy_record.kategoria)
+
           issue = Issue.find_or_create_by!(
             legacy_id: legacy_record.id,
             anonymous: legacy_record.anonymous,
@@ -61,7 +65,9 @@ module Import
             title: legacy_record.heading,
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
             owner: Legacy::User.find_or_create_agent(legacy_record.riesitel_new || legacy_record.riesitel),
-            category: ::Issues::Category.find_by(legacy_id: legacy_record.kategoria),
+            category: category,
+            subcategory: subcategory,
+            subtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             municipality_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
             responsible_subject: ResponsibleSubject.find_by(legacy_id: legacy_record.zodpovednost),
