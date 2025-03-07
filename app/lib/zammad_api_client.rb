@@ -207,7 +207,6 @@ class ZammadApiClient
     end
   end
 
-
   def get_author(user_id, anonymous: false)
     return nil if anonymous
 
