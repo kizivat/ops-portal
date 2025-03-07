@@ -5,7 +5,7 @@ module Import
     def perform(
       municipality:,
       municipality_district: nil,
-      import_since: Date.parse('2020-01-01').beginning_of_day,
+      import_since: Date.parse("2020-01-01").beginning_of_day,
       import_photos_job: Issues::ImportIssuePhotosJob,
       import_updates_job: Issues::ImportIssueUpdatesJob,
       import_comments_job: Issues::ImportIssueCommentsJob,

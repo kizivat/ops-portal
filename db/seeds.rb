@@ -39,6 +39,7 @@ end
 
 [ "Zaslaný zodpovednému", "Odstúpený", "Čakajúci", "Vyriešený", "Neriešený", "V riešení", "Neprijatý", "Uzavretý", "Označený za vyriešený" ].each do |state_name|
   Issues::State.find_or_create_by!(name: state_name)
+end
 
 [
   { triage_external_id: 1, name: "Cesty a chodníky", name_hu: "Közutak és közterület", alias: "cesty-a-dopravne-znacenie", description: "cesty, cyklotrasy, schody, oplotenie", description_hu: "utak, kerékpárutak, lépcsők, kerítések", weight: 1000, legacy_id: 16 },

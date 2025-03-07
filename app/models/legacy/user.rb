@@ -62,7 +62,7 @@ module Legacy
     end
 
     def self.create_agent_from_legacy_record(legacy_record)
-      Legacy::Agent.find_or_create_by!(self.user_params(legacy_record).merge!({rights: convert_legacy_rights_value(legacy_record.rights)}))
+      Legacy::Agent.find_or_create_by!(self.user_params(legacy_record).merge!({ rights: convert_legacy_rights_value(legacy_record.rights) }))
     end
 
     def self.user_params(legacy_record)
