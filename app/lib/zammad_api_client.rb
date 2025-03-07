@@ -1,7 +1,7 @@
 class ZammadApiClient
   attr :client
 
-  DEFAULT_GROUP = "Incomming"
+  DEFAULT_GROUP = "Incoming"
   DEFAULT_ARTICLE_TYPE = "web"
   DEFAULT_ARTICLE_CONTENT_TYPE = "text/html"
 

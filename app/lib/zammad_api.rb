@@ -1,7 +1,5 @@
 class ZammadApi
-  attr :client
-
-  DEFAULT_GROUP = "Incomming"
+  DEFAULT_GROUP = "Incoming"
   DEFAULT_ARTICLE_TYPE = "web"
 
   def initialize(url:, http_token:, handler: Faraday)
