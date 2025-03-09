@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -55,6 +55,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "connector_comments", force: :cascade do |t|
+    t.integer "triage_external_id"
+    t.integer "backoffice_external_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["backoffice_external_id"], name: "index_connector_comments_on_backoffice_external_id", unique: true
+    t.index ["triage_external_id"], name: "index_connector_comments_on_triage_external_id", unique: true
+  end
+
+  create_table "connector_issues", force: :cascade do |t|
+    t.integer "triage_external_id"
+    t.integer "backoffice_external_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id", unique: true
+    t.index ["triage_external_id"], name: "index_connector_issues_on_triage_external_id", unique: true
+  end
+
   create_table "connector_tenants", force: :cascade do |t|
     t.string "name"
     t.string "api_token_private_key"
@@ -62,6 +80,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "webhook_public_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "triage_user_id"
   end
 
   create_table "connector_users", force: :cascade do |t|
@@ -78,6 +97,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_districts_on_legacy_id", unique: true
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -177,20 +198,32 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.bigint "user_id"
+    t.jsonb "legacy_data"
     t.boolean "anonymous"
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
-    t.jsonb "legacy_data"
-    t.bigint "category_id"
+    t.bigint "category_id", null: false
     t.bigint "state_id"
     t.bigint "municipality_id", null: false
+    t.integer "legacy_id"
+    t.bigint "street_id"
+    t.bigint "municipality_district_id"
+    t.bigint "responsible_subject_id"
+    t.bigint "owner_id"
+    t.bigint "subcategory_id"
+    t.bigint "subtype_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
+    t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
+    t.index ["municipality_district_id"], name: "index_issues_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
+    t.index ["owner_id"], name: "index_issues_on_owner_id"
+    t.index ["responsible_subject_id"], name: "index_issues_on_responsible_subject_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
-    t.index ["user_id"], name: "index_issues_on_user_id"
+    t.index ["street_id"], name: "index_issues_on_street_id"
+    t.index ["subcategory_id"], name: "index_issues_on_subcategory_id"
+    t.index ["subtype_id"], name: "index_issues_on_subtype_id"
   end
 
   create_table "issues_activities", force: :cascade do |t|
@@ -208,11 +241,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "description"
     t.string "description_hu"
     t.boolean "catch_all", default: false
-    t.bigint "parent_id"
     t.integer "weight"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id"], name: "index_issues_categories_on_parent_id"
+    t.integer "legacy_id"
+    t.integer "triage_external_id"
+    t.index ["legacy_id"], name: "index_issues_categories_on_legacy_id", unique: true
   end
 
   create_table "issues_comments", force: :cascade do |t|
@@ -231,8 +265,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.integer "verification"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.integer "triage_external_id"
     t.index ["activity_id"], name: "index_issues_comments_on_activity_id"
     t.index ["author_id"], name: "index_issues_comments_on_author_id"
+    t.index ["legacy_id"], name: "index_issues_comments_on_legacy_id", unique: true
   end
 
   create_table "issues_communications", force: :cascade do |t|
@@ -257,13 +294,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.integer "triage_external_id"
     t.index ["activity_id"], name: "index_issues_communications_on_activity_id"
+    t.index ["legacy_id"], name: "index_issues_communications_on_legacy_id", unique: true
   end
 
   create_table "issues_drafts", force: :cascade do |t|
     t.string "title"
     t.string "description"
-    t.string "author"
     t.boolean "anonymous"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -284,9 +323,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "address_country"
     t.string "address_country_code"
     t.string "address_village"
-    t.string "category"
-    t.string "subcategory"
-    t.string "subtype"
+    t.bigint "category_id"
+    t.bigint "subcategory_id"
+    t.bigint "subtype_id"
+    t.bigint "author_id", null: false
+    t.index ["author_id"], name: "index_issues_drafts_on_author_id"
+    t.index ["category_id"], name: "index_issues_drafts_on_category_id"
+    t.index ["subcategory_id"], name: "index_issues_drafts_on_subcategory_id"
+    t.index ["subtype_id"], name: "index_issues_drafts_on_subtype_id"
   end
 
   create_table "issues_states", force: :cascade do |t|
@@ -294,6 +338,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_issues_states_on_legacy_id", unique: true
+  end
+
+  create_table "issues_subcategories", force: :cascade do |t|
+    t.string "name"
+    t.string "name_hu"
+    t.string "alias"
+    t.string "description"
+    t.string "description_hu"
+    t.boolean "catch_all", default: false
+    t.integer "weight"
+    t.bigint "category_id", null: false
+    t.integer "legacy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_issues_subcategories_on_category_id"
+    t.index ["legacy_id"], name: "index_issues_subcategories_on_legacy_id", unique: true
+  end
+
+  create_table "issues_subtypes", force: :cascade do |t|
+    t.string "name"
+    t.string "name_hu"
+    t.string "alias"
+    t.string "description"
+    t.string "description_hu"
+    t.boolean "catch_all", default: false
+    t.integer "weight"
+    t.bigint "subcategory_id", null: false
+    t.integer "legacy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["legacy_id"], name: "index_issues_subtypes_on_legacy_id", unique: true
+    t.index ["subcategory_id"], name: "index_issues_subtypes_on_subcategory_id"
   end
 
   create_table "issues_updates", force: :cascade do |t|
@@ -308,9 +386,52 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.inet "ip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.integer "triage_external_id"
     t.index ["activity_id"], name: "index_issues_updates_on_activity_id"
     t.index ["author_id"], name: "index_issues_updates_on_author_id"
     t.index ["confirmed_by_id"], name: "index_issues_updates_on_confirmed_by_id"
+    t.index ["legacy_id"], name: "index_issues_updates_on_legacy_id", unique: true
+  end
+
+  create_table "legacy_agents", force: :cascade do |t|
+    t.string "email"
+    t.string "firstname"
+    t.string "lastname"
+    t.integer "legacy_id"
+    t.integer "zammad_identifier"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.boolean "banned", default: false
+    t.string "login"
+    t.integer "rights"
+    t.string "admin_name"
+    t.string "phone"
+    t.string "password"
+    t.string "about"
+    t.boolean "organization"
+    t.datetime "timestamp"
+    t.boolean "anonymous", default: false
+    t.boolean "active"
+    t.bigint "municipality_id"
+    t.boolean "created_from_app", default: false
+    t.string "verification"
+    t.boolean "verified", default: false
+    t.string "signature"
+    t.integer "city_id"
+    t.bigint "street_id"
+    t.boolean "resident"
+    t.integer "sex"
+    t.date "birth"
+    t.string "fcm_token"
+    t.boolean "gdpr_accepted"
+    t.string "access_token"
+    t.integer "exp"
+    t.boolean "email_notifiable", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["municipality_id"], name: "index_legacy_agents_on_municipality_id"
+    t.index ["street_id"], name: "index_legacy_agents_on_street_id"
+    t.index ["zammad_identifier"], name: "index_legacy_agents_on_zammad_identifier", unique: true
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -331,10 +452,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "logo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
     t.index ["active"], name: "index_municipalities_on_active"
     t.index ["alias"], name: "index_municipalities_on_alias"
     t.index ["district_id"], name: "index_municipalities_on_district_id"
     t.index ["latitude"], name: "index_municipalities_on_latitude"
+    t.index ["legacy_id"], name: "index_municipalities_on_legacy_id", unique: true
     t.index ["longitude"], name: "index_municipalities_on_longitude"
   end
 
@@ -348,6 +471,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "logo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_municipality_districts_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_municipality_districts_on_municipality_id"
   end
 
@@ -365,7 +490,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.boolean "pro"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
     t.index ["district_id"], name: "index_responsible_subjects_on_district_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_on_legacy_id", unique: true
     t.index ["municipality_district_id"], name: "index_responsible_subjects_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_responsible_subjects_on_municipality_id"
     t.index ["responsible_subjects_type_id"], name: "index_responsible_subjects_on_responsible_subjects_type_id"
@@ -373,10 +500,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
 
   create_table "responsible_subjects_categories", force: :cascade do |t|
     t.bigint "responsible_subject_id"
-    t.bigint "issues_category_id", null: false
+    t.bigint "issues_category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.bigint "issues_subcategory_id"
+    t.bigint "issues_subtype_id"
     t.index ["issues_category_id"], name: "index_responsible_subjects_categories_on_issues_category_id"
+    t.index ["issues_subcategory_id"], name: "index_responsible_subjects_categories_on_issues_subcategory_id"
+    t.index ["issues_subtype_id"], name: "index_responsible_subjects_categories_on_issues_subtype_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_categories_on_legacy_id", unique: true
     t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_7ec5499a35"
   end
 
@@ -385,6 +518,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_organization_units_on_legacy_id", unique: true
     t.index ["responsible_subject_id"], name: "idx_on_responsible_subject_id_f2ce80d659"
   end
 
@@ -393,6 +528,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_types_on_legacy_id", unique: true
   end
 
   create_table "responsible_subjects_user_roles", force: :cascade do |t|
@@ -400,6 +537,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_user_roles_on_legacy_id", unique: true
   end
 
   create_table "responsible_subjects_users", force: :cascade do |t|
@@ -417,6 +556,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.boolean "tooltips"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.index ["legacy_id"], name: "index_responsible_subjects_users_on_legacy_id", unique: true
     t.index ["organization_unit_id"], name: "index_responsible_subjects_users_on_organization_unit_id"
     t.index ["responsible_subject_id"], name: "index_responsible_subjects_users_on_responsible_subject_id"
     t.index ["role_id"], name: "index_responsible_subjects_users_on_role_id"
@@ -432,7 +573,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.boolean "tested"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
     t.index ["latitude"], name: "index_streets_on_latitude"
+    t.index ["legacy_id"], name: "index_streets_on_legacy_id", unique: true
     t.index ["longitude"], name: "index_streets_on_longitude"
     t.index ["municipality_district_id"], name: "index_streets_on_municipality_district_id"
     t.index ["municipality_id"], name: "index_streets_on_municipality_id"
@@ -477,7 +620,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.boolean "banned", default: false
     t.string "login"
-    t.integer "legacy_rights"
     t.string "admin_name"
     t.string "phone"
     t.string "password_hash"
@@ -503,8 +645,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
     t.boolean "email_notifiable", default: true
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "legacy_id"
     t.integer "status", default: 1, null: false
     t.index ["email"], name: "index_users_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
+    t.index ["legacy_id"], name: "index_users_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_users_on_municipality_id"
     t.index ["street_id"], name: "index_users_on_street_id"
     t.index ["zammad_identifier"], name: "index_users_on_zammad_identifier", unique: true
@@ -515,15 +659,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_104552) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
+  add_foreign_key "issues", "issues_subcategories", column: "subcategory_id"
+  add_foreign_key "issues", "issues_subtypes", column: "subtype_id"
+  add_foreign_key "issues", "legacy_agents", column: "owner_id"
+  add_foreign_key "issues", "municipality_districts"
+  add_foreign_key "issues", "responsible_subjects"
+  add_foreign_key "issues", "streets"
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_activities", "issues"
-  add_foreign_key "issues_categories", "issues_categories", column: "parent_id"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
   add_foreign_key "issues_comments", "users", column: "author_id"
   add_foreign_key "issues_communications", "issues_activities", column: "activity_id"
+  add_foreign_key "issues_drafts", "issues_categories", column: "category_id"
+  add_foreign_key "issues_drafts", "issues_subcategories", column: "subcategory_id"
+  add_foreign_key "issues_drafts", "issues_subtypes", column: "subtype_id"
+  add_foreign_key "issues_drafts", "users", column: "author_id"
+  add_foreign_key "issues_subcategories", "issues_categories", column: "category_id"
+  add_foreign_key "issues_subtypes", "issues_subcategories", column: "subcategory_id"
   add_foreign_key "issues_updates", "issues_activities", column: "activity_id"
   add_foreign_key "issues_updates", "users", column: "author_id"
   add_foreign_key "issues_updates", "users", column: "confirmed_by_id"
+  add_foreign_key "legacy_agents", "municipalities"
+  add_foreign_key "legacy_agents", "streets"
   add_foreign_key "municipalities", "districts"
   add_foreign_key "municipality_districts", "municipalities"
   add_foreign_key "responsible_subjects", "districts"

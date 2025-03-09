@@ -18,7 +18,6 @@
 #  firstname         :string
 #  gdpr_accepted     :boolean
 #  lastname          :string
-#  legacy_rights     :integer
 #  login             :string
 #  organization      :boolean
 #  password_hash     :string
@@ -35,6 +34,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  city_id           :integer
+#  legacy_id         :integer
 #  municipality_id   :bigint
 #  street_id         :bigint
 #
@@ -43,14 +43,15 @@ class User < ApplicationRecord
 
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
+  has_many :issues
+  has_many :issues_drafts, class_name: "Issues::Draft"
 
-  enum :legacy_rights, ops_admin: 1, municipality_admin: 2, user: 3
   enum :sex, m: 1, f: 2
   enum :status, { unverified: 1, verified: 2, closed: 3 }
 
   validates :zammad_identifier, uniqueness: true, allow_nil: true
 
   def fullname
-    [firstname, lastname].reject(&:empty?).join(" ")
+    [ firstname, lastname ].reject(&:blank?).join(" ")
   end
 end

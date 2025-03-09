@@ -5,9 +5,11 @@ module Import
       Legacy::GenericModel.find_in_batches do |group|
         group.each do |legacy_record|
           ::ResponsibleSubjects::Category.find_or_create_by!(
-            id: legacy_record.id,
-            responsible_subject: ResponsibleSubject.find_by_id(legacy_record.id_zodpovednost),
-            issues_category_id: legacy_record.id_kategoria,
+            legacy_id: legacy_record.id,
+            responsible_subject: ::ResponsibleSubject.find_by_id(legacy_record.id_zodpovednost),
+            issues_category: ::Issues::Category.find_by(legacy_id: legacy_record.id_kategoria),
+            issues_subcategory: ::Issues::Subcategory.find_by(legacy_id: legacy_record.id_kategoria),
+            issues_subtype: ::Issues::Subtype.find_by(legacy_id: legacy_record.id_kategoria)
           )
         end
       end

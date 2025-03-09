@@ -18,7 +18,7 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
+gem "tailwindcss-rails", "~> 3.3.1"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
@@ -90,3 +90,6 @@ gem "tilt", "~> 2.4"
 gem "rodauth-omniauth", "~> 0.6.0"
 gem "omniauth-facebook", "~> 10.0"
 gem "omniauth-google-oauth2", "~> 1.2"
+
+# deployment
+gem "kamal", "~> 2.5"
