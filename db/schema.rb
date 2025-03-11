@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_10_150122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -54,12 +54,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "connector_backoffice_instances", force: :cascade do |t|
+    t.string "url"
+    t.string "api_token"
+    t.string "webhook_secret"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "connector_comments", force: :cascade do |t|
     t.integer "triage_external_id"
     t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_backoffice_instance_id"
     t.index ["backoffice_external_id"], name: "index_connector_comments_on_backoffice_external_id", unique: true
+    t.index ["connector_backoffice_instance_id"], name: "index_connector_comments_on_connector_backoffice_instance_id"
     t.index ["triage_external_id"], name: "index_connector_comments_on_triage_external_id", unique: true
   end
 
@@ -68,7 +78,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
     t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_backoffice_instance_id"
     t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id", unique: true
+    t.index ["connector_backoffice_instance_id"], name: "index_connector_issues_on_connector_backoffice_instance_id"
     t.index ["triage_external_id"], name: "index_connector_issues_on_triage_external_id", unique: true
   end
 
@@ -80,6 +92,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "triage_user_id"
+    t.bigint "connector_backoffice_instance_id"
+    t.index ["connector_backoffice_instance_id"], name: "index_connector_tenants_on_connector_backoffice_instance_id"
   end
 
   create_table "connector_users", force: :cascade do |t|
@@ -89,6 +103,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
     t.string "lastname"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_backoffice_instance_id"
+    t.index ["connector_backoffice_instance_id"], name: "index_connector_users_on_connector_backoffice_instance_id"
     t.index ["zammad_identifier"], name: "index_connector_users_on_zammad_identifier", unique: true
   end
 
@@ -206,12 +222,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
     t.bigint "state_id"
     t.bigint "municipality_id", null: false
     t.integer "legacy_id"
+    t.bigint "subcategory_id"
+    t.bigint "subtype_id"
     t.bigint "street_id"
     t.bigint "municipality_district_id"
     t.bigint "responsible_subject_id"
     t.bigint "owner_id"
-    t.bigint "subcategory_id"
-    t.bigint "subtype_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
@@ -622,15 +638,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_153107) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "connector_comments", "connector_backoffice_instances"
+  add_foreign_key "connector_issues", "connector_backoffice_instances"
+  add_foreign_key "connector_tenants", "connector_backoffice_instances"
+  add_foreign_key "connector_users", "connector_backoffice_instances"
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
-  add_foreign_key "issues", "legacy_agents", column: "owner_id"
+  add_foreign_key "issues", "issues_subcategories", column: "subcategory_id"
+  add_foreign_key "issues", "issues_subtypes", column: "subtype_id"
   add_foreign_key "issues", "municipality_districts"
   add_foreign_key "issues", "responsible_subjects"
   add_foreign_key "issues", "streets"
-  add_foreign_key "issues", "issues_subcategories", column: "subcategory_id"
-  add_foreign_key "issues", "issues_subtypes", column: "subtype_id"
   add_foreign_key "issues", "users", column: "author_id"
+  add_foreign_key "issues", "users", column: "owner_id"
   add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
   add_foreign_key "issues_comments", "users", column: "author_id"
