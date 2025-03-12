@@ -1,1 +1,1 @@
-json.comment_id @comment[:id]
+json.comment_id @comment_id

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_12_135218) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_12_142328) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -59,7 +59,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_12_135218) do
     t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_tenant_id", null: false
     t.index ["backoffice_external_id"], name: "index_connector_comments_on_backoffice_external_id", unique: true
+    t.index ["connector_tenant_id"], name: "index_connector_comments_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_comments_on_triage_external_id", unique: true
   end
 
@@ -68,7 +70,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_12_135218) do
     t.integer "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_tenant_id", null: false
     t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id", unique: true
+    t.index ["connector_tenant_id"], name: "index_connector_issues_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_issues_on_triage_external_id", unique: true
   end
 
@@ -92,6 +96,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_12_135218) do
     t.string "lastname"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "connector_tenant_id", null: false
+    t.index ["connector_tenant_id"], name: "index_connector_users_on_connector_tenant_id"
     t.index ["zammad_identifier"], name: "index_connector_users_on_zammad_identifier", unique: true
   end
 
@@ -625,6 +631,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_12_135218) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "connector_comments", "connector_tenants"
+  add_foreign_key "connector_issues", "connector_tenants"
+  add_foreign_key "connector_users", "connector_tenants"
   add_foreign_key "issues", "issues_categories", column: "category_id"
   add_foreign_key "issues", "issues_states", column: "state_id"
   add_foreign_key "issues", "issues_subcategories", column: "subcategory_id"

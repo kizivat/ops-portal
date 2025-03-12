@@ -15,7 +15,7 @@
 #  triage_user_id         :integer
 #
 class Connector::Tenant < ApplicationRecord
-  has_many :issues, class_name: "Connector::Issue", dependent: :destroy
-  has_many :users, class_name: "Connector::User", dependent: :destroy
-  has_many :comments, class_name: "Connector::Comment", dependent: :destroy
+  has_many :issues, class_name: "Connector::Issue", dependent: :destroy, inverse_of: :tenant
+  has_many :users, class_name: "Connector::User", dependent: :destroy, inverse_of: :tenant
+  has_many :comments, class_name: "Connector::Comment", dependent: :destroy, inverse_of: :tenant
 end

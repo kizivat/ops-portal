@@ -22,7 +22,7 @@ module Connector
     end
 
     def update_issue_status(issue_id, status)
-      response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/status"), { status: status, token: jwt_token })
+      response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/new_status"), { status: status, token: jwt_token })
       raise unless response.status == 204
     end
 
@@ -38,7 +38,8 @@ module Connector
       response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/issue_comments"), { comment: comment, token: jwt_token })
       raise unless response.status == 200
 
-      JSON.parse response.body["comment_id"]
+      puts "Response body: #{response.body}"
+      JSON.parse(response.body)["comment_id"]
     end
 
     private

@@ -6,6 +6,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  backoffice_external_id :integer
+#  connector_tenant_id    :bigint           not null
 #  triage_external_id     :integer
 #
 class Connector::Issue < ApplicationRecord

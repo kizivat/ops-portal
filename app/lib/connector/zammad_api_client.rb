@@ -44,6 +44,29 @@ module Connector
       ticket.state
     end
 
+    def get_comment(ticket_id, comment_id)
+      begin
+        ticket = @client.ticket.find(ticket_id)
+        article = ticket.articles.find { |a| comment_id == a.id.to_i }
+
+        {
+          content_type: article.content_type,
+          body: article.body,
+          type: article.type,
+          attachments: article.attachments.map do |attachment|
+            {
+              filename: attachment.filename,
+              content_type: attachment.preferences.dig(:"Mime-Type"),
+              data64: Base64.strict_encode64(attachment.download)
+            }
+          end
+        }
+
+      rescue RuntimeError => e
+        raise e unless e.message.include? "Couldn't find Ticket with"
+      end
+    end
+
     private
 
     def create_or_find_customer(author)
@@ -63,34 +86,6 @@ module Connector
 
       zammad_identifier
     end
-
-    def get_comment(ticket_id, comment_id)
-      begin
-        ticket = @client.ticket.find(ticket_id)
-        article = ticket.articles.find { |a| comment_id == a.id }&.attributes
-
-        {
-          author: @triage_user_id,
-          content_type: article.content_type,
-          body: article.body,
-          type: article.type,
-          created_at: article.created_at,
-          updated_at: article.updated_at,
-          attachments: article.attachments.map do |attachment|
-            {
-              filename: attachment.filename,
-              content_type: attachment.preferences.dig(:"Mime-Type"),
-              data64: Base64.strict_encode64(attachment.download)
-            }
-          end
-        }
-
-      rescue RuntimeError => e
-        raise e unless e.message.include? "Couldn't find Ticket with"
-      end
-    end
-
-    private
 
     def find_or_create_ticket!(issue)
       ticket = @tenant.issues.find_by(triage_external_id: issue["triage_identifier"])

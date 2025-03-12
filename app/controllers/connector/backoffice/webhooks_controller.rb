@@ -22,12 +22,12 @@ class Connector::Backoffice::WebhooksController < ActionController::API
   end
 
   def data
-    params.require(:data).permit(:ticket_id, :article_id, :group)
+    params.require(:data).permit(:ticket_id, :article_id, :tenant_id)
   end
 
   def set_tenant
     @tenant = Connector::Tenant.find(data.require(:tenant_id))
-    render status: :unauthorized, json: nil and return unless secret.present?
+    render status: :unauthorized, json: nil and return unless @tenant
   end
 
   def authenticate
@@ -36,6 +36,6 @@ class Connector::Backoffice::WebhooksController < ActionController::API
 
     secret = @tenant.webhook_secret
     signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), secret, request.body.read)
-    # render status: :forbidden, json: nil if signature != sig_header
+    render status: :forbidden, json: nil if signature != sig_header
   end
 end

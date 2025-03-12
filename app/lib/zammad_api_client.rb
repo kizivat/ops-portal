@@ -147,6 +147,29 @@ class ZammadApiClient
     article.id
   end
 
+  def create_article_from_api!(issue_id, comment_data)
+    ticket = @client.ticket.find(issue_id)
+
+    article = ticket.article(
+      origin_by_id: comment_data["author"],
+      content_type: comment_data["content_type"],
+      body: comment_data["body"],
+      type: comment_data["type"],
+      attachments: comment_data["attachments"].map do |attachment|
+        {
+          "filename" => attachment["filename"],
+          "mime-type" => attachment["content_type"],
+          "data" => attachment["data64"]
+        }
+      end,
+      created_at: comment_data["created_at"],
+    )
+
+    # TODO custom error
+    raise unless article.id
+    article.id
+  end
+
   def get_users
     @client.user.all
   end
