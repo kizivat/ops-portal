@@ -38,6 +38,8 @@
 #  street_id         :bigint
 #
 class User < ApplicationRecord
+  # TODO: encrypt password field and access_token
+
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
   has_many :issues
