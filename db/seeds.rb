@@ -8,13 +8,31 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-webhook_url = ENV.fetch("CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connector/webhook")
+webhook_url = ENV.fetch "CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connector/webhook"
+default_connector_zammad_api_token = ENV.fetch("CONNECTOR__ZAMMAD_API_TOKEN")
+default_connector_zammad_webhook_secret = ENV.fetch("CONNECTOR__ZAMMAD_WEBHOOK_SECRET")
+
 
 # TODO: only run in development
 [
-  { name: "MÚ Staré Mesto", subject: "1", url: webhook_url, triage_user_id: 46 },
-  { name: "MÚ Karlova Ves", subject: "8", url: webhook_url, triage_user_id: 46 },
-  { name: "Dopravný podnik Bratislava, a.s.", subject: "217", url: webhook_url, triage_user_id: 46 }
+  {
+    name: "MÚ Staré Mesto",
+    subject: "1",
+    url: webhook_url,
+    triage_user_id: 120,
+    connector_zammad_url: "https://staremesto-ba.ops.dev.slovensko.digital/",
+    connector_zammad_api_token: default_connector_zammad_api_token,
+    connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
+  },
+  {
+    name: "Hlavné mesto SR Bratislava",
+    subject: "19",
+    url: webhook_url,
+    triage_user_id: 121,
+    connector_zammad_url: "https://magistrat-ba.ops.dev.slovensko.digital/",
+    connector_zammad_api_token: default_connector_zammad_api_token,
+    connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
+  }
 ].each do |data|
   client = Client.find_or_create_by!(name: data[:name])
   tenant = Connector::Tenant.find_or_create_by!(name: data[:name])
@@ -26,14 +44,17 @@ webhook_url = ENV.fetch("CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connecto
     api_token_public_key: api_key.public_to_pem,
     webhook_private_key: webhook_key.to_pem,
     url: data[:url],
-    responsible_subject_zammad_identifier: data[:subject]
+    responsible_subject_zammad_identifier: data[:subject],
+    triage_external_author_identifier: data[:triage_user_id]
   )
 
   tenant.update_columns(
-    api_token_private_key: api_key.to_pem,
-    webhook_public_key: webhook_key.public_to_pem,
-    api_subject_identifier: client.id,
-    triage_user_id: data["triage_user_id"]
+    backoffice_api_token: data[:connector_zammad_api_token],
+    backoffice_webhook_secret: data[:connector_zammad_webhook_secret],
+    ops_api_token_private_key: api_key.to_pem,
+    ops_webhook_public_key: webhook_key.public_to_pem,
+    ops_api_subject_identifier: client.id,
+    backoffice_url: data[:connector_zammad_url]
   )
 end
 

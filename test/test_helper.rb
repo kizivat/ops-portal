@@ -12,5 +12,8 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    # Use the test adapter for Active Job
+    ActiveJob::Base.queue_adapter = :test
   end
 end
