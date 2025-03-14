@@ -1,6 +1,6 @@
 require "test_helper"
 
-class WebhooksControllerTest < ActionDispatch::IntegrationTest
+class Triage::WebhooksControllerTest < ActionDispatch::IntegrationTest
   test "ticket-updated should receive 401 without x-hub-signature header" do
     post triage_webhook_url
     assert_response :unauthorized

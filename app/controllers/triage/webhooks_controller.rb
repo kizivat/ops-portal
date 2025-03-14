@@ -8,9 +8,9 @@ class Triage::WebhooksController < ActionController::API
     when "ticket.created"
       Triage::SendNewIssueFromTriageToBackofficeJob.perform_later(data.require(:ticket_id))
     when "article.created"
-      Triage::ProcessNewCommentFromTriageJob.perform_later(data.require(:ticket_id), data.require(:article_id))
-    when "ticket.status_updated"
-      Triage::SendNewIssueStatusFromTriageToBackofficeJob.perform_later(data.require :ticket_id)
+      Triage::ProcessNewActivityFromTriageJob.perform_later(data.require(:ticket_id), data.require(:article_id))
+    when "ticket.updated"
+      Triage::SendNewIssueUpdateFromTriageToBackofficeJob.perform_later(data.require :ticket_id)
     else
       render json: "Unrecognized webhook event: #{event_type}", status: :unprocessable_entity
     end
@@ -31,6 +31,6 @@ class Triage::WebhooksController < ActionController::API
     render status: :unauthorized, json: nil and return unless sig_header.present?
 
     signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), ENV.fetch("TRIAGE_ZAMMAD_WEBHOOK_SECRET"), request.body.read)
-    render status: :forbidden, json: nil if signature != sig_header
+    render status: :forbidden, json: nil unless ActiveSupport::SecurityUtils.secure_compare(signature, sig_header)
   end
 end

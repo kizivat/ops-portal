@@ -1,48 +1,49 @@
-class Connector::OpsApiClient
-  def initialize(tenant, url: ENV.fetch("CONNECTOR__OPS_API_URL"), provider: Faraday)
-    @subject = tenant.api_subject_identifier
-    @private_key = OpenSSL::PKey::EC.new(tenant.api_token_private_key)
-    @url = url
-    @provider = provider
-  end
+module Connector
+  class OpsApiClient
+    def initialize(tenant, url: ENV.fetch("CONNECTOR__OPS_API_URL", "http://localhost:3000/"), provider: Faraday)
+      @subject = tenant.ops_api_subject_identifier
+      @private_key = OpenSSL::PKey::EC.new(tenant.ops_api_token_private_key)
+      @url = url
+      @provider = provider
+    end
 
-  def get_issue(issue_id)
-    response = @provider.get(URI.join(@url, "api/v1/issues/#{issue_id}"), { token: jwt_token })
-    nil unless response.status == 200
+    def get_issue(issue_id)
+      response = @provider.get(URI.join(@url, "api/v1/issues/#{issue_id}"), { token: jwt_token })
+      return nil unless response.status == 200
 
-    JSON.parse response.body
-  end
+      JSON.parse response.body
+    end
 
-  def update_issue_status(issue_id, status)
-    response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/status"), { status: status, token: jwt_token })
-    raise unless response.status == 204
-  end
+    def update_issue(issue_id, issue_data)
+      response = @provider.put(URI.join(@url, "api/v1/issues/#{issue_id}"), { token: jwt_token }.merge(issue_data))
+      raise unless response.status == 204
+    end
 
-  def get_comment(issue_id, comment_id)
-    response = @provider.get(URI.join(@url, "api/v1/issues/#{issue_id}/comments/#{comment_id}"), { token: jwt_token })
-    nil unless response.status == 200
+    def get_activity(issue_id, activity_id)
+      response = @provider.get(URI.join(@url, "api/v1/issues/#{issue_id}/activities/#{activity_id}"), { token: jwt_token })
+      return nil unless response.status == 200
 
-    JSON.parse response.body
-  end
+      JSON.parse response.body
+    end
 
-  def create_comment!(issue_id, comment)
-    # TODO
-    response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/comments"), { comment: comment, token: jwt_token })
-    raise unless response.status == 200
+    def create_activity!(issue_id, activity)
+      response = @provider.post(URI.join(@url, "api/v1/issues/#{issue_id}/activities"), { activity: activity, token: jwt_token })
+      raise unless response.status == 200
 
-    JSON.parse response.body["comment_id"]
-  end
+      JSON.parse(response.body)["activity_id"]
+    end
 
-  private
+    private
 
-  def jwt_token
-    JWT.encode({
-        sub: @subject,
-        exp: 5.minutes.from_now.to_i,
-        jti: SecureRandom.uuid
-      },
-      @private_key,
-      "ES256"
-    )
+    def jwt_token
+      JWT.encode({
+          sub: @subject,
+          exp: 5.minutes.from_now.to_i,
+          jti: SecureRandom.uuid
+        },
+        @private_key,
+        "ES256"
+      )
+    end
   end
 end

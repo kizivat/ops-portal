@@ -8,12 +8,10 @@ class Connector::WebhooksController < ActionController::API
     case event_type
     when "issue.created"
       Connector::CreateNewBackofficeIssueFromTriageJob.perform_later(@tenant, data.require(:issue_id))
-    when "comment.created"
-      unless Connector::Comment.find_by(triage_external_id: data.require(:comment_id))
-        Connector::CreateNewBackofficeCommentFromTriageJob.perform_later(@tenant, data.require(:issue_id), data.require(:comment_id))
-      end
-    when "issue.status_updated"
-      Connector::UpdateBackofficeIssueStatusFromTriageJob.perform_later(@tenant, data.require(:issue_id))
+    when "activity.created"
+      Connector::CreateNewBackofficeActivityFromTriageJob.perform_later(@tenant, data.require(:issue_id), data.require(:activity_id))
+    when "issue.updated"
+      Connector::UpdateBackofficeIssueFromTriageJob.perform_later(@tenant, data.require(:issue_id))
     else
       render text: "Unrecognized webhook event: #{event_type}", status: :unprocessable_entity
     end
@@ -22,15 +20,15 @@ class Connector::WebhooksController < ActionController::API
   private
 
   def webhook_params
-    params.permit(:type, :timestamp, data: [ :subject_id, :issue_id, :comment_id ])
+    params.permit(:type, :timestamp, data: [ :subject_id, :issue_id, :activity_id ])
   end
 
   def data
-    params.require(:data).permit(:subject_id, :issue_id, :comment_id)
+    params.require(:data).permit(:subject_id, :issue_id, :activity_id)
   end
 
   def set_tenant
-    @tenant = Connector::Tenant.find_by(api_subject_identifier: data.require(:subject_id))
+    @tenant = Connector::Tenant.find_by(ops_api_subject_identifier: data.require(:subject_id))
   end
 
   def authenticate
@@ -39,19 +37,22 @@ class Connector::WebhooksController < ActionController::API
     signature = request.headers["webhook-signature"]
     render status: :unauthorized, json: nil and return unless signature.present? && hook_id.present? && timestamp.present?
 
-    # TODO: canonicalize/sort json keys to create the same signed hash
-    # if signature.starts_with? "v1a,"
-    #   key = OpenSSL::PKey::EC.new(@tenant.webhook_public_key)
-    #   hash = OpenSSL::Digest.digest("SHA256", "#{hook_id}.#{timestamp}.#{webhook_params.to_json}")
-    #   render status: :forbidden, json: nil unless key.verify_raw("SHA256", Base64.decode64(signature&.gsub("v1a,", "")), hash)
+    data_string = "#{hook_id}.#{timestamp}.#{request.body.read}"
 
-    # elsif signature.starts_with "v1,"
-    #   key = OpenSSL::PKey::EC.new(@tenant.webhook_public_key)
-    #   expected_signature = OpenSSL::HMAC.base64digest("SHA256", @tenant.webhook_public_key, "#{hook_id}.#{timestamp}.#{webhook_params.to_json}")
-    #   render status: :forbidden, json: nil unless expected_signature == signature&.gsub("v1,", "")
+    if signature.starts_with? "v1a,"
+      hash = OpenSSL::Digest.digest("SHA256", data_string)
+      key = OpenSSL::PKey::EC.new(@tenant.ops_webhook_public_key)
+      render status: :forbidden, json: nil unless key.verify_raw("SHA256", Base64.decode64(signature.gsub("v1a,", "")), hash)
 
-    # else
-    #   render text: "Unrecognized webhook-signature prefix", status: :unprocessable_entity
-    # end
+    elsif signature.starts_with? "v1,"
+      key = @tenant.ops_webhook_public_key
+      expected_signature = OpenSSL::HMAC.base64digest("SHA256", key, data_string)
+      render status: :forbidden, json: nil unless ActiveSupport::SecurityUtils.secure_compare(expected_signature, signature.gsub("v1,", ""))
+
+    else
+      render status: :unprocessable_entity, json: { message: "Unrecognized webhook-signature prefix" }
+    end
+  rescue
+    render status: :unprocessable_entity, json: nil
   end
 end

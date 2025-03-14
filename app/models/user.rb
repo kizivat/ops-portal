@@ -40,6 +40,7 @@
 #
 class User < ApplicationRecord
   include Rodauth::Rails.model
+  # TODO: encrypt password field and access_token
 
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true

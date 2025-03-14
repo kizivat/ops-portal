@@ -8,10 +8,11 @@ class Triage::FireWebhookJob < ApplicationJob
     headers = {
       "webhook-id" => webhook_id,
       "webhook-timestamp" => attempt_timestamp.to_s,
-      "webhook-signature" => "v1a,#{Base64.strict_encode64 signature}"
+      "webhook-signature" => "v1a,#{Base64.strict_encode64 signature}",
+      "Content-Type" => "application/json"
     }
 
-    response = provider.post(client.url, payload, headers)
+    response = provider.post(client.url, payload.to_json, headers)
     raise unless response.status == 204
   end
 end
