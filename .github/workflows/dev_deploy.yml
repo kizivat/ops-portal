@@ -4,6 +4,12 @@ on:
   workflow_call:
   workflow_dispatch:
 
+env:
+  FACEBOOK_APP_ID: fake
+  FACEBOOK_APP_SECRET: secret
+  GOOGLE_CLIENT_ID: fake
+  GOOGLE_CLIENT_SECRET: secret
+
 jobs:
   dev-deploy:
     name: Deploy to DEV environment
@@ -50,6 +56,6 @@ jobs:
           CONNECTOR__OPS_API_URL: ${{ vars.CONNECTOR__OPS_API_URL }}
           CONNECTOR_WEBHOOK_URL: ${{ vars.CONNECTOR_WEBHOOK_URL }}
           CONNECTOR__ZAMMAD_URL: ${{ vars.CONNECTOR__ZAMMAD_URL }}
-          TRIAGE_ZAMMAD_URL: ${{ vars.TRIAGE_ZAMMAD_URL }}      
+          TRIAGE_ZAMMAD_URL: ${{ vars.TRIAGE_ZAMMAD_URL }}
 
         run: kamal deploy -d staging

@@ -5,6 +5,12 @@ on:
   push:
     branches: [ main ]
 
+env:
+  FACEBOOK_APP_ID: fake
+  FACEBOOK_APP_SECRET: secret
+  GOOGLE_CLIENT_ID: fake
+  GOOGLE_CLIENT_SECRET: secret
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
