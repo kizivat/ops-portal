@@ -11,7 +11,6 @@ class ZammadApiClient
   end
 
   def get_ticket(ticket_id, expand: false)
-    puts "Getting ticket: #{ticket_id}"
     begin
       ticket = @client.ticket.find(ticket_id)
     rescue => e
@@ -20,12 +19,13 @@ class ZammadApiClient
     end
 
     result = build_ticket_response(ticket)
-    puts "Ticket: #{result}"
+
+    return nil unless result.present?
     return result unless expand
 
-    result + {
+    result.merge({
       activities: ticket.articles.map { |article| build_article_response(ticket, article) }.compact
-    }
+    })
   end
 
   def create_ticket!(issue, group: DEFAULT_GROUP)

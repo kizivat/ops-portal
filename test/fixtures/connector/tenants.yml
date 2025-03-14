@@ -1,0 +1,21 @@
+default:
+  name: Test Tenant
+  ops_api_subject_identifier: 1
+  ops_api_token_private_key: <%= OpenSSL::PKey::RSA.new(2048).to_pem.inspect %>
+  ops_webhook_public_key: <%= SecureRandom.hex(32).inspect %>
+  backoffice_url: https://test-backoffice.example.com
+  backoffice_api_token: test_api_token_123
+  backoffice_webhook_secret: test_webhook_secret_456
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
+  
+other:
+  name: Other Tenant
+  ops_api_subject_identifier: 2
+  ops_api_token_private_key: <%= OpenSSL::PKey::RSA.new(2048).to_pem.inspect %>
+  ops_webhook_public_key: <%= SecureRandom.hex(32).inspect %>
+  backoffice_url: https://inactive-backoffice.example.com
+  backoffice_api_token: inactive_api_token_789
+  backoffice_webhook_secret: inactive_webhook_secret_012
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

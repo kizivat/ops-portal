@@ -3,7 +3,7 @@ class Api::V1::IssuesController < ApiController
   before_action :set_issue, only: [ :show, :update ]
 
   def show
-    @issue = @zammad_client.get_ticket(params.require :id, expand: true)
+    @issue = @zammad_client.get_ticket(params.require(:id), expand: true)
   end
 
   def update
@@ -19,7 +19,7 @@ class Api::V1::IssuesController < ApiController
   def set_issue
     @ticket = @zammad_client.get_ticket(params.require :id)
 
-    head :not_found unless @ticket
-    head :not_found unless @ticket["responsible_subject"] == @client.responsible_subject_zammad_identifier
+    return head :not_found unless @ticket
+    return head :not_found unless @ticket[:responsible_subject_identifier]&.to_i == @client.responsible_subject_zammad_identifier.to_i
   end
 end
