@@ -185,7 +185,7 @@ class RodauthMain < Rodauth::Rails::Auth
         {
           firstname: param_or_nil("firstname"),
           lastname: param_or_nil("lastname"),
-          municipality_id: param_or_nil("municipality_id"),
+          municipality_id: param_or_nil("municipality_id")
         }
       end
 

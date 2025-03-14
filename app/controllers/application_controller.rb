@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   def require_login
     unless current_user?
-      flash[:alert] = 'You must be logged in to access this page'
+      flash[:alert] = "You must be logged in to access this page"
       redirect_to rodauth.login_path
     end
   end
