@@ -1,5 +1,5 @@
 <div class="space-y-4 flex flex-col items-center">
-  <%= form_with url: rodauth.close_account_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+  <%= form_with url: rodauth.close_account_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm", html: { novalidate: true } do |form| %>
     <% if rodauth.close_account_requires_password? %>
       <div class="mb-6">
         <%= form.label "password", rodauth.password_label, class: "block text-sm font-semibold" %>

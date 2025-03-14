@@ -1,5 +1,5 @@
 <div class="flex items-start w-full max-w-sm">
-  <%= form_with url: rodauth.remember_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+  <%= form_with url: rodauth.remember_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm", html: { novalidate: true } do |form| %>
     <fieldset class="mb-6 space-y-2">
       <div class="flex items-center space-x-2">
         <%= form.radio_button rodauth.remember_param, rodauth.remember_remember_param_value, id: "remember-remember" %>

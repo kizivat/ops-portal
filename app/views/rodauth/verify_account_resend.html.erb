@@ -1,5 +1,5 @@
 <div class="space-y-4 flex flex-col items-center">
-  <%= form_with url: rodauth.verify_account_resend_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+  <%= form_with url: rodauth.verify_account_resend_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm", html: { novalidate: true } do |form| %>
     <div class="mb-4 text-sm">
       <%== rodauth.verify_account_resend_explanatory_text %>
     </div>
