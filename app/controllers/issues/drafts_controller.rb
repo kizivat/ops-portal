@@ -1,5 +1,5 @@
 class Issues::DraftsController < ApplicationController
-  before_action :require_login
+  before_action :require_user
 
   def new
     @draft = Issues::Draft.new

@@ -7,16 +7,18 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user
-    rodauth.rails_account
+    rodauth.rails_account # `rodauth.rails_account` surprisingly sets value for registration and password reset
   end
   helper_method :current_user
 
-  def current_user?
-    current_user.present?
+  def logged_in?
+    # `rodauth.logged_in?` checks only session entry
+    # `rodauth.rails_account` surprisingly sets value for registration and password reset
+    rodauth.logged_in? && current_user.present?
   end
-  helper_method :current_user?
+  helper_method :logged_in?
 
-  def require_login
+  def require_user
     unless current_user?
       flash[:alert] = "You must be logged in to access this page"
       redirect_to rodauth.login_path

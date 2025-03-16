@@ -44,9 +44,8 @@ with smaller changes
                 1</a>
             </div>
 
-
             <div class="flex space-x-4">
-              <% if current_user? %>
+              <% if logged_in? %>
                 <%= link_to "Sign out", rodauth.logout_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white", data: { turbo_method: :post } %>
               <% else %>
                 <a href="<%= rodauth.create_account_path %>" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Register</a>

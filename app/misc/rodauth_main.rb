@@ -65,6 +65,7 @@ class RodauthMain < Rodauth::Rails::Auth
 
     # Change some default param keys.
     login_param "email"
+    login_label "Email"
     login_confirm_param "email-confirm"
     # password_confirm_param "confirm_password"
     login_minimum_length 0
