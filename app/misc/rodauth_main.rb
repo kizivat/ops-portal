@@ -14,7 +14,8 @@ class RodauthMain < Rodauth::Rails::Auth
     omniauth_provider :facebook,
       ENV.fetch("FACEBOOK_APP_ID"),
       ENV.fetch("FACEBOOK_APP_SECRET"),
-      scope: "email"
+      scope: "email",
+      info_fields: "name,email,first_name,last_name"
 
     # Make sure provider name is explicitly set as a string for database queries
     omniauth_provider :google_oauth2,
