@@ -11,7 +11,7 @@
 #  banned            :boolean          default(FALSE)
 #  birth             :date
 #  created_from_app  :boolean          default(FALSE)
-#  email             :string
+#  email             :citext           not null
 #  email_notifiable  :boolean          default(TRUE)
 #  exp               :integer
 #  fcm_token         :string
@@ -20,11 +20,12 @@
 #  lastname          :string
 #  login             :string
 #  organization      :boolean
-#  password          :string
+#  password_hash     :string
 #  phone             :string
 #  resident          :boolean
 #  sex               :integer
 #  signature         :string
+#  status            :integer          default("unverified"), not null
 #  timestamp         :datetime
 #  uuid              :uuid             not null
 #  verification      :string
@@ -38,6 +39,7 @@
 #  street_id         :bigint
 #
 class User < ApplicationRecord
+  include Rodauth::Rails.model
   # TODO: encrypt password field and access_token
 
   belongs_to :municipality, optional: true
@@ -46,6 +48,7 @@ class User < ApplicationRecord
   has_many :issues_drafts, class_name: "Issues::Draft"
 
   enum :sex, m: 1, f: 2
+  enum :status, { unverified: 1, verified: 2, closed: 3 }
 
   validates :zammad_identifier, uniqueness: true, allow_nil: true
 

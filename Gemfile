@@ -54,6 +54,7 @@ gem "jwt"
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "pry", "~> 0.15.0"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
@@ -79,4 +80,18 @@ gem "good_job"
 
 gem "rack-cors", "~> 2.0"
 
+# Auth
+gem "rodauth-rails", "~> 2.0"
+gem "rodauth-omniauth", "~> 0.6.0"
+gem "omniauth-facebook", "~> 10.0"
+gem "omniauth-google-oauth2", "~> 1.2"
+
+# Used by Rodauth. Enables Sequel to use Active Record's database connection
+gem "sequel-activerecord_connection", "~> 2.0"
+# Used by Rodauth for password hashing
+gem "bcrypt", "~> 3.1"
+# Used by Rodauth for rendering built-in view and email templates
+gem "tilt", "~> 2.4"
+
+# deployment
 gem "kamal", "~> 2.5"
