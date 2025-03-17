@@ -5,12 +5,6 @@ on:
   push:
     branches: [ main ]
 
-env:
-  FACEBOOK_APP_ID: ${{ vars.FACEBOOK_APP_ID }}
-  FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
-  GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
-  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
