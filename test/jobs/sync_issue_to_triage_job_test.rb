@@ -16,7 +16,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
-      SyncIssueToTriageJob.perform_now(issue)
+      SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
     end
 
     assert_equal 99, issue.reload.triage_external_id
@@ -39,7 +39,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
-      SyncIssueToTriageJob.perform_now(issue)
+      SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
     end
 
     assert_equal 9, issue.author.reload.zammad_identifier
@@ -69,7 +69,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
-      SyncIssueToTriageJob.perform_now(issue)
+      SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
     end
 
     assert_equal 9, issue.owner.reload.zammad_identifier
