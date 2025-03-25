@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_25_165114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+  enable_extension "unaccent"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false

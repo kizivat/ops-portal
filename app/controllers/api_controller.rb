@@ -1,6 +1,5 @@
 class ApiController < ActionController::API
   before_action :set_zammad_client
-  before_action :default_format_json
 
   private
 
@@ -15,9 +14,5 @@ class ApiController < ActionController::API
   def authenticate_client
     # TODO
     @client = ApiEnvironment.token_authenticator.verify_token(authenticity_token)
-  end
-
-  def default_format_json
-    request.format = "json"
   end
 end
