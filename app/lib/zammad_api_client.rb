@@ -30,23 +30,11 @@ class ZammadApiClient
     })
   end
 
-  ISSUE_STATE_TO_PROCESS_TYPE = {
-    "Neriešený" => "portal_issue_resolution",
-    "Vyriešený" => "portal_issue_resolution",
-    "V riešení" => "portal_issue_resolution",
-    "Uzavretý" => "portal_issue_resolution",
-    "Čakajúci" => "portal_issue_triage",
-    "Neprijatý" => "portal_issue_triage"
-  }
-
-  def create_ticket!(issue, group: DEFAULT_GROUP)
-    issue_type = "issue" # TODO fix in import ... add issue.issue_type
-    process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
-
+  def create_ticket!(issue, process_type:, issue_type:, title:, description:, responsible_subject:, likes_count:, group: DEFAULT_GROUP)
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue_type,
-      title: process_type == "portal_issue_triage" ? "Triáž: #{issue.title}" : issue.title,
+      title: title,
       group: group,
       customer_id: issue.author.zammad_identifier,
       origin_by_id: issue.author.zammad_identifier,
@@ -64,14 +52,14 @@ class ZammadApiClient
       subtype: issue.subtype.name,
       state: issue.state.name,
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
-      responsible_subject: issue.responsible_subject&.legacy_id, # TODO map to responsible_subjects in triage
+      responsible_subject: responsible_subject,
       owner_id: issue.owner&.zammad_identifier,
       created_at: issue.reported_at,
-      likes_count: issue.legacy_data ? issue.legacy_data["like_count"] : 999, # TODO handle also non legacy
+      likes_count: likes_count,
       origin: DEFAULT_ORIGIN,
       article: {
         origin_by_id: issue.author.zammad_identifier,
-        body: issue.description.presence || "(bez popisu)",
+        body: description,
         type: DEFAULT_ARTICLE_TYPE,
         attachments: issue.photos.map do |photo|
           {
@@ -92,7 +80,7 @@ class ZammadApiClient
   def update_ticket!(ticket_id, ticket_params)
     ticket = @client.ticket.find(ticket_id)
 
-    # TODO add more fields
+    # TODO add more fields - this way?
     for key, value in ticket_params
       case key
       when "state"
@@ -201,9 +189,15 @@ class ZammadApiClient
     end
   end
 
-  def create_agent!(email)
+  def create_agent!(user)
     begin
-      zammad_user = @client.user.create(email: email, roles: [ "Agent" ])
+      zammad_user = @client.user.create(
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        roles: [ "Agent" ],
+        origin: "portal"
+      )
       zammad_user.id
     rescue RuntimeError => e
       raise e unless e.message.include? "is already used for another user."

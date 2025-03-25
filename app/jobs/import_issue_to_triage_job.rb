@@ -7,7 +7,7 @@ class ImportIssueToTriageJob < ApplicationJob
     issue.author.update!(zammad_identifier: client.create_customer!(issue.author)) unless issue.author.zammad_identifier.present?
 
     if issue.owner
-      issue.owner.update!(zammad_identifier: client.create_agent!(issue.owner.email)) unless issue.owner.zammad_identifier.present?
+      issue.owner.update!(zammad_identifier: client.create_agent!(issue.owner)) unless issue.owner.zammad_identifier.present?
       client.add_user_to_group(issue.owner.zammad_identifier, zammad_group)
     end
 
