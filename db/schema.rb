@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_25_165114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+  enable_extension "unaccent"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -58,7 +59,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
 
   create_table "connector_activities", force: :cascade do |t|
     t.integer "triage_external_id"
-    t.integer "backoffice_external_id"
+    t.string "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
@@ -69,7 +70,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
 
   create_table "connector_issues", force: :cascade do |t|
     t.integer "triage_external_id"
-    t.integer "backoffice_external_id"
+    t.string "backoffice_external_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
@@ -207,11 +208,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
     t.datetime "updated_at", null: false
     t.datetime "last_synced_at"
     t.integer "triage_external_id"
-    t.jsonb "legacy_data"
+    t.bigint "user_id"
     t.boolean "anonymous"
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
+    t.jsonb "legacy_data"
     t.bigint "category_id", null: false
     t.bigint "state_id"
     t.bigint "municipality_id"
@@ -242,6 +244,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_203813) do
     t.index ["street_id"], name: "index_issues_on_street_id"
     t.index ["subcategory_id"], name: "index_issues_on_subcategory_id"
     t.index ["subtype_id"], name: "index_issues_on_subtype_id"
+    t.index ["user_id"], name: "index_issues_on_user_id"
   end
 
   create_table "issues_activities", force: :cascade do |t|

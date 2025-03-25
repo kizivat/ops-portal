@@ -12,10 +12,13 @@ Rails.application.routes.draw do
     post "webhook" => "webhooks#webhook"
   end
 
-  namespace "api" do
+  namespace "api", defaults: { format: :json } do
     namespace "v1" do
       resources :issues, only: [ :show, :update ] do
         resources :activities, only: [ :show, :create ], controller: "issues/activities"
+      end
+      resources :responsible_subjects do
+        get :search, on: :collection
       end
     end
   end

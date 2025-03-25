@@ -24,4 +24,8 @@ class ResponsibleSubject < ApplicationRecord
   belongs_to :district, optional: true
   belongs_to :municipality, optional: true
   belongs_to :municipality_district, optional: true
+
+  def self.search(query)
+    where("unaccent(lower(subject_name)) ILIKE unaccent(lower(?))", "%#{query}%")
+  end
 end
