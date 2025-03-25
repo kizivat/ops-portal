@@ -24,7 +24,7 @@ class SyncIssueToTriageJob < ApplicationJob
       responsible_subject = issue.responsible_subject&.legacy_id || issue.responsible_subject&.id # TODO map to responsible_subjects in triage
       likes_count = issue.legacy_data ? issue.legacy_data["like_count"] : 999 # TODO handle also non legacy
 
-      ticket_id = client.create_ticket!(
+      ticket_id = client.create_ticket_from_issue!(
         issue,
         issue_type: issue_type,
         process_type: process_type,

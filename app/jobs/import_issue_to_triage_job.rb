@@ -11,7 +11,7 @@ class ImportIssueToTriageJob < ApplicationJob
       client.add_user_to_group(issue.owner.zammad_identifier, zammad_group)
     end
 
-    ticket_id = client.create_ticket!(issue, group: zammad_group)
+    ticket_id = client.create_ticket_from_issue!(issue, group: zammad_group)
 
     raise unless ticket_id
 

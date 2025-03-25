@@ -30,7 +30,7 @@ class ZammadApiClient
     })
   end
 
-  def create_ticket!(issue, process_type:, issue_type:, title:, description:, responsible_subject:, likes_count:, group: DEFAULT_GROUP)
+  def create_ticket_from_issue!(issue, process_type:, issue_type:, title:, description:, responsible_subject:, likes_count:, group: DEFAULT_GROUP)
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue_type,
