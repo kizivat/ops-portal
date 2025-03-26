@@ -223,8 +223,7 @@ class ZammadApiClient
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
-        roles: [ "Agent" ],
-        origin: "portal"
+        roles: [ "Agent" ]
       )
       zammad_user.id
     rescue RuntimeError => e
