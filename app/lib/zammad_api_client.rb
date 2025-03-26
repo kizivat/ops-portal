@@ -39,6 +39,8 @@ class ZammadApiClient
       customer_id: issue.author.external_id,
       origin_by_id: issue.author.external_id,
       municipality: build_ticket_municipality(issue),
+      address_lat: issue.latitude,
+      address_long: issue.longitude,
       address_county: issue.address_county,
       address_city: issue.address_city,
       address_city_district: issue.address_city_district,
@@ -96,6 +98,8 @@ class ZammadApiClient
 
     ticket.title = title
     ticket.municipality = build_ticket_municipality(issue)
+    ticket.address_lat = issue.latitude
+    ticket.address_long = issue.longitude
     ticket.address_county = issue.address_county
     ticket.address_city = issue.address_city
     ticket.address_city_district = issue.address_city_district
