@@ -15,6 +15,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_26_052916) do
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+  enable_extension "unaccent"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
