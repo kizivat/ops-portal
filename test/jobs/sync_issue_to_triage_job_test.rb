@@ -97,11 +97,12 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
   test "import fails if zammad not in import mode" do
     issue = issues(:without_triage_external_id)
 
-    triage_zammad_api_mock = Minitest::Mock.new
-    triage_zammad_api_mock.expect :check_import_mode!, StandardError.new("Import mode OFF")
-    ZammadApi.stub :new, triage_zammad_api_mock do
+    triage_zammad_client_mock = Minitest::Mock.new
+    triage_zammad_client_mock.expect :check_import_mode!, StandardError.new("Import mode OFF")
+
+    ZammadApiClient.stub :new, triage_zammad_client_mock do
       assert_raise do
-        SyncIssueToTriageJob.perform_now(issue, api: triage_zammad_api_mock)
+        SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
       end
     end
 

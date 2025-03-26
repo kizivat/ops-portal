@@ -243,6 +243,20 @@ class ZammadApiClient
     @client.ticket.find(ticket_id).responsible_subject
   end
 
+  def check_import_mode!
+    response = Faraday.get("#{ENV.fetch("TRIAGE_ZAMMAD_URL")}api/v1/settings", {}, "Authorization": "Token token=#{ENV.fetch("TRIAGE_ZAMMAD_API_TOKEN")}")
+    response_body = response.body.empty? ? nil : JSON.parse(response.body)
+  rescue StandardError => error
+    raise error.response if error.respond_to?(:response) && error.response
+    raise error
+  else
+    raise "Unexpected status: #{response.status}" unless response.status == 200
+
+    import_mode_on = response_body.select { |attribute| attribute["name"] == "import_mode" }.first["state_current"]["value"]
+
+    raise "Import mode OFF" unless import_mode_on
+  end
+
   private
 
   def find_zammad_user(email)

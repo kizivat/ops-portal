@@ -1,6 +1,6 @@
 class ImportMunicipalityIssuesToTriageJob < ApplicationJob
-  def perform(municipality:, municipality_district:, api: TriageZammadEnvironment.api, client: TriageZammadEnvironment.client, import_issue_to_triage_job: ImportIssueToTriageJob)
-    api.check_import_mode!
+  def perform(municipality:, municipality_district:, client: TriageZammadEnvironment.client, import_issue_to_triage_job: ImportIssueToTriageJob)
+    client.check_import_mode!
 
     zammad_group = client.get_groups.select { |group| municipality.name.in?(group.name) && municipality_district&.name&.in?(group.name) }[0]
     raise "No zammad group found!" unless zammad_group

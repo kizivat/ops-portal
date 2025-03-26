@@ -1,6 +1,6 @@
 class SyncIssueToTriageJob < ApplicationJob
-  def perform(issue, client: TriageZammadEnvironment.client, api: TriageZammadEnvironment.api, import: false)
-    api.check_import_mode! if import
+  def perform(issue, client: TriageZammadEnvironment.client, import: false)
+    client.check_import_mode! if import
 
     # TODO actually do a sync (insert/update & handle triage_process/resolution_process)
     find_or_create_triage_portal_user!(issue.author, client) unless issue.author.external_id

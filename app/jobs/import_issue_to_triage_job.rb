@@ -1,8 +1,8 @@
 class ImportIssueToTriageJob < ApplicationJob
-  def perform(issue, zammad_group:, api: TriageZammadEnvironment.api, client: TriageZammadEnvironment.client, import_activities_to_triage_job: ImportIssueActivitiesToTriageJob)
+  def perform(issue, zammad_group:, client: TriageZammadEnvironment.client, import_activities_to_triage_job: ImportIssueActivitiesToTriageJob)
     return if issue.triage_external_id.present?
 
-    api.check_import_mode!
+    client.check_import_mode!
 
     issue.author.update!(external_id: client.create_customer!(issue.author)) unless issue.author.external_id.present?
 

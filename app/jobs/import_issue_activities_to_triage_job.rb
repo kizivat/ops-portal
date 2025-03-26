@@ -1,6 +1,6 @@
 class ImportIssueActivitiesToTriageJob < ApplicationJob
-  def perform(issue, api: TriageZammadEnvironment.api, client: TriageZammadEnvironment.client)
-    api.check_import_mode!
+  def perform(issue, client: TriageZammadEnvironment.client)
+    client.check_import_mode!
 
     issue.activities.includes(:activity_object).find_each do |activity|
       next if activity.activity_object.triage_external_id.present?
