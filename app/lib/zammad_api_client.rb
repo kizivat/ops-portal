@@ -109,6 +109,7 @@ class ZammadApiClient
 
     ticket.save
 
+    # TODO check if it is always 1st article
     article = ticket.articles.first
     article.body = issue.description
     article.save
