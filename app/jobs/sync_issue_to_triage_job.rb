@@ -61,9 +61,11 @@ class SyncIssueToTriageJob < ApplicationJob
   end
 
   def find_municipality_group(issue, client)
-    return client.get_groups.select { |group| issue.municipality.name.in?(group.name) }[0] unless issue.municipality_district
-
-    client.get_groups.select { |group| issue.municipality.name.in?(group.name) && issue.municipality_district.name&.in?(group.name) }[0]
+    if issue.municipality_district
+      client.get_groups.select { |group| issue.municipality.name.in?(group.name) && issue.municipality_district.name&.in?(group.name) }[0]
+    else
+      client.get_groups.select { |group| issue.municipality.name.in?(group.name) }[0]
+    end
   end
 
   ISSUE_STATE_TO_PROCESS_TYPE = {
