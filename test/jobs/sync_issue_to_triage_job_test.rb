@@ -5,6 +5,11 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     issue = issues(:without_triage_external_id)
 
     triage_zammad_client_mock = Minitest::Mock.new
+    triage_zammad_client_mock.expect :get_groups, [
+      OpenStruct.new(name: "Dobrovoľníci::Nitra"),
+      OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
+      OpenStruct.new(name: "Dobrovoľníci::Prešov")
+    ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
         issue_type: "issue",
@@ -12,7 +17,8 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
         title: "Triáž: New issue",
         description: "New issue description",
         responsible_subject: nil,
-        likes_count: 999
+        likes_count: 999,
+        group: "Dobrovoľníci::Trenčín"
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
@@ -27,6 +33,11 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     issue.update!(author: users(:two))
 
     triage_zammad_client_mock = Minitest::Mock.new
+    triage_zammad_client_mock.expect :get_groups, [
+      OpenStruct.new(name: "Dobrovoľníci::Nitra"),
+      OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
+      OpenStruct.new(name: "Dobrovoľníci::Prešov")
+    ]
     triage_zammad_client_mock.expect :create_customer!, 9, [ issue.author ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
@@ -35,7 +46,8 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
         title: "Triáž: New issue",
         description: "New issue description",
         responsible_subject: nil,
-        likes_count: 999
+        likes_count: 999,
+        group: "Dobrovoľníci::Trenčín"
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
@@ -51,12 +63,12 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     issue.update!(owner: legacy_agents(:two))
 
     triage_zammad_client_mock = Minitest::Mock.new
-    triage_zammad_client_mock.expect :create_agent!, 9, [ issue.owner ]
     triage_zammad_client_mock.expect :get_groups, [
       OpenStruct.new(name: "Dobrovoľníci::Nitra"),
       OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
       OpenStruct.new(name: "Dobrovoľníci::Prešov")
     ]
+    triage_zammad_client_mock.expect :create_agent!, 9, [ issue.owner ]
     triage_zammad_client_mock.expect :add_user_to_group, nil, [ 9, "Dobrovoľníci::Trenčín" ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
@@ -65,7 +77,8 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
         title: "Triáž: New issue",
         description: "New issue description",
         responsible_subject: nil,
-        likes_count: 999
+        likes_count: 999,
+        group: "Dobrovoľníci::Trenčín"
       }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
@@ -81,6 +94,11 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     issue_last_synced_at = issue.last_synced_at
 
     triage_zammad_client_mock = Minitest::Mock.new
+    triage_zammad_client_mock.expect :get_groups, [
+      OpenStruct.new(name: "Dobrovoľníci::Nitra"),
+      OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
+      OpenStruct.new(name: "Dobrovoľníci::Prešov")
+    ]
     triage_zammad_client_mock.expect :update_ticket_from_issue!, nil, [ issue.triage_external_id, issue ],
       **{
         title: "Triáž: MyString",
