@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_21_101726) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_28_134318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -45,15 +45,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_101726) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "announcements", force: :cascade do |t|
-    t.string "title", null: false
-    t.string "slug", null: false
-    t.text "text", null: false
-    t.jsonb "raw", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "clients", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -63,6 +54,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_101726) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "triage_external_author_identifier"
+  end
+
+  create_table "cms_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.bigint "parent_category_id"
+    t.jsonb "raw", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_category_id", "slug"], name: "index_cms_categories_on_parent_category_id_and_slug", unique: true
+  end
+
+  create_table "cms_pages", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.text "text", null: false
+    t.jsonb "raw", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "tags", default: [], array: true
+    t.bigint "category_id", null: false
+    t.index ["category_id", "slug"], name: "index_cms_pages_on_category_id_and_slug", unique: true
   end
 
   create_table "connector_activities", force: :cascade do |t|
@@ -685,6 +698,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_101726) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cms_pages", "cms_categories", column: "category_id", on_delete: :cascade
   add_foreign_key "connector_activities", "connector_tenants"
   add_foreign_key "connector_issues", "connector_tenants"
   add_foreign_key "connector_users", "connector_tenants"
