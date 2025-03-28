@@ -1,5 +1,5 @@
 class SyncIssueToTriageJob < ApplicationJob
-  def perform(issue, client: TriageZammadEnvironment.client, import: false)
+  def perform(issue, client: TriageZammadEnvironment.client, import: false, sync_activities_to_triage_job: SyncIssueActivitiesToTriageJob)
     client.check_import_mode! if import
 
     # TODO actually do a sync (insert/update & handle triage_process/resolution_process)
@@ -43,6 +43,8 @@ class SyncIssueToTriageJob < ApplicationJob
         triage_external_id: ticket_id
       )
     end
+
+    sync_activities_to_triage_job.perform_later(issue, import: import)
   end
 
   def find_or_create_triage_portal_user!(user, client, customer: true)

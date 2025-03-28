@@ -81,7 +81,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     issue_last_synced_at = issue.last_synced_at
 
     triage_zammad_client_mock = Minitest::Mock.new
-    triage_zammad_client_mock.expect :update_ticket_from_issue!, nil, [ issue.triage_external_id, issue],
+    triage_zammad_client_mock.expect :update_ticket_from_issue!, nil, [ issue.triage_external_id, issue ],
       **{
         title: "Triáž: MyString",
         likes_count: 999
