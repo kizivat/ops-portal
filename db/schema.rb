@@ -232,6 +232,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_28_070742) do
     t.string "address_road"
     t.string "address_house_number"
     t.string "portal_url"
+    t.string "address_postcode"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
