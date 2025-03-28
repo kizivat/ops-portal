@@ -36,6 +36,8 @@ module Import
               modified_at: legacy_record.modified_time, # TODO nestaci updated_at?
               updated_by_id: legacy_record.modified_by, # TODO overit na ktory model je toto referencia
               state_changed_at: legacy_record.last_status_change_time,
+              street: Street.find_by(legacy_id: legacy_record.ulica)&.name,
+              street_legacy_id: legacy_record.ulica,
               responsible_subject_type_id: legacy_record.zodpovednost_typ,
               mobile: legacy_record.mobile,
               ip: legacy_record.ip,
@@ -61,7 +63,7 @@ module Import
               organization_unit_id2: legacy_record.organizational_unit_id2
             },
             longitude: legacy_record.map_x,
-            portal_url: "", # TODO value
+            portal_url: URI.join(ENV.fetch("LEGACY_PORTAL_URL"), "podnety/", legacy_record.id.to_s).to_s,
             reported_at: convert_timestamp_value(legacy_record.posted_time),
             title: legacy_record.heading,
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
@@ -72,8 +74,7 @@ module Import
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             municipality_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
             responsible_subject: ResponsibleSubject.find_by(legacy_id: legacy_record.zodpovednost),
-            state: ::Issues::State.find_by(legacy_id: legacy_record.status),
-            street: Street.find_by(legacy_id: legacy_record.ulica)
+            state: ::Issues::State.find_by(legacy_id: legacy_record.status)
           )
 
           import_photos_job.perform_later(issue: issue)
