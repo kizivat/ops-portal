@@ -69,31 +69,31 @@ end
   },
   {
     name: "Čakajúci",
-    key: "waiting",
+    key: "waiting"
   },
   {
     name: "Vyriešený",
-    key: "resolved",
+    key: "resolved"
   },
   {
     name: "Neriešený",
-    key: "unresolved",
+    key: "unresolved"
   },
   {
     name: "V riešení",
-    key: "in_progress",
+    key: "in_progress"
   },
   {
     name: "Neprijatý",
-    key: "rejected",
+    key: "rejected"
   },
   {
     name: "Uzavretý",
-    key: "closed",
+    key: "closed"
   },
   {
     name: "Označený za vyriešený",
-    key: "marked_as_resolved",
+    key: "marked_as_resolved"
   }
 ].each do |state_data|
   Issues::State.find_or_create_by!(name: state_data[:name]).tap do |issues_state|
