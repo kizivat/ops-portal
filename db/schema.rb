@@ -15,6 +15,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_28_134318) do
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+  enable_extension "unaccent"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -253,6 +254,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_28_134318) do
     t.string "address_town"
     t.string "address_road"
     t.string "address_house_number"
+    t.string "address_postcode"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
