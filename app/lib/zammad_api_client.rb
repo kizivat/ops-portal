@@ -39,14 +39,14 @@ class ZammadApiClient
       customer_id: issue.author.external_id,
       origin_by_id: issue.author.external_id,
       address_state: issue.address_state,
-      address_county: issue.address_county || issue.municipality&.district&.name,
-      address_city: issue.address_city || issue.municipality&.name,
+      address_county: issue.address_county,
+      address_city: issue.address_city,
       address_city_district: issue.address_city_district,
       address_postcode: issue.address_postcode,
       address_suburb: issue.address_suburb,
       address_village: issue.address_village,
-      address_town: issue.address_town || issue.municipality_district&.name, # TODO no such attribute in triage zammad
-      address_road: issue.address_road || issue.legacy_data["street"],
+      address_town: issue.address_town, # TODO no such attribute in triage zammad
+      address_road: issue.address_road,
       address_house_number: issue.address_house_number,
       address_lat: issue.latitude,
       address_lon: issue.longitude,
@@ -54,7 +54,7 @@ class ZammadApiClient
       category: issue.category&.triage_external_id || issue.category.name,
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
-      state: issue.state.name,
+      ops_state: issue.state.name,
       portal_url: portal_url,
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: responsible_subject,
