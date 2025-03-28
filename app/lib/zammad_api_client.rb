@@ -40,12 +40,12 @@ class ZammadApiClient
       origin_by_id: issue.author.external_id,
       address_state: issue.address_state,
       address_county: issue.address_county || issue.municipality&.district&.name,
-      address_city: issue.address_city || issue.municipality,
+      address_city: issue.address_city || issue.municipality&.name,
       address_city_district: issue.address_city_district,
       address_postcode: issue.address_postcode,
       address_suburb: issue.address_suburb,
       address_village: issue.address_village,
-      address_town: issue.address_town || issue.municipality_district, # TODO no such attribute in triage zammad
+      address_town: issue.address_town || issue.municipality_district&.name, # TODO no such attribute in triage zammad
       address_road: issue.address_road || issue.legacy_data["street"],
       address_house_number: issue.address_house_number,
       address_lat: issue.latitude,
