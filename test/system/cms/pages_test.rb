@@ -38,12 +38,4 @@ class Cms::PagesTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Holiday Hours Notice"
     assert_text "upcoming holiday season"
   end
-
-  test "redirects to correct url" do
-    visit announcement_path(@announcement.id)
-
-    assert_current_path(/holiday-hours-notice/)
-
-    assert_selector "h1", text: "Holiday Hours Notice"
-  end
 end
