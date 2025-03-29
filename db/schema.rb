@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_28_134318) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -700,6 +700,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_28_134318) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cms_categories", "cms_categories", column: "parent_category_id"
   add_foreign_key "cms_pages", "cms_categories", column: "category_id", on_delete: :cascade
   add_foreign_key "connector_activities", "connector_tenants"
   add_foreign_key "connector_issues", "connector_tenants"
