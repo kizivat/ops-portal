@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_27_210325) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -55,6 +55,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_210325) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "triage_external_author_identifier"
+  end
+
+  create_table "cms_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.bigint "parent_category_id"
+    t.jsonb "raw", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_category_id", "slug"], name: "index_cms_categories_on_parent_category_id_and_slug", unique: true
+  end
+
+  create_table "cms_pages", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.text "text", null: false
+    t.jsonb "raw", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "tags", default: [], array: true
+    t.bigint "category_id", null: false
+    t.index ["category_id", "slug"], name: "index_cms_pages_on_category_id_and_slug", unique: true
   end
 
   create_table "connector_activities", force: :cascade do |t|
@@ -220,9 +242,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_210325) do
     t.bigint "street_id"
     t.bigint "municipality_district_id"
     t.bigint "responsible_subject_id"
+    t.bigint "owner_id"
     t.bigint "subcategory_id"
     t.bigint "subtype_id"
-    t.bigint "owner_id"
     t.string "address_state"
     t.string "address_county"
     t.string "address_city"
@@ -678,6 +700,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_210325) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cms_categories", "cms_categories", column: "parent_category_id"
+  add_foreign_key "cms_pages", "cms_categories", column: "category_id", on_delete: :cascade
   add_foreign_key "connector_activities", "connector_tenants"
   add_foreign_key "connector_issues", "connector_tenants"
   add_foreign_key "connector_users", "connector_tenants"
