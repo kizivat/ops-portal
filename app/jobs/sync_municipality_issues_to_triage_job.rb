@@ -1,5 +1,11 @@
 class SyncMunicipalityIssuesToTriageJob < ApplicationJob
-  def perform(municipality:, municipality_district:, client: TriageZammadEnvironment.client, import: false, sync_issue_to_triage_job: SyncIssueToTriageJob)
+  def perform(
+    municipality:,
+    municipality_district:,
+    client: TriageZammadEnvironment.client,
+    import: false,
+    sync_issue_to_triage_job: SyncIssueToTriageJob
+  )
     client.check_import_mode! if import
 
     Issue.where(municipality: municipality).where(municipality_district: municipality_district).find_each do |issue|

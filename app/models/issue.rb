@@ -55,11 +55,4 @@ class Issue < ApplicationRecord
   has_many_attached :photos
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
-
-  # TODO even during initial import?
-  after_create :schedule_sync_to_triage
-
-  def schedule_sync_to_triage
-    SyncIssueToTriageJob.perform_later(self)
-  end
 end

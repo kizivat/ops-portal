@@ -77,6 +77,8 @@ class Issues::Draft < ApplicationRecord
     photos.each do |photo|
       issue.photos.append photo
     end
+
+    SyncIssueToTriageJob.perform_later(issue)
   end
 
   def schedule_calculate_suggestions
