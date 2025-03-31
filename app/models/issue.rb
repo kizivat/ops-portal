@@ -8,8 +8,8 @@
 #  address_county           :string
 #  address_house_number     :string
 #  address_postcode         :string
-#  address_road             :string
 #  address_state            :string
+#  address_street           :string
 #  address_suburb           :string
 #  address_town             :string
 #  address_village          :string

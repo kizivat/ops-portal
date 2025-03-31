@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_31_101100) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_31_152058) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -251,7 +251,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_101100) do
     t.string "address_suburb"
     t.string "address_village"
     t.string "address_town"
-    t.string "address_road"
+    t.string "address_street"
     t.string "address_house_number"
     t.string "address_postcode"
     t.index ["author_id"], name: "index_issues_on_author_id"

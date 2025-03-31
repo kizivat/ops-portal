@@ -42,7 +42,7 @@ class ZammadApiClient
       address_county: issue.address_county,
       address_municipality: build_ticket_municipality(issue),
       address_postcode: issue.address_postcode,
-      address_street: issue.address_road,
+      address_street: issue.address_street,
       address_house_number: issue.address_house_number,
       address_lat: issue.latitude,
       address_lon: issue.longitude,
@@ -109,7 +109,7 @@ class ZammadApiClient
     ticket.address_suburb = issue.address_suburb
     ticket.address_village = issue.address_village
     ticket.address_town = issue.address_town
-    ticket.address_street =  issue.address_road
+    ticket.address_street =  issue.address_street
     ticket.address_house_number = issue.address_house_number
     ticket.ops_state = issue.state.key
     ticket.likes_count = likes_count
@@ -335,7 +335,7 @@ class ZammadApiClient
       address_city_district: ticket.address_city_district,
       address_postcode: ticket.address_postcode,
       address_suburb: ticket.address_suburb,
-      address_road: ticket.address_road,
+      address_street: ticket.address_street,
       address_house_number: ticket.address_house_number,
       likes_count: ticket.likes_count,
       created_at: ticket.created_at,

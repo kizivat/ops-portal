@@ -121,7 +121,7 @@ module Connector
         address_city: issue["address_city"],
         address_city_district: issue["address_city_district"],
         address_suburb: issue["address_suburb"],
-        address_road: issue["address_road"],
+        address_street: issue["address_street"],
         address_house_number: issue["address_house_number"],
         ops_likes_count: issue["likes_count"],
         created_at: issue["created_at"],

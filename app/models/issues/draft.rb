@@ -62,7 +62,7 @@ class Issues::Draft < ApplicationRecord
       address_suburb: address_suburb,
       address_village: address_village,
       address_town: address_town,
-      address_road: address_road,
+      address_street: address_road,
       address_house_number: address_house_number,
       address_postcode: address_postcode,
       category: category,
