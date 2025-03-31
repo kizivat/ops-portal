@@ -26,7 +26,7 @@ module Import
             address_city_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast)&.name,
             anonymous: legacy_record.anonymous,
             description: legacy_record.description,
-            latitude: legacy_record.map_y,
+            latitude: legacy_record.map_x,
             legacy_data: {
               embed: legacy_record.embed,
               map_zoom: legacy_record.map_zoom,
@@ -65,7 +65,7 @@ module Import
               parent_id: legacy_record.parent_id,
               organization_unit_id2: legacy_record.organizational_unit_id2
             },
-            longitude: legacy_record.map_x,
+            longitude: legacy_record.map_y,
             reported_at: convert_timestamp_value(legacy_record.posted_time),
             title: legacy_record.heading,
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
