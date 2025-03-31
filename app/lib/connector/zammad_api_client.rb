@@ -7,6 +7,7 @@ module Connector
     DEFAULT_GROUP = "Incoming"
     DEFAULT_STATE = "new"
     OPS_ORIGIN = "ops"
+    RESPONSIBLE_SUBJECT_ARTICLE_TAG = ENV.fetch("RESPONSIBLE_SUBJECT_ARTICLE_TAG", "[[pre zodpovedny subjekt]]")
 
     def initialize(tenant)
       @token = tenant.backoffice_api_token
@@ -29,10 +30,34 @@ module Connector
 
       ticket = @client.ticket.find(issue.backoffice_external_id)
       for key, value in issue_data
-        # TODO add more attributes
         case key
-        when "state"
+        when "ops_state"
           ticket.ops_state = value
+        when "responsible_subject"
+          ticket.ops_responsible_subject = value
+        when "responsible_subject_changed_at"
+          ticket.ops_responsible_subject_changed_at = value
+        when "likes_count"
+          ticket.ops_likes_count = value
+        when "category"
+          ticket.ops_category = value
+        when "subcategory"
+          ticket.ops_subcategory = value
+        when "subtype"
+          ticket.ops_subtype = value
+        when "address_municipality"
+          ticket.address_municipality = value&.split("::").first
+          ticket.address_municipality_district = value&.split("::").last
+        when "address_street"
+          ticket.address_street = value
+        when "address_house_number"
+          ticket.address_house_number = value
+        when "address_postcode"
+          ticket.address_postcode = value
+        when "address_lat"
+          ticket.address_lat = value
+        when "address_lon"
+          ticket.address_lon = value
         end
       end
       ticket.save
@@ -49,9 +74,10 @@ module Connector
     def get_issue(issue_id)
       ticket = @client.ticket.find(issue_id)
 
-      # TODO add more attributes
       {
-        state: ticket.state
+        ops_state: ticket.ops_state,
+        responsible_subject: ticket.ops_responsible_subject,
+        investment: ticket.investment
       }
     end
 
@@ -67,7 +93,7 @@ module Connector
           attachments: article.attachments.map do |attachment|
             {
               filename: attachment.filename,
-              content_type: attachment.preferences.dig(:"Mime-Type"),
+              content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
               data64: Base64.strict_encode64(attachment.download)
             }
           end
@@ -108,28 +134,30 @@ module Connector
         group: DEFAULT_GROUP,
         origin: OPS_ORIGIN,
         title: issue["title"],
-        ops_state: issue["state"],
+        ops_state: issue["ops_state"],
         origin_by_id: create_or_find_customer(issue["author"]),
         customer_id: create_or_find_customer(issue["author"]),
-        triage_identifier: issue["triage_identifier"],
-        issue_type: issue["issue_type"],
+        ops_issue_type: issue["issue_type"],
+        ops_responsible_subject: issue["responsible_subject"],
         ops_category: issue["category"],
         ops_subcategory: issue["subcategory"],
         ops_subtype: issue["subtype"],
-        address_state: issue["address_state"],
-        address_county: issue["address_county"],
-        address_city: issue["address_city"],
-        address_city_district: issue["address_city_district"],
-        address_suburb: issue["address_suburb"],
+        address_municipality: issue["address_municipality"].split("::").first,
+        address_municipality_district: issue["address_municipality"].split("::").last,
         address_street: issue["address_street"],
         address_house_number: issue["address_house_number"],
+        address_postcode: issue["address_postcode"],
+        address_lat: issue["address_lat"],
+        address_lon: issue["address_lon"],
+        ops_responsible_subject_changed_at: issue["responsible_subject_changed_at"],
         ops_likes_count: issue["likes_count"],
+        ops_portal_url: issue["portal_url"],
         created_at: issue["created_at"],
         updated_at: issue["updated_at"],
         article: {
           origin_by_id: create_or_find_customer(article["author"]),
           content_type: article["content_type"],
-          body: article["body"].gsub(/\[\[zodpovedny\]\]/, ""),
+          body: article["body"].gsub(RESPONSIBLE_SUBJECT_ARTICLE_TAG, ""),
           type: article["type"],
           triage_created_at: article["created_at"],
           attachments: article["attachments"].map do |attachment|
@@ -157,8 +185,9 @@ module Connector
       new_article = ticket.article(
         origin_by_id: create_or_find_customer(activity["author"]),
         content_type: activity["content_type"],
-        body: activity["body"],
+        body: activity["body"].gsub(RESPONSIBLE_SUBJECT_ARTICLE_TAG, ""),
         type: activity["type"],
+        internal: false,
         triage_created_at: activity["created_at"],
         attachments: activity["attachments"].map do |attachment|
           {

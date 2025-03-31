@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_31_152058) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_31_190007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -49,12 +49,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_152058) do
   create_table "clients", force: :cascade do |t|
     t.string "name"
     t.string "url"
-    t.string "responsible_subject_zammad_identifier"
     t.string "api_token_public_key"
     t.string "webhook_private_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "triage_external_author_identifier"
+    t.bigint "responsible_subject_id"
+    t.index ["responsible_subject_id"], name: "index_clients_on_responsible_subject_id"
   end
 
   create_table "cms_categories", force: :cascade do |t|
@@ -700,6 +700,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_152058) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "clients", "responsible_subjects"
   add_foreign_key "cms_categories", "cms_categories", column: "parent_category_id"
   add_foreign_key "cms_pages", "cms_categories", column: "category_id", on_delete: :cascade
   add_foreign_key "connector_activities", "connector_tenants"
