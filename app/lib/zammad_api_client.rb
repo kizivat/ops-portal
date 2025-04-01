@@ -177,9 +177,9 @@ class ZammadApiClient
     article = ticket.article(
       origin_by_id: author_id,
       content_type: activity["content_type"],
-      body: activity["body"].gsub(OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG, ""),
+      body: activity["body"],
       type: activity["type"],
-      internal: !activity["body"].include?(OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG),
+      internal: false,
       attachments: activity["attachments"].map do |attachment|
         {
           "filename" => attachment["filename"],
