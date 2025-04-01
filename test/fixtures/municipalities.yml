@@ -2,7 +2,15 @@
 
 one:
   sub: ba
+  name: Bratislava
   alias: bratislava
   email: bratislava
   municipality_type: 2
   has_municipality_districts: 1
+
+tn:
+  sub: tn
+  name: Trenčín
+  alias: trencin
+  email: trencin
+  municipality_type: 1

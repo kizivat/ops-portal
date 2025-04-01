@@ -20,9 +20,13 @@ module Import
 
           issue = Issue.find_or_create_by!(
             legacy_id: legacy_record.id,
+            address_city: Municipality.find_by(legacy_id: legacy_record.mesto)&.name,
+            address_state: Municipality.find_by(legacy_id: legacy_record.mesto)&.district&.name,
+            address_street: Street.find_by(legacy_id: legacy_record.ulica)&.name,
+            address_city_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast)&.name,
             anonymous: legacy_record.anonymous,
             description: legacy_record.description,
-            latitude: legacy_record.map_y,
+            latitude: legacy_record.map_x,
             legacy_data: {
               embed: legacy_record.embed,
               map_zoom: legacy_record.map_zoom,
@@ -36,6 +40,7 @@ module Import
               modified_at: legacy_record.modified_time, # TODO nestaci updated_at?
               updated_by_id: legacy_record.modified_by, # TODO overit na ktory model je toto referencia
               state_changed_at: legacy_record.last_status_change_time,
+              street_legacy_id: legacy_record.ulica,
               responsible_subject_type_id: legacy_record.zodpovednost_typ,
               mobile: legacy_record.mobile,
               ip: legacy_record.ip,
@@ -60,19 +65,18 @@ module Import
               parent_id: legacy_record.parent_id,
               organization_unit_id2: legacy_record.organizational_unit_id2
             },
-            longitude: legacy_record.map_x,
-            reported_at: convert_timestamp_value(legacy_record.posted_time),
+            longitude: legacy_record.map_y,
+            reported_at: convert_timestamp_value(legacy_record.posted_time), # TODO dolezity udaj pre triaz podnetu
             title: legacy_record.heading,
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
-            owner: Legacy::User.find_or_create_agent(legacy_record.riesitel_new || legacy_record.riesitel),
+            owner: Legacy::User.find_or_create_agent(legacy_record.riesitel_new&.nonzero?.presence || legacy_record.riesitel),
             category: category,
             subcategory: subcategory,
             subtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             municipality_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
             responsible_subject: ResponsibleSubject.find_by(legacy_id: legacy_record.zodpovednost),
-            state: ::Issues::State.find_by(legacy_id: legacy_record.status),
-            street: Street.find_by(legacy_id: legacy_record.ulica)
+            state: ::Issues::State.find_by(legacy_id: legacy_record.status)
           )
 
           import_photos_job.perform_later(issue: issue)

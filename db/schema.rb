@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_01_094510) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -114,7 +114,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
   end
 
   create_table "connector_users", force: :cascade do |t|
-    t.integer "zammad_identifier"
+    t.integer "external_id"
     t.uuid "uuid"
     t.string "firstname"
     t.string "lastname"
@@ -122,7 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
     t.index ["connector_tenant_id"], name: "index_connector_users_on_connector_tenant_id"
-    t.index ["zammad_identifier"], name: "index_connector_users_on_zammad_identifier", unique: true
+    t.index ["external_id"], name: "index_connector_users_on_external_id", unique: true
   end
 
   create_table "districts", force: :cascade do |t|
@@ -239,12 +239,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.bigint "state_id"
     t.bigint "municipality_id"
     t.integer "legacy_id"
-    t.bigint "street_id"
     t.bigint "municipality_district_id"
     t.bigint "responsible_subject_id"
-    t.bigint "owner_id"
     t.bigint "subcategory_id"
     t.bigint "subtype_id"
+    t.bigint "owner_id"
     t.string "address_state"
     t.string "address_county"
     t.string "address_city"
@@ -252,7 +251,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.string "address_suburb"
     t.string "address_village"
     t.string "address_town"
-    t.string "address_road"
+    t.string "address_street"
     t.string "address_house_number"
     t.string "address_postcode"
     t.index ["author_id"], name: "index_issues_on_author_id"
@@ -263,7 +262,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.index ["owner_id"], name: "index_issues_on_owner_id"
     t.index ["responsible_subject_id"], name: "index_issues_on_responsible_subject_id"
     t.index ["state_id"], name: "index_issues_on_state_id"
-    t.index ["street_id"], name: "index_issues_on_street_id"
     t.index ["subcategory_id"], name: "index_issues_on_subcategory_id"
     t.index ["subtype_id"], name: "index_issues_on_subtype_id"
   end
@@ -338,6 +336,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.integer "triage_external_id"
+    t.bigint "author_id"
+    t.string "author_type"
     t.index ["activity_id"], name: "index_issues_communications_on_activity_id"
     t.index ["legacy_id"], name: "index_issues_communications_on_legacy_id", unique: true
   end
@@ -382,6 +382,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.string "key"
     t.index ["legacy_id"], name: "index_issues_states_on_legacy_id", unique: true
   end
 
@@ -442,7 +443,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.string "firstname"
     t.string "lastname"
     t.integer "legacy_id"
-    t.integer "zammad_identifier"
+    t.integer "external_id"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.boolean "banned", default: false
     t.string "login"
@@ -472,9 +473,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.boolean "email_notifiable", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_legacy_agents_on_external_id", unique: true
     t.index ["municipality_id"], name: "index_legacy_agents_on_municipality_id"
     t.index ["street_id"], name: "index_legacy_agents_on_street_id"
-    t.index ["zammad_identifier"], name: "index_legacy_agents_on_zammad_identifier", unique: true
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -534,6 +535,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
+    t.string "external_id"
     t.index ["district_id"], name: "index_responsible_subjects_on_district_id"
     t.index ["legacy_id"], name: "index_responsible_subjects_on_legacy_id", unique: true
     t.index ["municipality_district_id"], name: "index_responsible_subjects_on_municipality_district_id"
@@ -659,7 +661,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.citext "email", null: false
     t.string "firstname"
     t.string "lastname"
-    t.integer "zammad_identifier"
+    t.integer "external_id"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.boolean "banned", default: false
     t.string "login"
@@ -691,10 +693,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
     t.integer "legacy_id"
     t.integer "status", default: 1, null: false
     t.index ["email"], name: "index_users_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
+    t.index ["external_id"], name: "index_users_on_external_id", unique: true
     t.index ["legacy_id"], name: "index_users_on_legacy_id", unique: true
     t.index ["municipality_id"], name: "index_users_on_municipality_id"
     t.index ["street_id"], name: "index_users_on_street_id"
-    t.index ["zammad_identifier"], name: "index_users_on_zammad_identifier", unique: true
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+\\.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
 
@@ -712,7 +714,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_29_152643) do
   add_foreign_key "issues", "legacy_agents", column: "owner_id"
   add_foreign_key "issues", "municipality_districts"
   add_foreign_key "issues", "responsible_subjects"
-  add_foreign_key "issues", "streets"
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"

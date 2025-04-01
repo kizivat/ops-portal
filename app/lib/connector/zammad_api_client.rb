@@ -85,11 +85,11 @@ module Connector
 
       begin
         user = @tenant.users.find_or_initialize_by(uuid: author["uuid"])
-        return user.zammad_identifier unless user.new_record?
+        return user.external_id unless user.new_record?
 
         zammad_identifier = @client.user.create(firstname: author["firstname"], lastname: author["lastname"], login: author["uuid"]).id
         raise unless zammad_identifier
-        user.update(firstname: author["firstname"], lastname: author["lastname"], zammad_identifier: zammad_identifier)
+        user.update(firstname: author["firstname"], lastname: author["lastname"], external_id: zammad_identifier)
       rescue RuntimeError => e
         # TODO custom error
         raise e unless e.message.include? "is already used for another user."
@@ -121,7 +121,7 @@ module Connector
         address_city: issue["address_city"],
         address_city_district: issue["address_city_district"],
         address_suburb: issue["address_suburb"],
-        address_road: issue["address_road"],
+        address_street: issue["address_street"],
         address_house_number: issue["address_house_number"],
         ops_likes_count: issue["likes_count"],
         created_at: issue["created_at"],
