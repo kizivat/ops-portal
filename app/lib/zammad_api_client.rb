@@ -6,6 +6,14 @@ class ZammadApiClient
   DEFAULT_ORIGIN = "portal"
   DEFAULT_ARTICLE_CONTENT_TYPE = "text/html"
   USERS_PER_PAGE = 1000
+  # TODO: consider seeding this value
+  DEFAULT_OPS_ADMIN_USER = {
+    firstname: "Dobrovoľník Odkazu pre starostu",
+    lastname: "",
+    uuid: "11111111-1111-1111-1111-111111111111"
+  }
+  RESPONSIBLE_SUBJECT_ARTICLE_TAG = ENV.fetch("RESPONSIBLE_SUBJECT_ARTICLE_TAG", "[[pre zodpovedny subjekt]]")
+  OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG", "[[ops portal]]")
 
   def initialize(url:, http_token:)
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
@@ -50,7 +58,6 @@ class ZammadApiClient
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
       ops_state: issue.state.key,
-      state: issue.state.name,
       portal_url: portal_url,
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
@@ -87,8 +94,12 @@ class ZammadApiClient
     # TODO add more fields - this way?
     for key, value in ticket_params
       case key
-      when "state"
-          ticket.state = value
+      when "ops_state"
+        ticket.ops_state = value
+      when "responsible_subject"
+        ticket.responsible_subject = value
+      when "investment"
+        ticket.investment = value
       end
     end
 
@@ -160,14 +171,15 @@ class ZammadApiClient
     article.id
   end
 
-  def create_article_from_api!(triage_external_author_identifier, issue_id, activity)
+  def create_article_from_api!(author_id, issue_id, activity)
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(
-      origin_by_id: triage_external_author_identifier,
+      origin_by_id: author_id,
       content_type: activity["content_type"],
       body: activity["body"],
       type: activity["type"],
+      internal: false,
       attachments: activity["attachments"].map do |attachment|
         {
           "filename" => attachment["filename"],
@@ -321,33 +333,41 @@ class ZammadApiClient
   def build_ticket_response(ticket)
     {
       triage_identifier: ticket.id,
-      state: ticket.state,
+      ops_state: ticket.ops_state,
       title: ticket.title,
       author: get_author(ticket.customer_id, anonymous: ticket.anonymous),
-      responsible_subject_identifier: ticket.responsible_subject,
+      responsible_subject: ResponsibleSubject.find(ticket.responsible_subject[:value]),
       issue_type: ticket.issue_type,
       category: ticket.category,
       subcategory: ticket.subcategory,
       subtype: ticket.subtype,
-      address_state: ticket.address_state,
-      address_county: ticket.address_county,
-      address_city: ticket.address_city || ticket.address_village,
-      address_city_district: ticket.address_city_district,
+      address_municipality: ticket.address_municipality,
       address_postcode: ticket.address_postcode,
-      address_suburb: ticket.address_suburb,
       address_street: ticket.address_street,
+      address_lat: ticket.address_lat,
+      address_lon: ticket.address_lon,
       address_house_number: ticket.address_house_number,
       likes_count: ticket.likes_count,
+      portal_url: ticket.portal_url,
       created_at: ticket.created_at,
       updated_at: ticket.updated_at
     }
   end
 
   def build_article_response(ticket, article, first_article: false)
-    return nil unless first_article || article.body.include?("[[zodpovedny]]")
+    return nil unless first_article || article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
+
+    if article.sender == "Agent"
+      author = DEFAULT_OPS_ADMIN_USER
+    else
+      author = get_author(
+        article.origin_by_id || article.created_by_id,
+        anonymous: (ticket.anonymous && article.created_by == ticket.customer)
+      )
+    end
 
     {
-      author: get_author(article.origin_by_id || article.created_by_id, anonymous: (ticket.anonymous && article.created_by == ticket.customer)),
+      author: author,
       triage_identifier: article.id,
       content_type: article.content_type,
       body: article.body,
@@ -358,7 +378,7 @@ class ZammadApiClient
         {
           triage_identifier: attachment.id,
           filename: attachment.filename,
-          content_type: attachment.preferences.dig(:"Mime-Type"),
+          content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
           data64: Base64.strict_encode64(attachment.download)
         }
       end

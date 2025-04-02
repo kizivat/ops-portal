@@ -70,6 +70,7 @@ class Issues::Draft < ApplicationRecord
       subtype: subtype,
       reported_at: created_at,
       state: DEFAULT_STATE,
+      municipality: Municipality.find_by(name: address_city || address_village || address_town) || author.municipality || Municipality.first,
     )
 
     # TODO delete draft after success
