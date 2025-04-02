@@ -8,8 +8,8 @@
 #  address_county           :string
 #  address_house_number     :string
 #  address_postcode         :string
-#  address_road             :string
 #  address_state            :string
+#  address_street           :string
 #  address_suburb           :string
 #  address_town             :string
 #  address_village          :string
@@ -31,7 +31,6 @@
 #  owner_id                 :bigint
 #  responsible_subject_id   :bigint
 #  state_id                 :bigint
-#  street_id                :bigint
 #  subcategory_id           :bigint
 #  subtype_id               :bigint
 #  triage_external_id       :integer
@@ -45,7 +44,6 @@ class Issue < ApplicationRecord
   belongs_to :subtype, class_name: "Issues::Subtype", optional: true
   belongs_to :municipality, optional: true
   belongs_to :municipality_district, optional: true
-  belongs_to :street, optional: true
   belongs_to :responsible_subject, optional: true
   belongs_to :state, class_name: "Issues::State", optional: true
 
@@ -57,10 +55,4 @@ class Issue < ApplicationRecord
   has_many_attached :photos
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
-
-  after_create :schedule_sync_to_triage
-
-  def schedule_sync_to_triage
-    SyncIssueToTriageJob.perform_later(self)
-  end
 end

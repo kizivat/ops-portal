@@ -65,6 +65,6 @@ class ClientsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def client_params
-      params.expect(client: [ :name, :url, :api_token_public_key, :webhook_private_key, :responsible_subject_zammad_identifier ])
+      params.expect(client: [ :name, :url, :api_token_public_key, :webhook_private_key ])
     end
 end

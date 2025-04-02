@@ -9,7 +9,13 @@ class Api::V1::Issues::ActivitiesController < ApiController
   end
 
   def create
-    @activity_id = @zammad_client.create_article_from_api!(@client.triage_external_author_identifier, params.require(:issue_id), activity_params)
+    unless @client.responsible_subject.external_id.present?
+      responsible_subject = @client.responsible_subject
+      responsible_subject.external_id = @zammad_client.create_responsible_subject!(responsible_subject)
+      responsible_subject.save!
+    end
+
+    @activity_id = @zammad_client.create_article_from_api!(@client.responsible_subject.external_id, params.require(:issue_id), activity_params)
   end
 
   private
@@ -22,7 +28,7 @@ class Api::V1::Issues::ActivitiesController < ApiController
     @ticket = @zammad_client.get_ticket(params.require :issue_id)
 
     head :not_found unless @ticket
-    head :not_found unless @ticket[:responsible_subject_identifier] == @client.responsible_subject_zammad_identifier
+    head :not_found unless @ticket[:responsible_subject] == @client.responsible_subject
   end
 
   def set_activity

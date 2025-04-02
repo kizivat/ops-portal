@@ -1,0 +1,10 @@
+one:
+  email: firstname.lastname.agent@example.org
+  external_id: 1
+  firstname: Firstname
+  lastname: Lastname Agent
+
+two:
+  email: brian.agent@queen.com
+  firstname: Firstname
+  lastname: Lastname Agent

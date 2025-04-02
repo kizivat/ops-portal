@@ -8,58 +8,108 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-webhook_url = ENV.fetch "CONNECTOR_WEBHOOK_URL", "http://localhost:3000/connector/webhook"
-default_connector_zammad_api_token = ENV.fetch("CONNECTOR__ZAMMAD_API_TOKEN")
-default_connector_zammad_webhook_secret = ENV.fetch("CONNECTOR__ZAMMAD_WEBHOOK_SECRET")
+if Rails.env.development?
+  webhook_url = "http://localhost:3000/connector/webhook"
+  default_connector_zammad_api_token = "CsnpmnPAlMZCmbaClOoWE7QlFPgCsElVLsfgkJMZQfs"
+  default_connector_zammad_webhook_secret = "6fvpqr777ryN9FTqkRH2xYGWFXU1W862R6NUyhQOErN"
 
+  [
+    {
+      name: "MÚ Staré Mesto",
+      pro: true,
+      url: webhook_url,
+      connector_zammad_url: "http://localhost:8081/",
+      connector_zammad_api_token: default_connector_zammad_api_token,
+      connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
+    },
+    {
+      name: "Hlavné mesto SR Bratislava",
+      pro: true,
+      url: webhook_url,
+      connector_zammad_url: "http://localhost:8082/",
+      connector_zammad_api_token: default_connector_zammad_api_token,
+      connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
+    },
+    {
+      name: "MÚ Nové Mesto",
+      pro: false
+    }
+  ].each do |data|
+    responsible_subject_type = ResponsibleSubjects::Type.find_or_create_by!(name: "Mestský úrad")
+    responsible_subject = ResponsibleSubject.find_or_create_by!(name: data[:name], responsible_subjects_type_id: responsible_subject_type.id)
+    responsible_subject.update_columns(
+      subject_name: data[:name],
+      active: true,
+      pro: data[:pro]
+    )
 
-# TODO: only run in development
-[
-  {
-    name: "MÚ Staré Mesto",
-    subject: "1",
-    url: webhook_url,
-    triage_user_id: 120,
-    connector_zammad_url: "https://staremesto-ba.ops.dev.slovensko.digital/",
-    connector_zammad_api_token: default_connector_zammad_api_token,
-    connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
-  },
-  {
-    name: "Hlavné mesto SR Bratislava",
-    subject: "19",
-    url: webhook_url,
-    triage_user_id: 121,
-    connector_zammad_url: "https://magistrat-ba.ops.dev.slovensko.digital/",
-    connector_zammad_api_token: default_connector_zammad_api_token,
-    connector_zammad_webhook_secret: default_connector_zammad_webhook_secret
-  }
-].each do |data|
-  client = Client.find_or_create_by!(name: data[:name])
-  tenant = Connector::Tenant.find_or_create_by!(name: data[:name])
+    next unless data[:pro]
 
-  api_key = OpenSSL::PKey::EC.generate("prime256v1")
-  webhook_key = OpenSSL::PKey::EC.generate("prime256v1")
+    client = Client.find_or_create_by!(name: data[:name])
+    tenant = Connector::Tenant.find_or_create_by!(name: data[:name])
 
-  client.update_columns(
-    api_token_public_key: api_key.public_to_pem,
-    webhook_private_key: webhook_key.to_pem,
-    url: data[:url],
-    responsible_subject_zammad_identifier: data[:subject],
-    triage_external_author_identifier: data[:triage_user_id]
-  )
+    api_key = OpenSSL::PKey::EC.generate("prime256v1")
+    webhook_key = OpenSSL::PKey::EC.generate("prime256v1")
 
-  tenant.update_columns(
-    backoffice_api_token: data[:connector_zammad_api_token],
-    backoffice_webhook_secret: data[:connector_zammad_webhook_secret],
-    ops_api_token_private_key: api_key.to_pem,
-    ops_webhook_public_key: webhook_key.public_to_pem,
-    ops_api_subject_identifier: client.id,
-    backoffice_url: data[:connector_zammad_url]
-  )
+    client.update_columns(
+      api_token_public_key: api_key.public_to_pem,
+      webhook_private_key: webhook_key.to_pem,
+      url: data[:url],
+      responsible_subject_id: responsible_subject.id
+    )
+
+    tenant.update_columns(
+      backoffice_api_token: data[:connector_zammad_api_token],
+      backoffice_webhook_secret: data[:connector_zammad_webhook_secret],
+      ops_api_token_private_key: api_key.to_pem,
+      ops_webhook_public_key: webhook_key.public_to_pem,
+      ops_api_subject_identifier: client.id,
+      backoffice_url: data[:connector_zammad_url]
+    )
+  end
 end
 
-[ "Zaslaný zodpovednému", "Odstúpený", "Čakajúci", "Vyriešený", "Neriešený", "V riešení", "Neprijatý", "Uzavretý", "Označený za vyriešený" ].each do |state_name|
-  Issues::State.find_or_create_by!(name: state_name)
+[
+  {
+    name: "Zaslaný zodpovednému",
+    key: "sent_to_responsible"
+  },
+  {
+    name: "Odstúpený",
+    key: "referred"
+  },
+  {
+    name: "Čakajúci",
+    key: "waiting"
+  },
+  {
+    name: "Vyriešený",
+    key: "resolved"
+  },
+  {
+    name: "Neriešený",
+    key: "unresolved"
+  },
+  {
+    name: "V riešení",
+    key: "in_progress"
+  },
+  {
+    name: "Neprijatý",
+    key: "rejected"
+  },
+  {
+    name: "Uzavretý",
+    key: "closed"
+  },
+  {
+    name: "Označený za vyriešený",
+    key: "marked_as_resolved"
+  }
+].each do |state_data|
+  Issues::State.find_or_create_by!(name: state_data[:name]).tap do |issues_state|
+    issues_state.update(key: state_data[:key])
+  end
 end
 
 [

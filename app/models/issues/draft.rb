@@ -62,7 +62,7 @@ class Issues::Draft < ApplicationRecord
       address_suburb: address_suburb,
       address_village: address_village,
       address_town: address_town,
-      address_road: address_road,
+      address_street: address_road,
       address_house_number: address_house_number,
       address_postcode: address_postcode,
       category: category,
@@ -70,6 +70,7 @@ class Issues::Draft < ApplicationRecord
       subtype: subtype,
       reported_at: created_at,
       state: DEFAULT_STATE,
+      municipality: Municipality.find_by(name: address_city || address_village || address_town) || author.municipality || Municipality.first,
     )
 
     # TODO delete draft after success
@@ -77,6 +78,8 @@ class Issues::Draft < ApplicationRecord
     photos.each do |photo|
       issue.photos.append photo
     end
+
+    SyncIssueToTriageJob.perform_later(issue)
   end
 
   def schedule_calculate_suggestions

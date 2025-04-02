@@ -15,7 +15,7 @@ module Connector
     end
 
     def update_issue(issue_id, issue_data)
-      response = @provider.put(URI.join(@url, "api/v1/issues/#{issue_id}"), { token: jwt_token }.merge(issue_data))
+      response = @provider.put(URI.join(@url, "api/v1/issues/#{issue_id}"), { issue: issue_data, token: jwt_token })
       raise unless response.status == 204
     end
 

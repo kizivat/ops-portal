@@ -6,6 +6,14 @@ class ZammadApiClient
   DEFAULT_ORIGIN = "portal"
   DEFAULT_ARTICLE_CONTENT_TYPE = "text/html"
   USERS_PER_PAGE = 1000
+  # TODO: consider seeding this value
+  DEFAULT_OPS_ADMIN_USER = {
+    firstname: "Dobrovoľník Odkazu pre starostu",
+    lastname: "",
+    uuid: "11111111-1111-1111-1111-111111111111"
+  }
+  RESPONSIBLE_SUBJECT_ARTICLE_TAG = ENV.fetch("RESPONSIBLE_SUBJECT_ARTICLE_TAG", "[[pre zodpovedny subjekt]]")
+  OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG", "[[ops portal]]")
 
   def initialize(url:, http_token:)
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
@@ -30,48 +38,39 @@ class ZammadApiClient
     })
   end
 
-  ISSUE_STATE_TO_PROCESS_TYPE = {
-    "Neriešený" => "portal_issue_resolution",
-    "Vyriešený" => "portal_issue_resolution",
-    "V riešení" => "portal_issue_resolution",
-    "Uzavretý" => "portal_issue_resolution",
-    "Čakajúci" => "portal_issue_triage",
-    "Neprijatý" => "portal_issue_triage"
-  }
-
-  def create_ticket!(issue, group: DEFAULT_GROUP)
-    issue_type = "issue" # TODO fix in import ... add issue.issue_type
-    process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
-
+  def create_ticket_from_issue!(issue, process_type:, issue_type:, title:, description:, portal_url:, responsible_subject:, likes_count:, group: DEFAULT_GROUP)
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue_type,
-      title: process_type == "portal_issue_triage" ? "Triáž: #{issue.title}" : issue.title,
+      title: title,
       group: group,
-      customer_id: issue.author.zammad_identifier,
-      origin_by_id: issue.author.zammad_identifier,
-      municipality: build_ticket_municipality(issue),
+      customer_id: issue.author.external_id,
+      origin_by_id: issue.author.external_id,
+      address_state: issue.address_state,
       address_county: issue.address_county,
-      address_city: issue.address_city,
-      address_city_district: issue.address_city_district,
-      address_suburb: issue.address_suburb,
-      address_village: issue.address_village,
-      address_town: issue.address_town,
-      address_road: issue.street&.name || issue.address_road,
+      address_municipality: build_ticket_municipality(issue),
+      address_postcode: issue.address_postcode,
+      address_street: issue.address_street,
       address_house_number: issue.address_house_number,
+      address_lat: issue.latitude,
+      address_lon: issue.longitude,
       category: issue.category&.triage_external_id || issue.category.name,
-      subcategory: issue.subcategory.name,
-      subtype: issue.subtype.name,
-      state: issue.state.name,
+      subcategory: issue.subcategory&.name,
+      subtype: issue.subtype&.name,
+      ops_state: issue.state.key,
+      portal_url: portal_url,
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
-      responsible_subject: issue.responsible_subject&.legacy_id, # TODO map to responsible_subjects in triage
-      owner_id: issue.owner&.zammad_identifier,
+      responsible_subject: {
+        "label"=> responsible_subject&.subject_name,
+        "value"=> responsible_subject&.id
+      },
+      owner_id: issue.owner&.external_id,
       created_at: issue.reported_at,
-      likes_count: issue.legacy_data ? issue.legacy_data["like_count"] : 999, # TODO handle also non legacy
+      likes_count: likes_count,
       origin: DEFAULT_ORIGIN,
       article: {
-        origin_by_id: issue.author.zammad_identifier,
-        body: issue.description.presence || "(bez popisu)",
+        origin_by_id: issue.author.external_id,
+        body: description,
         type: DEFAULT_ARTICLE_TYPE,
         attachments: issue.photos.map do |photo|
           {
@@ -92,15 +91,46 @@ class ZammadApiClient
   def update_ticket!(ticket_id, ticket_params)
     ticket = @client.ticket.find(ticket_id)
 
-    # TODO add more fields
+    # TODO add more fields - this way?
     for key, value in ticket_params
       case key
-      when "state"
-          ticket.state = value
+      when "ops_state"
+        ticket.ops_state = value
+      when "responsible_subject"
+        ticket.responsible_subject = value
+      when "investment"
+        ticket.investment = value
       end
     end
 
     ticket.save
+  end
+
+  def update_ticket_from_issue!(ticket_id, issue, title:, likes_count:)
+    ticket = @client.ticket.find(ticket_id)
+
+    ticket.title = title
+    ticket.municipality = build_ticket_municipality(issue)
+    ticket.address_lat = issue.latitude
+    ticket.address_lon = issue.longitude
+    ticket.address_county = issue.address_county
+    ticket.address_city = issue.address_city
+    ticket.address_city_district = issue.address_city_district
+    ticket.address_postcode = issue.address_postcode
+    ticket.address_suburb = issue.address_suburb
+    ticket.address_village = issue.address_village
+    ticket.address_town = issue.address_town
+    ticket.address_street =  issue.address_street
+    ticket.address_house_number = issue.address_house_number
+    ticket.ops_state = issue.state.key
+    ticket.likes_count = likes_count
+
+    ticket.save
+
+    # TODO check if it is always 1st article
+    article = ticket.articles.first
+    article.body = issue.description
+    article.save
   end
 
   def get_article(ticket_id, article_id)
@@ -122,7 +152,7 @@ class ZammadApiClient
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(
-      origin_by_id: activity_object.author&.zammad_identifier,
+      origin_by_id: activity_object.author&.external_id,
       content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
       body: activity_object.activity_body,
       type: "web",
@@ -141,14 +171,15 @@ class ZammadApiClient
     article.id
   end
 
-  def create_article_from_api!(triage_external_author_identifier, issue_id, activity)
+  def create_article_from_api!(author_id, issue_id, activity)
     ticket = @client.ticket.find(issue_id)
 
     article = ticket.article(
-      origin_by_id: triage_external_author_identifier,
+      origin_by_id: author_id,
       content_type: activity["content_type"],
       body: activity["body"],
       type: activity["type"],
+      internal: false,
       attachments: activity["attachments"].map do |attachment|
         {
           "filename" => attachment["filename"],
@@ -196,21 +227,39 @@ class ZammadApiClient
       raise e unless e.message.include? "is already used for another user."
 
       result = find_zammad_user(user.email)
-      raise "Can't find nor create triage zammad user with email: #{email}" unless result
+      raise "Can't find nor create triage zammad user with email: #{user.email}" unless result
       result
     end
   end
 
-  def create_agent!(email)
+  def create_agent!(user)
     begin
-      zammad_user = @client.user.create(email: email, roles: [ "Agent" ])
+      zammad_user = @client.user.create(
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        roles: [ "Agent" ]
+      )
       zammad_user.id
     rescue RuntimeError => e
       raise e unless e.message.include? "is already used for another user."
 
-      result = find_zammad_user email
-      raise "Can't find nor create triage zammad user with email: #{email}" unless result
+      result = find_zammad_user(user.email)
+      raise "Can't find nor create triage zammad user with email: #{user.email}" unless result
       result
+    end
+  end
+
+  def create_responsible_subject!(responsible_subject)
+    begin
+      zammad_user = @client.user.create(
+        firstname: responsible_subject.subject_name,
+        roles: [ "Zodpovedný Subjekt" ]
+      )
+      zammad_user.id
+    rescue RuntimeError => e
+      raise e unless e.message.include? "is already used for another user."
+      raise "Can't create triage zammad user for responsible subject email: #{responsible_subject.subject_name}"
     end
   end
 
@@ -220,6 +269,20 @@ class ZammadApiClient
 
   def find_ticket_responsible_subject(ticket_id)
     @client.ticket.find(ticket_id).responsible_subject
+  end
+
+  def check_import_mode!
+    response = Faraday.get("#{ENV.fetch("TRIAGE_ZAMMAD_URL")}api/v1/settings", {}, "Authorization": "Token token=#{ENV.fetch("TRIAGE_ZAMMAD_API_TOKEN")}")
+    response_body = response.body.empty? ? nil : JSON.parse(response.body)
+  rescue StandardError => error
+    raise error.response if error.respond_to?(:response) && error.response
+    raise error
+  else
+    raise "Unexpected status: #{response.status}" unless response.status == 200
+
+    import_mode_on = response_body.select { |attribute| attribute["name"] == "import_mode" }.first["state_current"]["value"]
+
+    raise "Import mode OFF" unless import_mode_on
   end
 
   private
@@ -247,12 +310,12 @@ class ZammadApiClient
   end
 
   def find_or_create_user(user_id)
-    user = User.find_by(zammad_identifier: user_id)
+    user = User.find_by(external_id: user_id)
     return user if user
 
     u = get_user(user_id)
     # TODO why are we creating a user from zammad in portal? this should never happen
-    User.create!(zammad_identifier: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
+    User.create!(external_id: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 
   def find_zammad_category(issue_category)
@@ -270,32 +333,41 @@ class ZammadApiClient
   def build_ticket_response(ticket)
     {
       triage_identifier: ticket.id,
-      state: ticket.state,
+      ops_state: ticket.ops_state,
       title: ticket.title,
       author: get_author(ticket.customer_id, anonymous: ticket.anonymous),
-      responsible_subject_identifier: ticket.responsible_subject,
+      responsible_subject: ResponsibleSubject.find(ticket.responsible_subject[:value]),
       issue_type: ticket.issue_type,
       category: ticket.category,
       subcategory: ticket.subcategory,
       subtype: ticket.subtype,
-      address_state: ticket.address_state,
-      address_county: ticket.address_county,
-      address_city: ticket.address_city || ticket.address_village,
-      address_city_district: ticket.address_city_district,
-      address_suburb: ticket.address_suburb,
-      address_road: ticket.address_road,
+      address_municipality: ticket.address_municipality,
+      address_postcode: ticket.address_postcode,
+      address_street: ticket.address_street,
+      address_lat: ticket.address_lat,
+      address_lon: ticket.address_lon,
       address_house_number: ticket.address_house_number,
       likes_count: ticket.likes_count,
+      portal_url: ticket.portal_url,
       created_at: ticket.created_at,
       updated_at: ticket.updated_at
     }
   end
 
   def build_article_response(ticket, article, first_article: false)
-    return nil unless first_article || article.body.include?("[[zodpovedny]]")
+    return nil unless first_article || article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
+
+    if article.sender == "Agent"
+      author = DEFAULT_OPS_ADMIN_USER
+    else
+      author = get_author(
+        article.origin_by_id || article.created_by_id,
+        anonymous: (ticket.anonymous && article.created_by == ticket.customer)
+      )
+    end
 
     {
-      author: get_author(article.origin_by_id || article.created_by_id, anonymous: (ticket.anonymous && article.created_by == ticket.customer)),
+      author: author,
       triage_identifier: article.id,
       content_type: article.content_type,
       body: article.body,
@@ -306,7 +378,7 @@ class ZammadApiClient
         {
           triage_identifier: attachment.id,
           filename: attachment.filename,
-          content_type: attachment.preferences.dig(:"Mime-Type"),
+          content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
           data64: Base64.strict_encode64(attachment.download)
         }
       end

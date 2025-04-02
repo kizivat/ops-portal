@@ -22,8 +22,7 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
           api_token_public_key: @client.api_token_public_key,
           name: @client.name,
           url: @client.url,
-          webhook_private_key: @client.webhook_private_key,
-          responsible_subject_zammad_identifier: @client.responsible_subject_zammad_identifier
+          webhook_private_key: @client.webhook_private_key
           }
         }
     end
@@ -47,8 +46,7 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
         api_token_public_key: @client.api_token_public_key,
         name: @client.name,
         url: @client.url,
-        webhook_private_key: @client.webhook_private_key,
-        responsible_subject_zammad_identifier: @client.responsible_subject_zammad_identifier
+        webhook_private_key: @client.webhook_private_key
         }
       }
     assert_redirected_to client_url(@client)

@@ -18,20 +18,9 @@ proxy:
 env:
   secret:
     - SECRET_KEY_BASE
-    - DEFAULT_USER_EMAIL
-    - DEFAULT_USER_FIRSTNAME
-    - DEFAULT_USER_LASTNAME
-    - DEFAULT_USER_ZAMMAD_IDENTIFIER
-    - LEGACY_PORTAL_URL
-    - CONNECTOR__OPS_API_URL
-    - CONNECTOR_WEBHOOK_URL
-    - CONNECTOR__ZAMMAD_URL
-    - TRIAGE_ZAMMAD_URL
     - DATABASE_URL
     - ANTHROPIC_API_KEY
     - GEMINI_API_KEY
-    - CONNECTOR__ZAMMAD_API_TOKEN
-    - CONNECTOR__ZAMMAD_WEBHOOK_SECRET
     - TRIAGE_ZAMMAD_API_TOKEN
     - TRIAGE_ZAMMAD_WEBHOOK_SECRET
     - LEGACY_DB_URL
@@ -59,6 +48,9 @@ registry:
 builder:
   arch: amd64
   remote: ssh://kamal@dev.slovensko.digital
+  cache:
+    type: registry
+    options: mode=max,image-manifest=true,oci-mediatypes=true
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old

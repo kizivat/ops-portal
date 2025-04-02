@@ -1,20 +1,24 @@
 json.triage_identifier @issue[:triage_identifier]
-json.state @issue[:state]
+json.ops_state @issue[:ops_state]
 json.title @issue[:title]
-json.responsible_subject_identifier @issue[:responsible_subject_identifier]
+json.responsible_subject {
+  json.label @issue[:responsible_subject]&.subject_name
+  json.value @issue[:responsible_subject]&.id
+}
+json.responsible_subject_changed_at @issue[:responsible_subject_changed_at]
 json.author @issue[:author]
 json.issue_type @issue[:issue_type]
 json.category @issue[:category]
 json.subcategory @issue[:subcategory]
 json.subtype @issue[:subtype]
-json.address_state @issue[:address_state]
-json.address_county @issue[:address_county]
-json.address_city @issue[:address_city]
-json.address_city_district @issue[:address_city_district]
-json.address_suburb @issue[:address_suburb]
-json.address_road @issue[:address_road]
+json.address_municipality @issue[:address_municipality]
+json.address_postcode @issue[:address_postcode]
+json.address_street @issue[:address_street]
 json.address_house_number @issue[:address_house_number]
 json.likes_count @issue[:likes_count]
+json.address_lat @issue[:address_lat]
+json.address_lon @issue[:address_lon]
+json.portal_url @issue[:portal_url]
 json.created_at @issue[:created_at]
 json.updated_at @issue[:updated_at]
 json.activities @issue[:activities] do |activity|
