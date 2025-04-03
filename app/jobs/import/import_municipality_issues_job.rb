@@ -15,8 +15,8 @@ module Import
       Legacy::GenericModel
         .where(mesto: municipality.legacy_id)
         .where(mestska_cast: municipality_district&.legacy_id)
-        .where("posted_time >= ?", import_since.to_i)
-        .where(is_manual: 0).find_in_batches do |group|
+        .where(is_manual: 0) # !! DO NOT ever delete this condition !!
+        .where("posted_time >= ?", import_since.to_i).find_in_batches do |group|
         group.each do |legacy_record|
           subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
           subcategory = subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
