@@ -3,14 +3,14 @@ class WebhookClient
     @client = client
   end
 
-  def issue_created(issue_id, include_customer_articles = false)
+  def issue_created(issue_id, include_customer_activities)
     payload = {
       type: "issue.created",
       timestamp: Time.now.to_i,
       data: {
         subject_id: @client.id,
         issue_id: issue_id,
-        include_customer_articles: include_customer_articles
+        include_customer_activities: include_customer_activities
       }
     }
 

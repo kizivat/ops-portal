@@ -9,6 +9,7 @@ class Triage::CreateNewPortalActivityFromTriageJob < ApplicationJob
     issue = Issue.find_by(triage_external_id: ticket_id)
     raise "Issue not found" unless issue
 
+    # TODO: consider using other than the Issues::Comment model
     Issues::Comment.find_or_initialize_by(triage_external_id: article_id).tap do |comment|
       comment.text = article[:body]
       comment.activity ||= issue.comment_activities.create!
