@@ -20,7 +20,8 @@ module Import
             state: legacy_record.status,
             text: legacy_record.komentar,
             verification: legacy_record.verification,
-            author: Legacy::User.find_or_create_user(legacy_record.user)
+            user_author: Legacy::User.find_or_create_user(legacy_record.user),
+            legacy_agent_author: Legacy::User.find_or_create_agent(legacy_record.user)
           )
           comment.activity ||= issue.comment_activities.create!
           comment.save!

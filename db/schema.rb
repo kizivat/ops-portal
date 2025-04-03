@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_02_140951) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_03_124709) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -291,7 +291,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_140951) do
 
   create_table "issues_comments", force: :cascade do |t|
     t.bigint "activity_id", null: false
-    t.bigint "author_id"
     t.string "author_name"
     t.string "author_email"
     t.datetime "added_at"
@@ -307,9 +306,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_140951) do
     t.datetime "updated_at", null: false
     t.integer "legacy_id"
     t.integer "triage_external_id"
+    t.bigint "legacy_agent_author_id"
+    t.bigint "user_author_id"
     t.index ["activity_id"], name: "index_issues_comments_on_activity_id"
-    t.index ["author_id"], name: "index_issues_comments_on_author_id"
+    t.index ["legacy_agent_author_id"], name: "index_issues_comments_on_legacy_agent_author_id"
     t.index ["legacy_id"], name: "index_issues_comments_on_legacy_id", unique: true
+    t.index ["user_author_id"], name: "index_issues_comments_on_user_author_id"
   end
 
   create_table "issues_communications", force: :cascade do |t|
@@ -720,7 +722,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_140951) do
   add_foreign_key "issues", "users", column: "author_id"
   add_foreign_key "issues_activities", "issues"
   add_foreign_key "issues_comments", "issues_activities", column: "activity_id"
-  add_foreign_key "issues_comments", "users", column: "author_id"
+  add_foreign_key "issues_comments", "legacy_agents", column: "legacy_agent_author_id"
+  add_foreign_key "issues_comments", "users", column: "user_author_id"
   add_foreign_key "issues_communications", "issues_activities", column: "activity_id"
   add_foreign_key "issues_communications", "legacy_agents", column: "legacy_agent_author_id"
   add_foreign_key "issues_communications", "responsible_subjects_users", column: "responsible_subjects_user_author_id"

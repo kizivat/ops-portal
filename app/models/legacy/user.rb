@@ -6,7 +6,7 @@ module Legacy
       return ::User.find_by(legacy_id: legacy_id) if ::User.find_by(legacy_id: legacy_id)
 
       Legacy::GenericModel.set_table_name("users")
-      legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
+      legacy_record = Legacy::GenericModel.where(rights: "U").find_by_id(legacy_id)
       self.create_user_from_legacy_record(legacy_record) if legacy_record
     end
 
@@ -14,12 +14,12 @@ module Legacy
       return Legacy::Agent.find_by(legacy_id: legacy_id) if Legacy::Agent.find_by(legacy_id: legacy_id)
 
       Legacy::GenericModel.set_table_name("users")
-      legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
+      legacy_record = Legacy::GenericModel.where(rights: %w[A Ax]).find_by_id(legacy_id)
       self.create_agent_from_legacy_record(legacy_record) if legacy_record
     end
 
     def self.find_or_create_responsible_subjects_user(legacy_id)
-      return ResponsibleSubjects::User.find_by(legacy_id: legacy_id) if ResponsibleSubjects::User.find_by(legacy_id: legacy_id)
+      return ::ResponsibleSubjects::User.find_by(legacy_id: legacy_id) if ::ResponsibleSubjects::User.find_by(legacy_id: legacy_id)
 
       Legacy::GenericModel.set_table_name("municipality_users")
       legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
