@@ -364,7 +364,7 @@ class ZammadApiClient
     # hide all agent public articles without a tag
     return nil if article.sender == "Agent" && !responsible_subject_tag && !ops_portal_tag
 
-    return nil unless force || responsible_subject_tag || ops_portal_tag
+    return nil unless force || responsible_subject_tag
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER
