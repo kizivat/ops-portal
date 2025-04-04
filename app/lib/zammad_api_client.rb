@@ -13,7 +13,7 @@ class ZammadApiClient
     uuid: "11111111-1111-1111-1111-111111111111"
   }
   RESPONSIBLE_SUBJECT_ARTICLE_TAG = ENV.fetch("RESPONSIBLE_SUBJECT_ARTICLE_TAG", "[[pre zodpovedny subjekt]]")
-  OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_FROM_BACKOFFICE_TAG", "[[ops portal]]")
+  OPS_PORTAL_ARTICLE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_TAG", "[[ops portal]]")
 
   def initialize(url:, http_token:)
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
@@ -354,9 +354,17 @@ class ZammadApiClient
     }
   end
 
-  def build_article_response(ticket, article, force: false)
+  def build_article_response(ticket, article, force: false, system: false)
+    # hide all internal articles
     return nil if article.internal
-    return nil unless force || article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
+
+    responsible_subject_tag = article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
+    ops_portal_tag = article.body.include?(OPS_PORTAL_ARTICLE_TAG)
+
+    # hide all agent public articles without a tag
+    return nil if article.sender == "Agent" && !responsible_subject_tag && !ops_portal_tag
+
+    return nil unless force || responsible_subject_tag || ops_portal_tag
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER
@@ -371,8 +379,9 @@ class ZammadApiClient
       author: author,
       triage_identifier: article.id,
       content_type: article.content_type,
-      body: article.body,
+      body: article.body.gsub(RESPONSIBLE_SUBJECT_ARTICLE_TAG, "").gsub(OPS_PORTAL_ARTICLE_TAG, ""),
       type: article.type,
+      customer_activity: !responsible_subject_tag,
       created_at: article.created_at,
       updated_at: article.updated_at,
       attachments: article.attachments.map do |attachment|
