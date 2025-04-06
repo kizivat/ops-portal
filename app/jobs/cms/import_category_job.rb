@@ -43,7 +43,7 @@ class Cms::ImportCategoryJob < ApplicationJob
 
     return nil if root_category_raw.nil?
 
-    child_category_raw = root_category_raw["category_list"].to_a.find { |child_raw| child_raw["id"] == category_id.to_i }
+    child_category_raw = root_category_raw["subcategory_list"].to_a.find { |child_raw| child_raw["id"] == category_id.to_i }
 
     [ root_category_raw, child_category_raw ]
   end
