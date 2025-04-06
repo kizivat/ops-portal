@@ -12,7 +12,6 @@ class Cms::ImportPageJob < ApplicationJob
     # category exists, everything is ok
     category = Cms::Category.find_by(id: topic_result["category_id"])
     if category
-      puts "category: #{category}"
       upsert_page(topic_result, category)
     else
       page.destroy! if page # if the page was moved to the not existing category, we consider it as deleted
