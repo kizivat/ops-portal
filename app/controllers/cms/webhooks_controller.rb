@@ -22,12 +22,12 @@ class Cms::WebhooksController < ActionController::API
 
   def authenticate
     payload = request.raw_post
-    header_signature = request.headers['X-Discourse-Event-Signature']
-    secret = ENV['DISCOURSE_WEBHOOK_SECRET']
+    header_signature = request.headers["X-Discourse-Event-Signature"]
+    secret = ENV["DISCOURSE_WEBHOOK_SECRET"]
 
-    render status: :unauthorized, json: nil and return unless header_signature&.start_with?('sha256=')
+    render status: :unauthorized, json: nil and return unless header_signature&.start_with?("sha256=")
 
-    expected_signature = 'sha256=' + OpenSSL::HMAC.hexdigest('SHA256', secret, payload)
+    expected_signature = "sha256=" + OpenSSL::HMAC.hexdigest("SHA256", secret, payload)
     render status: :forbidden, json: nil unless ActiveSupport::SecurityUtils.secure_compare(expected_signature, header_signature)
   end
 
