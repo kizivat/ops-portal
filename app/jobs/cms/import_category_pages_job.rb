@@ -17,9 +17,9 @@ class Cms::ImportCategoryPagesJob < ApplicationJob
 
   def load_category_topic_ids(discourse_client, category)
     if category.parent_category.nil?
-      discourse_client.load_all_topic_ids_for_root_category(category.discourse_slug)
+      discourse_client.load_all_topic_ids_for_root_category("#{category.slug}/#{category.id}")
     else
-      discourse_client.load_all_topic_ids_for_sub_category(category.discourse_slug)
+      discourse_client.load_all_topic_ids_for_sub_category("#{category.parent_category.slug}/#{category.slug}/#{category.id}")
     end
   end
 end
