@@ -7,8 +7,8 @@ class Triage::ProcessNewActivityFromTriageJob < ApplicationJob
 
     return unless article[:body].include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
 
-    responsible_subject_hash = triage_zammad_client.find_ticket_responsible_subject(ticket_id)
-    responsible_subject = ResponsibleSubject.find(responsible_subject_hash[:value])
+    responsible_subject_data = triage_zammad_client.find_ticket_responsible_subject(ticket_id)
+    responsible_subject = ResponsibleSubject.find(responsible_subject_data[:value])
 
     return unless responsible_subject.pro?
 
