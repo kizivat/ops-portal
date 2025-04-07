@@ -5,7 +5,7 @@ class IssuesController < ApplicationController
   def index
     @tab = params[:tab].in?(%w[map stats]) ? params[:tab] : "list"
 
-    @issues = search_issues.limit(4)
+    @issues = search_issues.limit(12)
   end
 
   # GET /issues/1 or /issues/1.json
