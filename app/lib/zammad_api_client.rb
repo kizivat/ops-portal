@@ -24,12 +24,12 @@ class ZammadApiClient
       ticket = @client.ticket.find(ticket_id)
     rescue => e
       raise e unless e.message.include?("Couldn't find Ticket with")
-      return nil
+      return
     end
 
     result = build_ticket_response(ticket)
 
-    return nil unless result.present?
+    return unless result.present?
     return result unless expand
 
     result.merge({
@@ -140,11 +140,11 @@ class ZammadApiClient
     rescue RuntimeError => e
       raise e unless e.message.include?("Couldn't find Ticket with") || e.message.include?("Couldn't find Article with")
       puts "Couldn't find article with id: #{article_id} in ticket with id: #{ticket_id}"
-      return nil
+      return
     end
 
     result = build_article_response(ticket, article)
-    return nil unless result.present?
+    return unless result.present?
     result
   end
 
@@ -294,12 +294,12 @@ class ZammadApiClient
       zammad_user = users_on_page.select { |user| email == user[:email] }.first
 
       return zammad_user[:id] if zammad_user
-      return nil unless users_on_page == USERS_PER_PAGE
+      return unless users_on_page == USERS_PER_PAGE
     end
   end
 
   def get_author(user_id, anonymous: false)
-    return nil if anonymous
+    return if anonymous
 
     user = find_or_create_user(user_id)
     {
@@ -356,15 +356,15 @@ class ZammadApiClient
 
   def build_article_response(ticket, article, force: false, system: false)
     # hide all internal articles
-    return nil if article.internal
+    return if article.internal
 
     responsible_subject_tag = article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
     ops_portal_tag = article.body.include?(OPS_PORTAL_ARTICLE_TAG)
 
     # hide all agent public articles without a tag
-    return nil if article.sender == "Agent" && !responsible_subject_tag && !ops_portal_tag
+    return if article.sender == "Agent" && !responsible_subject_tag && !ops_portal_tag
 
-    return nil unless force || responsible_subject_tag
+    return unless force || responsible_subject_tag
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER
