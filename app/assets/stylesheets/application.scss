@@ -206,7 +206,8 @@ nav.pagination a.button-pagination {
   stroke-width: 1.5;
   @include rounded(25px);
 }
-nav.pagination a.button-pagination:hover {
+nav.pagination a.button-pagination:hover,
+nav.pagination a.button-pagination.active {
   background: $blue;
 }
 nav.pagination .dash {

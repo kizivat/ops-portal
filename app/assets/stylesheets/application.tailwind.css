@@ -20,3 +20,11 @@
 .search-con input[type="search"]::-webkit-search-cancel-button {
     display: none;
 }
+
+article .lightbox .meta {
+    display: none;
+}
+
+em, i {
+    font-style: italic;
+}

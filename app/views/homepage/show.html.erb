@@ -52,58 +52,12 @@
   <%= link_to "Pozrieť viac", issues_path, class: "button button-transparent button-read-more-home" %>
 </section>
 
-<!-- Aktuality -->
-<section class="home home-news">
-  <h1>Aktuality</h1>
-  <div class="home-news-con">
-
-    <a href="./aktualita.html" class="news-block">
-      <div class="date">18.10.2023</div>
-      <h2 class="news-block-title">Na Odkaze pre starostu vyriešili v roku 2022 samosprávy takmer 9-tisíc podnetov od občanov</h2>
-      <div class="button-read-more-news">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 20">
-          <path d="M11.5,19l9-9L11.5,1" fill="none" />
-          <path d="M.5,10h20" fill="none" />
-        </svg>
-      </div>
-    </a>
-
-    <a href="./aktualita.html" class="news-block">
-      <div class="date">27.9.2022</div>
-      <h2 class="news-block-title">Zlaté vedro 2021 si odniesli Trnava, Hlavné mesto SR Bratislava a Malacky</h2>
-      <div class="button-read-more-news">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 20">
-          <path d="M11.5,19l9-9L11.5,1" fill="none" />
-          <path d="M.5,10h20" fill="none" />
-        </svg>
-      </div>
-    </a>
-
-    <a href="./aktualita.html" class="news-block">
-      <div class="date">4.10.2021</div>
-      <h2 class="news-block-title">Štatút súťaže „Lovci stratených podnetov”</h2>
-      <div class="button-read-more-news">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 20">
-          <path d="M11.5,19l9-9L11.5,1" fill="none" />
-          <path d="M.5,10h20" fill="none" />
-        </svg>
-      </div>
-    </a>
-
-    <a href="./aktualita.html" class="news-block">
-      <div class="date">1.10.2021</div>
-      <h2 class="news-block-title">Hľadáme Lovcov stratených podnetov!</h2>
-      <div class="button-read-more-news">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 20">
-          <path d="M11.5,19l9-9L11.5,1" fill="none" />
-          <path d="M.5,10h20" fill="none" />
-        </svg>
-      </div>
-    </a>
-
-  </div>
-
-  <%= link_to "Pozrieť viac", "/aktuality", class: "button button-transparent button-read-more-home" %>
-
-</section>
-
+<% if @news.length > 0 %>
+  <section class="home home-news">
+    <h1>Aktuality</h1>
+    <div class="home-news-con">
+      <%= render @news %>
+    </div>
+    <%= link_to "Pozrieť viac", "/aktuality", class: "button button-transparent button-read-more-home" %>
+  </section>
+<% end %>
