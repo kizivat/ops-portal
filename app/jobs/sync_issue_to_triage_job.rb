@@ -30,6 +30,7 @@ class SyncIssueToTriageJob < ApplicationJob
 
     return client.create_ticket_from_issue!(issue) unless import
 
+    zammad_group = find_municipality_group(issue, client)
     if issue.owner
       find_or_create_triage_portal_user!(issue.owner, client, customer: false) unless issue.owner.external_id
       client.add_user_to_group(issue.owner.external_id, zammad_group)
@@ -38,7 +39,7 @@ class SyncIssueToTriageJob < ApplicationJob
     client.create_ticket_from_issue!(
       issue,
       process_type: ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name),
-      group: find_municipality_group(issue, client),
+      group: zammad_group,
       owner_id: issue.owner&.external_id
     )
   end
