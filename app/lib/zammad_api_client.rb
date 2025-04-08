@@ -2,6 +2,7 @@ class ZammadApiClient
   attr :client
 
   DEFAULT_GROUP = "Incoming"
+  DEFAULT_PROCESS_TYPE = "portal_issue_triage"
   DEFAULT_ARTICLE_TYPE = "web"
   DEFAULT_ORIGIN = "portal"
   DEFAULT_ARTICLE_CONTENT_TYPE = "text/html"
@@ -16,6 +17,8 @@ class ZammadApiClient
   OPS_PORTAL_ARTICLE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_TAG", "[[ops portal]]")
 
   def initialize(url:, http_token:)
+    @url = url
+    @http_token = http_token
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
 
@@ -38,11 +41,11 @@ class ZammadApiClient
     })
   end
 
-  def create_ticket_from_issue!(issue, process_type:, issue_type:, title:, description:, portal_url:, responsible_subject:, likes_count:, group: DEFAULT_GROUP)
+  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, group: DEFAULT_GROUP, owner_id: nil)
     ticket = @client.ticket.create(
       process_type: process_type,
-      issue_type: issue_type,
-      title: title,
+      issue_type: issue.issue_type,
+      title: issue.title,
       group: group,
       customer_id: issue.author.external_id,
       origin_by_id: issue.author.external_id,
@@ -58,19 +61,19 @@ class ZammadApiClient
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
       ops_state: issue.state.key,
-      portal_url: portal_url,
+      portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
-        "label"=> responsible_subject&.subject_name,
-        "value"=> responsible_subject&.id
+        "label"=> issue.responsible_subject&.subject_name,
+        "value"=> issue.responsible_subject&.id
       },
-      owner_id: issue.owner&.external_id,
+      owner_id: owner_id,
       created_at: issue.reported_at,
-      likes_count: likes_count,
+      likes_count: issue.votes.count,
       origin: DEFAULT_ORIGIN,
       article: {
         origin_by_id: issue.author.external_id,
-        body: description,
+        body: issue.description.presence || "(bez popisu)",
         type: DEFAULT_ARTICLE_TYPE,
         attachments: issue.photos.map do |photo|
           {
@@ -106,10 +109,19 @@ class ZammadApiClient
     ticket.save
   end
 
-  def update_ticket_from_issue!(ticket_id, issue, title:, likes_count:)
+  def close_ticket!(ticket_id)
+    ticket = @client.ticket.find(ticket_id)
+    ticket.state = "closed"
+    ticket.save
+  end
+
+  def update_ticket_from_issue!(ticket_id, issue)
     ticket = @client.ticket.find(ticket_id)
 
-    ticket.title = title
+    likes_count = issue.legacy_data ? issue.legacy_data["like_count"] : 999 # TODO use issue.likes_count
+
+    ticket.title = issue.title
+    ticket.issue_type = issue.issue_type
     ticket.municipality = build_ticket_municipality(issue)
     ticket.address_lat = issue.latitude
     ticket.address_lon = issue.longitude
@@ -155,7 +167,7 @@ class ZammadApiClient
       origin_by_id: activity_object.author&.external_id,
       content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
       body: activity_object.activity_body,
-      type: "web",
+      type: DEFAULT_ARTICLE_TYPE,
       attachments: activity_object.attachments.map do |attachment|
         {
           "filename" => attachment.filename,
@@ -188,6 +200,22 @@ class ZammadApiClient
         }
       end,
       created_at: activity["created_at"],
+    )
+
+    # TODO custom error
+    raise unless article.id
+    article.id
+  end
+
+  def create_system_article!(ticket_id, body)
+    ticket = @client.ticket.find(ticket_id)
+
+    article = ticket.article(
+      content_type: "text/plain",
+      body: body,
+      type: "note",
+      internal: true,
+      sender: "System"
     )
 
     # TODO custom error
@@ -272,17 +300,42 @@ class ZammadApiClient
   end
 
   def check_import_mode!
-    response = Faraday.get("#{ENV.fetch("TRIAGE_ZAMMAD_URL")}api/v1/settings", {}, "Authorization": "Token token=#{ENV.fetch("TRIAGE_ZAMMAD_API_TOKEN")}")
-    response_body = response.body.empty? ? nil : JSON.parse(response.body)
+    response_body = raw_api_request(:get, "settings")
+    import_mode_on = response_body.select { |attribute| attribute["name"] == "import_mode" }.first["state_current"]["value"]
+
+    raise "Import mode OFF" unless import_mode_on
+  end
+
+  def link_tickets!(first_ticket_id, second_ticket_id)
+    second_ticket_number = @client.ticket.find(second_ticket_id).number
+    raw_api_request(:post, "links/add", {
+      link_type: "normal",
+      link_object_target: "Ticket",
+      link_object_target_value: first_ticket_id,
+      link_object_source: "Ticket",
+      link_object_source_number: second_ticket_number
+    })
+  end
+
+  def raw_api_request(method, endpoint, params = {})
+    url = File.join(@url, "api/v1/", endpoint)
+    connection = Faraday.new(url: url) do |conn|
+      conn.request :json
+      conn.response :json, content_type: /\bjson$/
+      conn.adapter :net_http
+    end
+
+    response = connection.send(method) do |req|
+      req.headers["Authorization"] = "Token token=#{@http_token}"
+      req.body = params.to_json unless params.empty?
+    end
   rescue StandardError => error
     raise error.response if error.respond_to?(:response) && error.response
     raise error
   else
-    raise "Unexpected status: #{response.status}" unless response.status == 200
+    raise "Request failed with status #{response.status}" unless response.status < 400
 
-    import_mode_on = response_body.select { |attribute| attribute["name"] == "import_mode" }.first["state_current"]["value"]
-
-    raise "Import mode OFF" unless import_mode_on
+    response.body
   end
 
   private
@@ -333,6 +386,8 @@ class ZammadApiClient
   def build_ticket_response(ticket)
     {
       triage_identifier: ticket.id,
+      triage_group: ticket.group,
+      triage_owner_id: ticket.owner_id,
       ops_state: ticket.ops_state,
       title: ticket.title,
       author: get_author(ticket.customer_id, anonymous: ticket.anonymous),
@@ -341,6 +396,8 @@ class ZammadApiClient
       category: ticket.category,
       subcategory: ticket.subcategory,
       subtype: ticket.subtype,
+      address_state: ticket.address_state,
+      address_county: ticket.address_county,
       address_municipality: ticket.address_municipality,
       address_postcode: ticket.address_postcode,
       address_street: ticket.address_street,

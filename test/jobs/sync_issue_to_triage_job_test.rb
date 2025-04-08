@@ -12,10 +12,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
-        issue_type: "issue",
         process_type: "portal_issue_triage",
-        title: "Triáž: New issue",
-        description: "New issue description",
         portal_url: "#{ENV.fetch("APP_HOST")}/issues/#{issue.id}",
         responsible_subject: responsible_subjects(:one),
         likes_count: 999,
@@ -42,10 +39,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :create_customer!, 9, [ issue.author ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
-        issue_type: "issue",
         process_type: "portal_issue_triage",
-        title: "Triáž: New issue",
-        description: "New issue description",
         portal_url: "#{ENV.fetch("APP_HOST")}/issues/#{issue.id}",
         responsible_subject: responsible_subjects(:one),
         likes_count: 999,
@@ -74,10 +68,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :add_user_to_group, nil, [ 9, "Dobrovoľníci::Trenčín" ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
-        issue_type: "issue",
         process_type: "portal_issue_triage",
-        title: "Triáž: New issue",
-        description: "New issue description",
         portal_url: "#{ENV.fetch("APP_HOST")}/issues/#{issue.id}",
         responsible_subject: responsible_subjects(:one),
         likes_count: 999,
@@ -102,11 +93,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
       OpenStruct.new(name: "Dobrovoľníci::Prešov")
     ]
-    triage_zammad_client_mock.expect :update_ticket_from_issue!, nil, [ issue.triage_external_id, issue ],
-      **{
-        title: "Triáž: MyString",
-        likes_count: 999
-      }
+    triage_zammad_client_mock.expect :update_ticket_from_issue!, nil, [ issue.triage_external_id, issue ]
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
       SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
