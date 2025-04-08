@@ -358,6 +358,8 @@ class ZammadApiClient
     # hide all internal articles
     return if article.internal
 
+    # TODO revise this logic based on SGI feedback - BA-02 in DFS
+
     responsible_subject_tag = article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
     ops_portal_tag = article.body.include?(OPS_PORTAL_ARTICLE_TAG)
 
