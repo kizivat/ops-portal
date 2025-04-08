@@ -6,22 +6,29 @@ class Triage::UpdatePortalIssueFromTriageJob < ApplicationJob
     issue = Issue.find_by(triage_external_id: ticket_id)
     raise "Issue not found" unless issue
 
+    municipality = Municipality.find_by(name: ticket[:address_municipality].split("::").first)
+    municipality_district = municipality&.municipality_districts&.find_by(name: ticket[:address_municipality].split("::").last)
+
+    category = Issues::Category.find_by(name: ticket[:category])
+    subcategory = category&.subcategories&.find_by(name: ticket[:subcategory])
+    subtype = subcategory&.subtypes&.find_by(name: ticket[:subtype])
+
     issue.update!(
       title: ticket[:title],
-      municipality: Municipality.find_by(name: ticket[:address_municipality].split("::").first),
-      municipality_district: MunicipalityDistrict.find_by(name: ticket[:address_municipality].split("::").last),
+      municipality: municipality,
+      municipality_district: municipality_district,
       address_state: ticket[:address_state],
       address_county: ticket[:address_county],
       address_postcode: ticket[:address_postcode],
       address_street: ticket[:address_street],
       address_house_number: ticket[:address_house_number],
-      address_lat: ticket[:latitude],
-      address_lon: ticket[:longitude],
-      category: Issues::Category.find_by(name: ticket[:category]),
-      subcategory: Issues::Subcategory.find_by(name: ticket[:subcategory]),
-      subtype: Issues::Subtype.find_by(name: ticket[:subtype]),
+      latitude: ticket[:address_lat],
+      longitude: ticket[:address_lon],
+      category: category,
+      subcategory: subcategory,
+      subtype: subtype,
       state: Issues::State.find_by(name: ticket[:state]),
-      responsible_subject: ResponsibleSubject.find(ticket[:responsible_subject]&.dig(:value)),
+      responsible_subject: ticket[:responsible_subject],
     )
   end
 end
