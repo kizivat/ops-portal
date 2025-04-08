@@ -139,7 +139,7 @@ class ZammadApiClient
       article = ticket.articles.find { |a| a.id == article_id.to_i }
     rescue RuntimeError => e
       raise e unless e.message.include?("Couldn't find Ticket with") || e.message.include?("Couldn't find Article with")
-      puts "Couldn't find article with id: #{article_id} in ticket with id: #{ticket_id}"
+      Rails.logger.info("Couldn't find article with id: #{article_id} in ticket with id: #{ticket_id}")
       return
     end
 
