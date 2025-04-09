@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_05_062328) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_193040) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -372,6 +372,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_062328) do
     t.bigint "subtype_id"
     t.bigint "author_id", null: false
     t.string "address_county"
+    t.boolean "latlon_from_exif", default: false
     t.index ["author_id"], name: "index_issues_drafts_on_author_id"
     t.index ["category_id"], name: "index_issues_drafts_on_category_id"
     t.index ["subcategory_id"], name: "index_issues_drafts_on_subcategory_id"

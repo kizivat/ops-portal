@@ -11,7 +11,7 @@
           </svg>
         <% end %>
         <div class="info-title">Pridaj fotku</div>
-        <%= form.file_field :photos, multiple: true, accept: "image/*;capture=camera", class: 'sr-only', data: { action: 'auto-submit#submit' } %>
+        <%= form.file_field :photos, multiple: true, accept: "capture=camera;image/*", class: 'sr-only', data: { action: 'auto-submit#submit' } %>
       </div>
       <%= form.submit data: { "turbo_submits_with": "Nahrávam..." }, class: "sr-only" %>
     <% end %>

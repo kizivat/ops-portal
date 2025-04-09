@@ -102,6 +102,7 @@ class Issues::Draft < ApplicationRecord
     if gps && gps[:gps_latitude] && gps[:gps_longitude]
       self.latitude = gps_to_float(gps[:gps_latitude])
       self.longitude = gps_to_float(gps[:gps_longitude])
+      self.latlon_from_exif = true
     end
   end
 
