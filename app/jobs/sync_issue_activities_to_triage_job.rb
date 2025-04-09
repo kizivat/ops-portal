@@ -7,7 +7,7 @@ class SyncIssueActivitiesToTriageJob < ApplicationJob
 
       find_or_create_triage_portal_user!(activity.activity_object.author, client) if activity.activity_object.author && !activity.activity_object.author&.external_id
 
-      article_id = client.create_article!(issue.triage_external_id, activity.activity_object)
+      article_id = client.create_article!(issue.triage_external_id, activity.activity_object, sender: sender_type(activity.activity_object.author))
 
       raise unless article_id
 
@@ -29,5 +29,13 @@ class SyncIssueActivitiesToTriageJob < ApplicationJob
     end
 
     user
+  end
+
+  def sender_type(user)
+    if user.is_a?(User)
+      "Customer"
+    elsif user.is_a?(Legacy::Agent) || user.is_a?(::ResponsibleSubjects::User)
+      "Agent"
+    end
   end
 end
