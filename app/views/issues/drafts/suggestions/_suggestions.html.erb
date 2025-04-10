@@ -1,7 +1,7 @@
 <div class="report-summary-block-con">
   <% suggestions.each_with_index do |suggestion, idx| %>
-    <%= button_to issues_draft_suggestions_path(@draft), method: :patch, class: 'button-report-summary' do %>
-      <%= hidden_field_tag 'issues_draft[picked_suggestion_index]', value: idx %>
+    <%= button_to issues_draft_suggestions_path(@draft, next: params[:next]), method: :patch, class: 'button-report-summary' do %>
+      <%= hidden_field_tag 'issues_draft[picked_suggestion_index]', idx %>
       <div class="report-summary-wrapper">
         <div class="title"><%= suggestion['title'] %></div>
         <div class="description"><%= simple_format(suggestion['description']) %></div>
@@ -22,8 +22,8 @@
     <% end %>
   <% end %>
 
-  <%= button_to issues_draft_suggestions_path(@draft), method: :patch, class: 'button-report-summary' do %>
-    <%= hidden_field_tag 'issues_draft[picked_suggestion_index]', value: -1 %>
+  <%= button_to issues_draft_suggestions_path(@draft, next: params[:next]), method: :patch, class: 'button-report-summary' do %>
+    <%= hidden_field_tag 'issues_draft[picked_suggestion_index]', -1 %>
     <div class="report-summary-wrapper">
       <div class="title">Vlastný popis</div>
       <div class="description">Zadám vlastny popis</div>

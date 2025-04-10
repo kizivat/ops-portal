@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  get "profile/show"
   resources :clients
 
   namespace :connector do
@@ -45,6 +44,10 @@ Rails.application.routes.draw do
         resource :checks do
           get :generate
         end
+        resource :summary
+        resource :category
+        resource :subcategory
+        resource :subtype
       end
     end
   end

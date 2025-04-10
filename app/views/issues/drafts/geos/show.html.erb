@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <%= form_with(model: @draft, url: issues_draft_geo_path(@draft)) do |form| %>
+  <%= form_with(model: @draft, url: issues_draft_geo_path(@draft, next: params[:next])) do |form| %>
     <%= form.hidden_field :latitude, data: { "geo-target": :latitude } %>
     <%= form.hidden_field :longitude, data: { "geo-target": :longitude } %>
     <%= form.hidden_field :address_house_number, data: { "geo-target": "addressHouseNumber" } %>
