@@ -87,6 +87,10 @@ class Issues::Draft < ApplicationRecord
     ::Issues::Draft::GenerateSuggestionsJob.perform_later(self)
   end
 
+  def needs_editing?
+    checks.any? { |check| check["action"] == "back" }
+  end
+
   def geo
     [ latitude, longitude ] if latitude.present? && longitude.present?
   end

@@ -40,7 +40,10 @@ class Issues::DraftsController < ApplicationController
 
   def confirm
     @draft.confirm
-    redirect_to @draft
+    redirect_to issues_draft_thanks_path
+  end
+
+  def thanks
   end
 
   private
