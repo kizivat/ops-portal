@@ -89,6 +89,8 @@ class RodauthMain < Rodauth::Rails::Auth
       db.after_commit { email.deliver_later }
     end
 
+    email_from ENV["NOTIFICATION_SMTP_USERNAME"] # this is actually also the email
+
     # ==> Flash
     # Match flash keys with ones already used in the Rails app.
     # flash_notice_key :success # default is :notice
