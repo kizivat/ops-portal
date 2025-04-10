@@ -30,7 +30,7 @@ class Cms::ImportPageJob < ApplicationJob
         slug: topic_raw["slug"],
         tags: topic_raw["tags"],
         text: post_raw["cooked"],
-        raw_text: post_raw["raw"],
+        raw: post_raw["raw"],
         category: category
       )
       page.save!

@@ -5,7 +5,7 @@ kontakt:
   slug: kontakt
   category_id: <%= ENV["CMS_ROOT_CATEGORY_ID"] %>
   text: "<p>Ask any question</p>"
-  raw_text: ""
+  raw: ""
   tags: ["published"]
 
 new_portal:
@@ -13,7 +13,7 @@ new_portal:
   slug: new-portal
   category: aktuality
   text: "<p>We have launched the new version</p>"
-  raw_text: ""
+  raw: ""
   tags: ["published"]
 
 holiday_notice:
@@ -21,7 +21,7 @@ holiday_notice:
   slug: holiday-hours-notice
   category: aktuality
   text: "<p>Check out our adjusted operating hours for the upcoming holiday season</p>"
-  raw_text: ""
+  raw: ""
   tags: ["published"]
 
 older_post:
@@ -29,5 +29,5 @@ older_post:
   slug: not-published-post
   category: aktuality
   text: "<p>This is obsolete and should not be displayed</p>"
-  raw_text: ""
+  raw: ""
   tags: []
