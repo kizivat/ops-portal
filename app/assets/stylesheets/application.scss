@@ -274,8 +274,7 @@ header nav .nav-con-head {
 .open-nav-body {
   overflow: hidden;
 }
-.open-nav {
-  align-items: left;
+.open-nav-body .nav-wrap-head {
   background: $white;
   bottom: 0;
   box-sizing: border-box;
@@ -283,7 +282,6 @@ header nav .nav-con-head {
   flex-direction: column;
   row-gap: 20px;
   height: 100%;
-  justify-content: top;
   left: 0;
   padding: per(30,320);
   position: fixed;
@@ -1119,6 +1117,8 @@ section.report .report-summary-block-con {
   gap: 20px;
 }
 section.report .button-report-summary {
+  text-align: left;
+  width: 100%;
   align-items: center;
   border: 2px solid $black;
   box-sizing: border-box;

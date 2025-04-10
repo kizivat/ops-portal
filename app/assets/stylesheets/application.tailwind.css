@@ -75,3 +75,13 @@ form .error-message {
     margin-top: -8px;
     line-height: 16px;
 }
+
+form[aria-busy='true'] .button-add-picture {
+    animation: rotate360 1500ms linear infinite;
+}
+
+@keyframes rotate360 {
+    to {
+        transform: rotate(360deg);
+    }
+}
