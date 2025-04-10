@@ -62,10 +62,10 @@ Rails.application.configure do
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
   config.action_mailer.smtp_settings = {
-    user_name: ENV.fetch("NOTIFICATION_SMTP_USERNAME"),
-    password: ENV.fetch("NOTIFICATION_SMTP_PASSWORD"),
-    address: ENV.fetch("NOTIFICATION_SMTP_SERVER"),
-    port: ENV.fetch("NOTIFICATION_SMTP_PORT"),
+    user_name: ENV["NOTIFICATION_SMTP_USERNAME"],
+    password: ENV["NOTIFICATION_SMTP_PASSWORD"],
+    address: ENV["NOTIFICATION_SMTP_SERVER"],
+    port: ENV["NOTIFICATION_SMTP_PORT"],
     authentication: :plain
   }
 
