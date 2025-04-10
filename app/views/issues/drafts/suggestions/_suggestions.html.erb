@@ -1,3 +1,10 @@
+<h1>Popis podnetu</h1>
+<% if suggestions.any? %>
+  <div class="report-suggestion-description">Umelá inteligencia vybrala niekoľko možností popisu podnetu za vás, nižšie
+    prosím vyberte jednu z možností alebo vyberte vlastný popis.
+  </div>
+<% end %>
+
 <div class="report-summary-block-con">
   <% suggestions.each_with_index do |suggestion, idx| %>
     <%= button_to issues_draft_suggestions_path(@draft, next: params[:next]), method: :patch, class: 'button-report-summary' do %>
