@@ -17,7 +17,8 @@
     cursor: not-allowed;
 }
 
-button {
+button,
+.button-add-picture {
     cursor: pointer;
 }
 
