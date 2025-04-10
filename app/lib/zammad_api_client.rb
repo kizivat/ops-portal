@@ -22,7 +22,7 @@ class ZammadApiClient
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
 
-  def get_ticket(ticket_id, include_customer_articles: false, expand: false)
+  def get_ticket(ticket_id, expand: false, customer_articles: false, responsible_subject: nil)
     begin
       ticket = @client.ticket.find(ticket_id)
     rescue => e
@@ -36,8 +36,15 @@ class ZammadApiClient
     return result unless expand
 
     result.merge({
-      activities: [ build_article_response(ticket, ticket.articles.first, force: true) ] +
-        ticket.articles[1..].map { |article| build_article_response(ticket, article, force: include_customer_articles) }.compact
+      activities: [ build_article_response(ticket, ticket.articles.first, first_article: true) ] +
+        ticket.articles[1..].map { |article|
+          build_article_response(
+            ticket,
+            article,
+            customer_articles: customer_articles,
+            responsible_subject: responsible_subject
+          )
+        }.compact
     })
   end
 
@@ -146,7 +153,7 @@ class ZammadApiClient
     article.save
   end
 
-  def get_article(ticket_id, article_id)
+  def get_article(ticket_id, article_id, customer_articles: true, responsible_subject: nil)
     begin
       ticket = @client.ticket.find(ticket_id)
       article = ticket.articles.find { |a| a.id == article_id.to_i }
@@ -156,7 +163,7 @@ class ZammadApiClient
       return
     end
 
-    result = build_article_response(ticket, article)
+    result = build_article_response(ticket, article, customer_articles: customer_articles, responsible_subject: responsible_subject)
     return unless result.present?
     result
   end
@@ -369,6 +376,7 @@ class ZammadApiClient
 
     u = get_user(user_id)
     # TODO why are we creating a user from zammad in portal? this should never happen
+    # TODO handle responsible subject users for portal
     User.create!(external_id: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 
@@ -397,6 +405,8 @@ class ZammadApiClient
       triage_group: ticket.group,
       triage_owner_id: ticket.owner_id,
       ops_state: ops_state,
+      origin: ticket.origin,
+      process_type: ticket.process_type,
       title: ticket.title,
       description: ticket.triage_ticket_description,
       author: get_author(ticket.customer_id, anonymous: ticket.anonymous),
@@ -421,23 +431,19 @@ class ZammadApiClient
     }
   end
 
-  def build_article_response(ticket, article, force: false, system: false)
-    # hide all internal articles
+  def build_article_response(ticket, article, customer_articles: true, responsible_subject: nil, first_article: false)
     return if article.internal
 
-    # TODO revise this logic based on SGI feedback - BA-02 in DFS
+    customer_article = article_from_customer?(article)
+    return unless customer_articles || customer_article
 
-    responsible_subject_tag = article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
-    ops_portal_tag = article.body.include?(OPS_PORTAL_ARTICLE_TAG)
-
-    # hide all agent public articles without a tag
-    return if article.sender == "Agent" && !responsible_subject_tag && !ops_portal_tag
-
-    return unless force || responsible_subject_tag
+    portal_article = article_for_portal?(article, ticket, first_article: first_article)
+    return unless portal_article || article_for_this_responsible_subject?(article, ticket, responsible_subject) || article_from_responsible_subject?(article, responsible_subject)
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER
     else
+      # TODO this anonymous logic is not correct as article.created_by is not always the same as article.origin_by
       author = get_author(
         article.origin_by_id || article.created_by_id,
         anonymous: (ticket.anonymous && article.created_by == ticket.customer)
@@ -449,8 +455,8 @@ class ZammadApiClient
       triage_identifier: article.id,
       content_type: article.content_type,
       body: article.body.gsub(RESPONSIBLE_SUBJECT_ARTICLE_TAG, "").gsub(OPS_PORTAL_ARTICLE_TAG, ""),
-      type: article.type,
-      customer_activity: !responsible_subject_tag,
+      portal_activity: portal_article,
+      customer_activity: customer_article,
       created_at: article.created_at,
       updated_at: article.updated_at,
       attachments: article.attachments.map do |attachment|
@@ -462,5 +468,43 @@ class ZammadApiClient
         }
       end
     }
+  end
+
+  def article_for_portal?(article, ticket, first_article: false)
+    return false if article.internal
+    return true if first_article
+
+    process_type = ticket.process_type
+    case process_type
+    when "portal_issue_triage"
+      return true
+    when "portal_issue_resolution"
+      return true if article.body.include?(OPS_PORTAL_ARTICLE_TAG)
+    end
+
+    # TODO add support for other process types
+
+    false
+  end
+
+  def article_from_customer?(article)
+    return false if article.internal
+    return false unless article.sender == "Customer"
+
+    @client.user.search(query: article.origin_by).each { |u| u }.first&.origin == "portal"
+  end
+
+  def article_from_responsible_subject?(article, responsible_subject)
+    return false if article.internal
+    return false unless article.sender == "Customer"
+
+    @client.user.search(query: article.origin_by).each { |u| u }.first&.roles.include?("Zodpovedný Subjekt")
+  end
+
+  def article_for_this_responsible_subject?(article, ticket, responsible_subject)
+    return false unless responsible_subject
+    return false unless article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
+
+    ticket.responsible_subject&.dig(:value) == responsible_subject.id
   end
 end
