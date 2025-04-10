@@ -26,25 +26,25 @@
               <path class="hand" d="M527.77,22.18h.17l.17-.17c2.38-1.53,4.75-2.71,7.13-3.39.34,0,.51-.17.68-.17h.17c.17,0,.34-.17.51-.17h.68s.17-.17.34-.17h.34c.34,0,.68,0,.34,0h.68c9.67,0,13.74,7.8,13.74,14.93,0,16.46-13.74,28.84-29.52,32.91-2.38.68-5.09,1.02-7.81,1.19.51,8.31,4.41,11.2,10.18,11.2,9.67,0,22.06-7.63,38-26.13,4.41-5.26,12.05,1.7,7.8,6.45-16.63,19.51-30.03,29.86-45.81,29.86-12.55,0-20.36-8.65-20.36-22.73,0-1.7.17-3.39.34-5.26-3.73.17-7.47-4.58-4.24-8.31,7.13-8.48,16.46-22.9,26.47-30.03ZM538.63,28.29c-2.04.34-5.09,2.54-8.48,6.11-5.26,5.6-10.69,14.08-13.23,22.39,1.19-.17,2.54-.34,3.9-.68,10.35-2.72,21.89-13.4,21.89-23.07,0-2.71-1.02-4.75-3.73-4.75h-.34Z"/>
             </svg>
           </a>
-          <div class="nav-wrap-head">
-            <a class="menu-button-close">
+          <div class="nav-wrap-head open-nav">
+            <a class="menu-button-close" data-action="navigation#close">
               <span></span>
               <span></span>
             </a>
-            <a href="./../moj-ucet.html" class="account">
+            <%= link_to profile_path, class: "account" do %>
               <figure>
                 <picture>
                   <%= image_tag "muz.jpg" %>
                 </picture>
               </figure>
-              <div class="name">František Mrkvička</div>
+              <div class="name"><%= current_user.firstname %></div>
               <div class="arrow"></div>
-            </a>
+            <% end %>
 
             <div class="mobile-buttons-nav">
-              <a class="" href="./../nahlas-podnet/">Nahlás podnet</a>
-              <a class="" href="./../poloz-otazku.html">Polož otázku</a>
-              <a class="" href="./../daj-pochvalu.html">Daj pochvalu</a>
+              <%= link_to "Nahlás podnet", new_issues_draft_path %>
+              <%= link_to "Polož otázku", new_question_path %>
+              <%= link_to "Daj pochvalu", new_praise_path %>
             </div>
 
             <%= link_to "Nahlásené dopyty", issues_path %>
@@ -56,13 +56,13 @@
           </div>
         </div>
         <div class="buttons-con">
-          <a href="./../nahlas-podnet/" class="add-button">Nahlás podnet</a>
-          <a href="./../" class="icon search">
+          <%= link_to "Nahlás podnet", new_issues_draft_path, class: "add-button" %>
+          <%= link_to issues_path, class: "icon search" do %>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke-miterlimit="10" />
-              <path d="M15,15l5,5" fill="none" stroke-miterlimit="10" />
+              <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke-miterlimit="10"/>
+              <path d="M15,15l5,5" fill="none" stroke-miterlimit="10"/>
             </svg>
-          </a>
+          <% end %>
           <% if logged_in? %>
             <%= link_to profile_path, class: "icon login" do %>
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@
               <span class="logged">Prihlásiť</span>
             <% end %>
           <% end %>
-          <a class="menu-button">
+          <a class="menu-button" data-action="navigation#open">
             <span></span>
             <span></span>
             <span></span>
