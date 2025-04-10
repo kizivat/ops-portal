@@ -93,7 +93,7 @@ sk:
     verify_account_button: Potvrdiť registráciu
     verify_account_email_recently_sent_error_flash: An email has recently been sent to you with a link to verify your account
     verify_account_email_sent_notice_flash: An email has been sent to you with a link to verify your account
-    verify_account_email_subject: Potvrdiť registráciu
+    verify_account_email_subject: Potvrdenie registrácie
     verify_account_error_flash: Unable to verify account
     verify_account_notice_flash: Your account has been verified
     verify_account_page_title: Potvrdenie registrácie
