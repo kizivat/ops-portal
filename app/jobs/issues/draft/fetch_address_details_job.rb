@@ -37,15 +37,14 @@ class Issues::Draft::FetchAddressDetailsJob < ApplicationJob
     # TODO what if not a node?
     # TODO handle errors
     osmtype = case json["osm_type"]
-      when "way"
+    when "way"
         "W"
-      when "node"
+    when "node"
         "N"
-      else
+    else
         raise NotImplementedError, "Unknown osm_type: #{json["osm_type"]}"
     end
     response = conn.get("/details", { format: :json, osmtype: osmtype, osmid: json["osm_id"], addressdetails: 1 })
     response.body
   end
-
 end
