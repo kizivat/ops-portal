@@ -4,11 +4,11 @@ class SyncIssueToTriageJob < ApplicationJob
 
     if issue.resolution_external_id.present?
       client.update_ticket_from_issue!(issue.resolution_external_id, issue)
-      issue.update!(last_synced_at: Time.now)
+      issue.touch(:last_synced_at)
 
     elsif issue.triage_external_id.present?
       client.update_ticket_from_issue!(issue.triage_external_id, issue)
-      issue.update!(last_synced_at: Time.now)
+      issue.touch(:last_synced_at)
 
     else
       ticket_id = create_new_triage_ticket(issue, client, import)
