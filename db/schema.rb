@@ -241,9 +241,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_10_092823) do
     t.integer "legacy_id"
     t.bigint "municipality_district_id"
     t.bigint "responsible_subject_id"
+    t.bigint "owner_id"
     t.bigint "subcategory_id"
     t.bigint "subtype_id"
-    t.bigint "owner_id"
     t.string "address_state"
     t.string "address_county"
     t.string "address_city"
@@ -254,6 +254,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_10_092823) do
     t.string "address_street"
     t.string "address_house_number"
     t.string "address_postcode"
+    t.integer "issue_type", default: 1
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["legacy_id"], name: "index_issues_on_legacy_id", unique: true
@@ -370,6 +371,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_10_092823) do
     t.bigint "subtype_id"
     t.bigint "author_id", null: false
     t.string "address_county"
+    t.boolean "latlon_from_exif", default: false
     t.index ["author_id"], name: "index_issues_drafts_on_author_id"
     t.index ["category_id"], name: "index_issues_drafts_on_category_id"
     t.index ["subcategory_id"], name: "index_issues_drafts_on_subcategory_id"
