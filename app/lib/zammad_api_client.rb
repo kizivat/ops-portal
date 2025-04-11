@@ -389,8 +389,9 @@ class ZammadApiClient
   end
 
   def build_ticket_response(ticket)
-    municipality = Municipality.find_by!(name: ticket.address_municipality.split("::").first)
-    municipality_district = municipality&.municipality_districts&.find_by(name: ticket.address_municipality.split("::").last)
+    municipality_name, district_name = ticket.address_municipality.split("::", 2)
+    municipality = Municipality.find_by!(name: municipality_name)
+    municipality_district = municipality&.municipality_districts&.find_by(name: district_name)
 
     category = Issues::Category.find_by!(name: ticket.category)
     subcategory = category&.subcategories&.find_by!(name: ticket.subcategory)
