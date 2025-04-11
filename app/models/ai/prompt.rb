@@ -14,7 +14,6 @@
 #
 module Ai
   class Prompt < Cms::Page
-
     def self.get(prompt_name)
       joins(:category)
         .where(cms_categories: { id: ENV.fetch("CMS_AI_CATEGORY_ID") })
