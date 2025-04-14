@@ -396,7 +396,7 @@ class ZammadApiClient
 
     ops_state = Issues::State.find_by!(key: ticket.ops_state)
 
-    responsible_subject = ticket.responsible_subject[:value] ? ResponsibleSubject.find(ticket.responsible_subject[:value]) : nil
+    responsible_subject = ResponsibleSubject.find_by(id: ticket.responsible_subject[:value])
 
     {
       triage_identifier: ticket.id,
