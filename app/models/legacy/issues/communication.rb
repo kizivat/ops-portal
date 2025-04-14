@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: issues_communications
+# Table name: legacy_issues_communications
 #
 #  id                                  :bigint           not null, primary key
 #  added_at                            :datetime
@@ -29,16 +29,12 @@
 #  triage_external_id                  :integer
 #  user_id                             :integer
 #
-class Issues::Communication < ApplicationRecord
-  belongs_to :activity, class_name: "Issues::Activity"
+class Legacy::Issues::Communication < ApplicationRecord
+  belongs_to :activity, class_name: "::Issues::Activity"
   belongs_to :legacy_agent_author, optional: true, class_name: "Legacy::Agent"
   belongs_to :responsible_subjects_user_author, optional: true, class_name: "ResponsibleSubjects::User"
 
   has_many_attached :attachments
-
-  def author
-    legacy_agent_author || responsible_subjects_user_author
-  end
 
   def activity_body
     message
