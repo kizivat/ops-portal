@@ -18,11 +18,12 @@
 #  solved_in                           :string
 #  subject                             :string
 #  text                                :string
+#  type                                :string
 #  created_at                          :datetime         not null
 #  updated_at                          :datetime         not null
 #  activity_id                         :bigint           not null
 #  admin_id                            :integer
-#  legacy_agent_author_id              :bigint
+#  agent_author_id                     :bigint
 #  legacy_id                           :integer
 #  person_id                           :integer
 #  responsible_subjects_user_author_id :bigint
@@ -30,8 +31,8 @@
 #  user_id                             :integer
 #
 class Legacy::Issues::Communication < ApplicationRecord
-  belongs_to :activity, class_name: "::Issues::Activity"
-  belongs_to :legacy_agent_author, optional: true, class_name: "Legacy::Agent"
+  belongs_to :activity, class_name: "Issues::Activity"
+  belongs_to :agent_author, optional: true, class_name: "Legacy::Agent"
   belongs_to :responsible_subjects_user_author, optional: true, class_name: "ResponsibleSubjects::User"
 
   has_many_attached :attachments

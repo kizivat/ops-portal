@@ -6,14 +6,11 @@
 #  added_at                      :datetime
 #  author_email                  :string
 #  author_name                   :string
-#  embed                         :string
 #  hidden                        :boolean          default(FALSE)
-#  image                         :string
 #  ip                            :inet
-#  link                          :string
-#  published                     :boolean
-#  state                         :boolean
+#  legacy_data                   :jsonb
 #  text                          :string
+#  type                          :string
 #  verification                  :integer
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
@@ -28,13 +25,12 @@ class Issues::Comment < ApplicationRecord
   belongs_to :activity, class_name: "Issues::Activity"
   belongs_to :user_author, class_name: "User", optional: true
   belongs_to :agent_author, class_name: "Legacy::Agent", foreign_key: "agent_author_id", optional: true
-  belongs_to :responsible_subject_author, class_name: "ResponsibleSubjects::User", optional: true
+  belongs_to :responsible_subject_author, class_name: "ResponsibleSubject", optional: true
 
   has_many_attached :attachments
 
-
   def activity_body
-    return "Zmazaný komentár: #{text}" unless published
+    return "Zmazaný komentár: #{text}" if hidden
 
     text
   end

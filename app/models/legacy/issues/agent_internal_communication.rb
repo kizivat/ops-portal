@@ -19,11 +19,12 @@
 #  solved_in                           :string
 #  subject                             :string
 #  text                                :string
+#  type                                :string
 #  created_at                          :datetime         not null
 #  updated_at                          :datetime         not null
 #  activity_id                         :bigint           not null
 #  admin_id                            :integer
-#  legacy_agent_author_id              :bigint
+#  agent_author_id                     :bigint
 #  legacy_id                           :integer
 #  person_id                           :integer
 #  responsible_subjects_user_author_id :bigint
@@ -32,6 +33,6 @@
 #
 class Legacy::Issues::AgentInternalCommunication < Legacy::Issues::Communication
   def author
-    legacy_agent_author
+    agent_author
   end
 end

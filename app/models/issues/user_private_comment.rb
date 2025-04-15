@@ -6,14 +6,11 @@
 #  added_at                      :datetime
 #  author_email                  :string
 #  author_name                   :string
-#  embed                         :string
 #  hidden                        :boolean          default(FALSE)
-#  image                         :string
 #  ip                            :inet
-#  link                          :string
-#  published                     :boolean
-#  state                         :boolean
+#  legacy_data                   :jsonb
 #  text                          :string
+#  type                          :string
 #  verification                  :integer
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
@@ -25,6 +22,9 @@
 #  user_author_id                :bigint
 #
 class Issues::UserPrivateComment < Issues::Comment
+  validates :agent_author_id, absence: true
+  validates :responsible_subject_author_id, absence: true
+
   def author
     user_author
   end
