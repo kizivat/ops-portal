@@ -66,7 +66,7 @@ module Import
               user_id: legacy_record.user,
               type: communication_type
             )
-            communication.activity ||= issue.communication_activities.create!
+            communication.activity ||= issue.legacy_communication_activities.create!
           end
 
           communication.save!

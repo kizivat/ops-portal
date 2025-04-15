@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #  issue_id   :bigint           not null
 #
-class Issues::CommunicationActivity < Issues::Activity
+class Legacy::Issues::CommunicationActivity < Issues::Activity
   has_one :activity_object, class_name: "Legacy::Issues::Communication", foreign_key: :activity_id
 
   def import_to_triage_as_internal?
