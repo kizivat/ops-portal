@@ -9,7 +9,7 @@ module Import
           attachment_content = download_from_ops_portal(legacy_record.href)
           attachment_name = File.basename(legacy_record.href)
 
-          persisted = update.attachments_attachments.includes(:blob).where(blob: { filename: attachment_name, byte_size: attachment_content.size }).any?
+          persisted = attachment_persisted?(name: attachment_name, content: attachment_content, persisted_records: update.attachments)
 
           update.attachments.attach(io: attachment_content, filename: attachment_name) unless persisted
         end

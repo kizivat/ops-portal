@@ -9,7 +9,7 @@ module Import
           photo_content = download_from_ops_portal(legacy_record.original)
           photo_name = File.basename(legacy_record.original)
 
-          persisted = issue.photos_attachments.includes(:blob).where(blob: { filename: photo_name, byte_size: photo_content.size }).any?
+          persisted = attachment_persisted?(name: photo_name, content: photo_content, persisted_records: issue.photos)
 
           unless persisted
             issue.photos.attach(io: photo_content, filename: photo_name)
