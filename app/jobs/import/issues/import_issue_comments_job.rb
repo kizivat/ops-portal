@@ -6,7 +6,11 @@ module Import
       Legacy::GenericModel.set_table_name("comments")
       Legacy::GenericModel.where(remoteid: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
-          comment_type = Legacy::User.find_or_create_agent(legacy_record.user).present? ? "Issues::AgentComment" : "Issues::UserComment"
+          comment_type = if Legacy::User.find_or_create_agent(legacy_record.user).present?
+           "Issues::AgentComment"
+          else
+           "Issues::UserComment"
+          end
 
           comment = ::Issues::Comment.find_or_initialize_by(
             legacy_id: legacy_record.id,
