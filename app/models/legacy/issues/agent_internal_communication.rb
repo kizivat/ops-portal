@@ -32,6 +32,8 @@
 #  user_id                             :integer
 #
 class Legacy::Issues::AgentInternalCommunication < Legacy::Issues::Communication
+  validates :responsible_subjects_user_author_id, absence: true
+
   def author
     agent_author
   end
