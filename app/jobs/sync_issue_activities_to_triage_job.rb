@@ -36,7 +36,7 @@ class SyncIssueActivitiesToTriageJob < ApplicationJob
   def sender_type(user)
     if user.is_a?(User)
       "Customer"
-    elsif user.is_a?(Legacy::Agent) || user.is_a?(::ResponsibleSubjects::User)
+    elsif user.is_a?(Legacy::Agent) || user.is_a?(::ResponsibleSubjects::User) || user.is_a?(::ResponsibleSubject)
       "Agent"
     end
   end
