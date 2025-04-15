@@ -23,7 +23,7 @@ module Legacy
 
       Legacy::GenericModel.set_table_name("municipality_users")
       legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
-      self.create_user_from_legacy_record(legacy_record) if legacy_record
+      self.create_responsible_subjects_user_from_legacy_record(legacy_record) if legacy_record
     end
 
     def self.create_user_from_legacy_record(legacy_record)
@@ -80,7 +80,7 @@ module Legacy
         gdpr_accepted: legacy_record.gdpr_accepted,
         login: legacy_record.login,
         name: legacy_record.name,
-        password_hash: dummy_password ? generate_dummy_password : legacy_record.password,
+        password: dummy_password ? generate_dummy_password : legacy_record.password,
         photo: legacy_record.photo,
         token: legacy_record.remember_token,
         tooltips: legacy_record.tooltips,
