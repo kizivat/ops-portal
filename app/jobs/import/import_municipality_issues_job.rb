@@ -80,7 +80,7 @@ module Import
             subtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             municipality_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
-            responsible_subject: ResponsibleSubject.find_by_legacy_id(legacy_record.zodpovednost),
+            responsible_subject: Legacy::ResponsibleSubject.find_or_create_responsible_subject(legacy_record.zodpovednost),
             state: ::Issues::State.find_by(legacy_id: legacy_record.status)
           )
 

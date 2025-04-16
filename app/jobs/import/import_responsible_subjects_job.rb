@@ -4,28 +4,11 @@ module Import
       Legacy::GenericModel.set_table_name("zodpovednost")
       Legacy::GenericModel.where.not(nazov: [ "Iné", "Iný subjekt" ]).find_in_batches do |group|
         group.each do |legacy_record|
-          ResponsibleSubject.find_or_create_by!(
-            legacy_id: legacy_record.id,
-            active: legacy_record.status,
-            code: legacy_record.code,
-            email: legacy_record.email,
-            name: legacy_record.meno,
-            pro: legacy_record.pro,
-            scope: legacy_record.scope,
-            subject_name: legacy_record.nazov,
-            district: ::District.find_by(legacy_id: legacy_record.kraj),
-            municipality_district: ::MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
-            municipality: ::Municipality.find_by(legacy_id: legacy_record.mesto),
-            responsible_subjects_type: ::ResponsibleSubjects::Type.find_by(legacy_id: legacy_record.typ)
-          )
+          Legacy::ResponsibleSubject.create_responsible_subject_from_legacy_record(legacy_record)
         end
       end
 
-      ResponsibleSubject.find_or_create_by!(
-        responsible_subjects_type: ::ResponsibleSubjects::Type.find_by(name: "Iný subjekt"),
-        subject_name: "Iný subjekt",
-        name: "Iné"
-      )
+      Legacy::ResponsibleSubject.find_or_create_other_responsible_subject
 
       if chain_import
         import_categories_job.perform_later
