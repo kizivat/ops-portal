@@ -11,8 +11,7 @@ module Import
       import_comments_job: Issues::ImportIssueCommentsJob,
       import_communications_job: Issues::ImportIssueCommunicationsJob
     )
-      Legacy::GenericModel.set_table_name("alerts")
-      Legacy::GenericModel
+      Legacy::Alert
         .where(mesto: municipality.legacy_id)
         .where(mestska_cast: municipality_district&.legacy_id)
         .where(is_manual: 0) # !! DO NOT ever delete this condition !!
