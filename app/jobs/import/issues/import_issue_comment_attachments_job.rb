@@ -3,8 +3,7 @@ module Import
     include ImportMethods
 
     def perform(comment:)
-      Legacy::GenericModel.set_table_name("media_comments")
-      Legacy::GenericModel.where(comment_id: comment.legacy_id).find_in_batches do |group|
+      Legacy::Alerts::CommentAttachment.where(comment_id: comment.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
           attachment_content = download_from_ops_portal(legacy_record.href)
           attachment_name = legacy_record.href

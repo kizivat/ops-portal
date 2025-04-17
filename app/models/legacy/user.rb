@@ -19,8 +19,7 @@ module Legacy
     def self.find_or_create_responsible_subjects_user(legacy_id)
       return ::ResponsibleSubjects::User.find_by(legacy_id: legacy_id) if ::ResponsibleSubjects::User.find_by(legacy_id: legacy_id)
 
-      Legacy::GenericModel.set_table_name("municipality_users")
-      legacy_record = Legacy::GenericModel.find_by_id(legacy_id)
+      legacy_record = Legacy::MunicipalityUser.find_by_id(legacy_id)
       self.create_responsible_subjects_user_from_legacy_record(legacy_record) if legacy_record
     end
 

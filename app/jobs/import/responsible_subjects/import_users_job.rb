@@ -3,8 +3,7 @@ module Import
     include ImportMethods
 
     def perform
-      Legacy::GenericModel.set_table_name("municipality_users")
-      Legacy::GenericModel.find_in_batches do |group|
+      Legacy::MunicipalityUser.find_in_batches do |group|
         group.each do |legacy_record|
           Legacy::User.create_responsible_subjects_user_from_legacy_record(legacy_record)
         end

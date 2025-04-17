@@ -3,8 +3,7 @@ module Import
     include ImportMethods
 
     def perform(issue:, import_photos_job: Issues::ImportIssueCommentAttachmentsJob)
-      Legacy::GenericModel.set_table_name("comments")
-      Legacy::GenericModel.where(remoteid: issue.legacy_id).find_in_batches do |group|
+      Legacy::Alerts::Comment.where(remoteid: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|
           comment_type = if Legacy::User.find_or_create_agent(legacy_record.user).present?
            "Issues::AgentComment"

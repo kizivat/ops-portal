@@ -3,9 +3,8 @@ module Import
     include ImportMethods
 
     def perform(issue:, import_attachments_job: Issues::ImportIssueCommunicationAttachmentsJob)
-      Legacy::GenericModel.set_table_name("communication")
       # !! DO NOT ever delete the internal attribute condition !!
-      Legacy::GenericModel.where(alert: issue.legacy_id).where(internal: 0).find_in_batches do |group|
+      Legacy::Alerts::Communication.where(alert: issue.legacy_id).where(internal: 0).find_in_batches do |group|
         group.each do |legacy_record|
           if legacy_record.direction == 1
             communication = ::Issues::ResponsibleSubjectComment.find_or_initialize_by(
