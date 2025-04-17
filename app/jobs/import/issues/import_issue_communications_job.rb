@@ -28,7 +28,7 @@ module Import
                 text: legacy_record.text,
                 admin_id: legacy_record.admin,
                 person_id: legacy_record.person,
-                user_id: legacy_record.user
+                user_id: legacy_record.user # legacy_id of ResponsibleSubject::User author
               },
               text: legacy_record.message,
               responsible_subject_author: Legacy::User.find_or_create_responsible_subjects_user(legacy_record.user)&.responsible_subject,
