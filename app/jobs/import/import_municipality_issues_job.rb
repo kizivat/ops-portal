@@ -71,7 +71,8 @@ module Import
               organizational_unit_id: legacy_record.organizational_unit_id,
               ended_at: legacy_record.end_date,
               parent_id: legacy_record.parent_id,
-              organization_unit_id2: legacy_record.organizational_unit_id2
+              organization_unit_id2: legacy_record.organizational_unit_id2,
+              legacy_responsible_subject_id: legacy_record.zodpovednost
             },
             longitude: legacy_record.map_y,
             reported_at: convert_timestamp_value(legacy_record.posted_time), # TODO dolezity udaj pre triaz podnetu
@@ -83,7 +84,7 @@ module Import
             subtype: subtype,
             municipality: Municipality.find_by(legacy_id: legacy_record.mesto),
             municipality_district: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast),
-            responsible_subject: ResponsibleSubject.find_by(legacy_id: legacy_record.zodpovednost),
+            responsible_subject: Legacy::ResponsibleSubject.find_or_create_responsible_subject(legacy_record.zodpovednost),
             state: ::Issues::State.find_by(legacy_id: legacy_record.status)
           )
 
