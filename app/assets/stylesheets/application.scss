@@ -1752,10 +1752,12 @@ section.podnety nav.suggestions .button-location {
   display: grid;
   gap: 40px 0;
 }
-.open-podnety-filter-con {
+
+[data-toggle-open-value="true"] .podnety-filter-con {
   display: block !important;
 }
-.open-podnety-filter-wrapper {
+
+[data-toggle-open-value="true"] .podnety-filter-wrapper {
   //display: grid;
   animation: open-smooth-podnety-filter-wrapper 0.5s ease;
 }
