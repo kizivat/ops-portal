@@ -38,16 +38,6 @@
   <body data-controller="navigation" data-navigation-target="toggler">
   <%= render "shared/header" %>
 
-  <% if notice %>
-    <div class="flash notice">
-      <%= flash[:notice] %>
-    </div>
-  <% elsif alert %>
-    <div class="flash alert">
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
-
   <%= yield %>
 
   <%= render "shared/footer" %>

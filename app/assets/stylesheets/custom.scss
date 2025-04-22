@@ -32,12 +32,11 @@ form .error-message {
 .flash {
     padding: 10px;
     border-radius: 6px;
-    margin: 2em auto;
-    width: 20em;
+    max-width: 400px;
 }
 
 .flash.alert {
-    background-color: #ff4761;
+    background-color: #ffd2e6;
 }
 
 .flash.notice {

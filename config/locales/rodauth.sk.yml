@@ -18,7 +18,7 @@ sk:
     close_account_page_title: Potvrdenie zmazania účtu
     contains_null_byte_message: contains null byte
     create_account_button: Vytvoriť účet
-    create_account_error_flash: There was an error creating your account
+    create_account_error_flash: Pri vytváraní účtu nastala chyba.
     create_account_link_text: Vytvoriť účet
     create_account_notice_flash: Your account has been created
     create_account_page_title: Create Account
@@ -37,11 +37,12 @@ sk:
     login_invalid_password_message: invalid password
     login_invalid_password_current_message: invalid current password
     login_invalid_password_match_message: passwords do not match
-    login_error_flash: There was an error logging in
+    login_error_flash: Pri prihlasovaní nastala chyba
     login_form_footer_links_heading: <h2 class="rodauth-login-form-footer-links-heading">Other Options</h2>
     login_label: Login
     login_not_valid_email_message: v nevhodnom formáte
     login_notice_flash: You have been logged in
+    login_too_short_message: email je príliš krátky
     login_page_title: Login
     logins_do_not_match_message: logins do not match
     logout_button: Logout

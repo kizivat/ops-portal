@@ -11,6 +11,8 @@ class RodauthMain < Rodauth::Rails::Auth
     # Omniauth
     enable :omniauth
 
+    enable :i18n
+
     omniauth_provider :facebook,
       ENV.fetch("FACEBOOK_APP_ID"),
       ENV.fetch("FACEBOOK_APP_SECRET"),
