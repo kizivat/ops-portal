@@ -3,5 +3,5 @@
   <div class="podnet-block-con">
     <%= render @search_results.hits %>
   </div>
-  <!-- TODO pagination -->
+  <%= ops_paginate @search_results.hits %>
 </div>

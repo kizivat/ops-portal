@@ -1,13 +1,17 @@
 module SearchEngine
   class Engine
-    def initialize(filters:)
+    def initialize(filters:, per_page: nil)
       @filters = filters
+      @per_page = per_page
     end
 
     def search(scope, params)
       @filters.each do |filter|
         scope = filter.apply(scope, params)
       end
+
+      scope = scope.page(params[:page])
+      scope = scope.per(@per_page) if @per_page
 
       build_results(scope, params)
     end

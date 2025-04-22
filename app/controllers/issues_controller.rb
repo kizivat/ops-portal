@@ -8,7 +8,6 @@ class IssuesController < ApplicationController
     scope = Issue.publicly_visible
     scope = scope.order(reported_at: :desc) # TODO
     scope = scope.with_attached_photos.includes(:state)
-    scope = scope.limit(12) # TODO move to engine
 
     @search_results = search_engine.search(scope, params)
   end
@@ -97,7 +96,8 @@ class IssuesController < ApplicationController
           label: "Textové vyhľadávanie",
           filter: ->(scope, params) { scope.fulltext_search(params[:q]) }
         )
-      ]
+      ],
+      per_page: 12,
     )
   end
 end
