@@ -1540,11 +1540,12 @@ ul.dropdown-list li {
 ul.dropdown-list li:hover {
   background: $line;
 }
-ul.dropdown-list li.check-box {
+ul.dropdown-list li.check-box a {
   align-items: center;
   display: grid;
   gap: 0 4px;
   grid-template-columns: 30px auto;
+  color: $black;
 }
 ul.dropdown-list li.check-box .form-check-box {
   height: 24px;
@@ -1990,10 +1991,11 @@ a.podnet-block .sent {
 a.podnet-block .state-v-rieseni {
   background: $blue;
 }
-a.podnet-block .unresolved {
+a.podnet-block .state-nerieseny {
   background: $neriesene;
 }
-a.podnet-block .close {
+a.podnet-block .state-uzavrety,
+a.podnet-block .state-neprijaty {
   background: $uzavrete;
 }
 a.podnet-block .icon-con {

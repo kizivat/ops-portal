@@ -5,7 +5,12 @@ class IssuesController < ApplicationController
   def index
     @tab = params[:tab].in?(%w[map stats]) ? params[:tab] : "list"
 
-    @issues = search_issues.limit(24)
+    scope = Issue.publicly_visible
+    scope = scope.order(reported_at: :desc) # TODO
+    scope = scope.with_attached_photos.includes(:state)
+    scope = scope.limit(12) # TODO move to engine
+
+    @search_results = search_engine.search(scope, params)
   end
 
   # GET /issues/1 or /issues/1.json
@@ -32,17 +37,67 @@ class IssuesController < ApplicationController
 
   private
 
-  def search_issues
-    scope = Issue
-    scope = scope.joins(:category).where(issues_categories: { name: params[:kategoria] }) if params[:kategoria].present?
-    scope = scope.joins(:subcategory).where(issues_subcategories: { name: params[:subkategoria] }) if params[:subkategoria].present?
-    scope = scope.joins(:subtype).where(issues_subtypes: { name: params[:typ] }) if params[:typ].present?
-    scope = scope.joins(:state).where.not(state: { name: 'Čakajúci' })
+  def search_engine
+    SearchEngine.new(
+      filters: [
+        SearchEngine::SimpleFilter.new(
+          :dopyt,
+          filter: ->(scope, params) do
+            map = {
+              "Podnet" => :issue,
+              "Pochvala" => :praise,
+              "Otázka" => :question
+            }
 
-    scope = scope.order(reported_at: :desc) # TODO
+            scope.where(issue_type: map.values_at(*Array(params[:dopyt])))
+          end,
+          visible_filter_label: "Typ dopytu",
+          items_finder: %w[Podnet Otázka Pochvala]
+        ),
 
-    scope = scope.with_attached_photos.includes(:state) # optimize N+1
+        SearchEngine::SimpleFilter.new(
+          :stav,
+          filter: ->(scope, params) { scope.joins(:state).where(state: { name: params[:stav] }) },
+          visible_filter_label: "Stav podnetu",
+          items_finder: -> { Issues::State.order(:name).pluck(:name) - %w[Čakajúci Neprijatý] },
+        ),
+        SearchEngine::SimpleFilter.new(
+          :kategoria,
+          filter: ->(scope, params) { scope.joins(:category).where(issues_categories: { name: params[:kategoria] }) },
+          visible_filter_label: "Kategória",
+          items_finder: -> { Issues::Category.order(:name).pluck(:name) },
+        ),
+        SearchEngine::SimpleFilter.new(
+          :podkategoria,
+          filter: ->(scope, params) { scope.joins(:subcategory).where(issues_subcategories: { name: params[:podkategoria] }) }
+        ),
+        SearchEngine::SimpleFilter.new(
+          :typ,
+          filter: ->(scope, params) { scope.joins(:subtype).where(issues_subtypes: { name: params[:typ] }) }
+        ),
+        SearchEngine::SimpleFilter.new(
+          :zodpovedny,
+          filter: ->(scope, params) { scope.joins(:responsible_subject).where(responsible_subject: { subject_name: params[:zodpovedny] }) }
+        ),
+        SearchEngine::SimpleFilter.new(
+          :ulica,
+          filter: ->(scope, params) { scope.where(address_street: params[:ulica]) }
+        ),
+        SearchEngine::SimpleFilter.new(
+          :cast,
+          filter: ->(scope, params) { scope.joins(:municipality_district).where(municipality_districts: { name: params[:cast] }) }
+        ),
+        SearchEngine::SimpleFilter.new(
+          :obec,
+          filter: ->(scope, params) { scope.joins(:municipality).where(municipalities: { name: params[:obec] }) }
+        ),
 
-    scope
+        SearchEngine::SimpleFilter.new(
+          :q,
+          label: "Textové vyhľadávanie",
+          filter: ->(scope, params) { scope.fulltext_search(params[:q]) }
+        )
+      ]
+    )
   end
 end
