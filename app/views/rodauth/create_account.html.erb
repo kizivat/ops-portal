@@ -4,9 +4,6 @@
   <div class="form-other-con">
     <div class="form-description">Polia označené * sú povinné.</div>
 
-    <%= render "shared/flash" %>
-
-
     <%= form_with url: rodauth.create_account_path, method: :post, data: { turbo: false }, html: { novalidate: true } do |form| %>
       <div class="form-items-con">
         <div class="form-item-wrapper">

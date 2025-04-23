@@ -6,8 +6,6 @@
       Nemáte účet? <%= link_to rodauth.create_account_link_text, rodauth.create_account_path, class: "link" %>
     </div>
 
-    <%= render "shared/flash" %>
-
     <%= form_with url: rodauth.login_path, method: :post, data: { turbo: false }, html: { novalidate: true } do |form| %>
       <div class="form-items-con">
         <div class="form-item-wrapper">

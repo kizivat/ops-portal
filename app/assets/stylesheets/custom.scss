@@ -29,7 +29,14 @@ form .error-message {
     border-radius: 6px;
 }
 
+.section-flash {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    max-width: 400px;
+}
+
 .flash {
+    margin: 0 auto;
     padding: 10px;
     border-radius: 6px;
     max-width: 400px;
