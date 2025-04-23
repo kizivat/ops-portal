@@ -22,8 +22,4 @@ class RodauthApp < Rodauth::Rails::App
     # ==> Secondary configurations
     # r.rodauth(:admin) # route admin rodauth requests
   end
-
-  plugin :rodauth do
-    enable :i18n
-  end
 end

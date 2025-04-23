@@ -1,27 +1,27 @@
 sk:
   rodauth:
     already_an_account_with_this_login_message: účet s týmto emailom už existuje
-    attempt_to_create_unverified_account_error_flash: The account you tried to create is currently awaiting verification
-    attempt_to_login_to_unverified_account_error_flash: The account you tried to login with is currently awaiting verification
-    change_login_button: Zmena prihlasovacieho emailu
-    change_login_error_flash: There was an error changing your login
-    change_login_needs_verification_notice_flash: An email has been sent to you with a link to verify your login change
+    attempt_to_create_unverified_account_error_flash: Účet, ktorý sa snažíte zaregistrovať, čaká na overenie.
+    attempt_to_login_to_unverified_account_error_flash: Účet, do ktorého sa snažíte prihlásiť, čaká na overenie.
+    change_login_button: Zmeniť prihlasovací email
+    change_login_error_flash: Pri zmene prihlasovacieho emailu nastala chyba.
+    change_login_needs_verification_notice_flash: Zaslali sme Vám email s odkazom na potvrdenie zmenu prihlasovacieho emailu.
     change_login_notice_flash: Your login has been changed
     change_login_page_title: Zmena prihlasovacieho emailu
     change_password_button: Zmeniť heslo
-    change_password_error_flash: There was an error changing your password
-    change_password_notice_flash: Your password has been changed
+    change_password_error_flash: Pri zmene hesla nastala chyba.
+    change_password_notice_flash: Vaše heslo bolo úspešne zmenené.
     change_password_page_title: Zmena hesla
-    close_account_button: Áno, chcem účet nenávratne zmazať
-    close_account_error_flash: There was an error closing your account
-    close_account_notice_flash: Your account has been closed
+    close_account_button: Áno, účet nenávratne zmazať
+    close_account_error_flash: Pri mazaní vášho účtu nastala chyba.
+    close_account_notice_flash: Váš účet bol úspešne zmazaný.
     close_account_page_title: Potvrdenie zmazania účtu
     contains_null_byte_message: contains null byte
     create_account_button: Vytvoriť účet
-    create_account_error_flash: There was an error creating your account
+    create_account_error_flash: Pri vytváraní účtu nastala chyba.
     create_account_link_text: Vytvoriť účet
     create_account_notice_flash: Your account has been created
-    create_account_page_title: Create Account
+    create_account_page_title: Vytvoriť účeť
     email_subject_prefix: ''
     input_field_label_suffix: ''
     invalid_password_message: Zadali ste nesprávne heslo. Skúste znova.
@@ -37,15 +37,16 @@ sk:
     login_invalid_password_message: invalid password
     login_invalid_password_current_message: invalid current password
     login_invalid_password_match_message: passwords do not match
-    login_error_flash: There was an error logging in
+    login_error_flash: Prihlásenie bolo neúspešné.
     login_form_footer_links_heading: <h2 class="rodauth-login-form-footer-links-heading">Other Options</h2>
     login_label: Login
     login_not_valid_email_message: v nevhodnom formáte
-    login_notice_flash: You have been logged in
+    login_notice_flash: Prihlásenie bolo úspešné.
+    login_too_short_message: email je príliš krátky
     login_page_title: Login
     logins_do_not_match_message: logins do not match
     logout_button: Logout
-    logout_notice_flash: You have been logged out
+    logout_notice_flash: Odhlásenie bolo úspešné.
     logout_page_title: Logout
     multi_phase_login_page_title: Login
     need_password_notice_flash: Login recognized, please enter your password
@@ -72,17 +73,17 @@ sk:
     remember_page_title: Change Remember Setting
     remember_remember_label: Zapamätať si prihlásenie
     require_login_error_flash: Please login to continue
-    resend_verify_account_page_title: Resend Verification Email
+    resend_verify_account_page_title: Preposlať overovací email
     reset_password_button: Nastaviť nové heslo
     reset_password_email_recently_sent_error_flash: An email has recently been sent to you with a link to reset your password
-    reset_password_email_sent_notice_flash: An email has been sent to you with a link to reset the password for your account
+    reset_password_email_sent_notice_flash: Zaslali sme Vám email s odkazom na zmenu hesla.
     reset_password_email_subject: Reset Password
-    reset_password_error_flash: There was an error resetting your password
+    reset_password_error_flash: Pri zmene hesla nastala chyba.
     reset_password_explanatory_text: "<p>Ak ste zabudli svoje heslo, môžete si vyžiadať jeho zmenu.</p>"
-    reset_password_notice_flash: Your password has been reset
+    reset_password_notice_flash: Heslo bolo úspešne zmenené.
     reset_password_page_title: Nastavenie nového hesla
     reset_password_request_button: Chcem zmeniť heslo
-    reset_password_request_error_flash: There was an error requesting a password reset
+    reset_password_request_error_flash: Pri žiadosti o zmenu hesla nastala chyba.
     reset_password_request_link_text: Zabudnuté heslo?
     reset_password_request_page_title: Zabudnuté heslo?
     same_as_current_login_message: same as current login
@@ -91,19 +92,19 @@ sk:
     unverified_account_message: Neoverený účet, prosím overte váš účet pred prvým prihlásením alebo kontaktujte administrátora.
     unverified_change_login_error_flash: Please verify this account before changing the login
     verify_account_button: Potvrdiť registráciu
-    verify_account_email_recently_sent_error_flash: An email has recently been sent to you with a link to verify your account
-    verify_account_email_sent_notice_flash: An email has been sent to you with a link to verify your account
+    verify_account_email_recently_sent_error_flash: Prednedávnom sme Vám zaslali email s odkazom na overenie účtu.
+    verify_account_email_sent_notice_flash: Zaslali sme Vám email odkazom na overenie účtu.
     verify_account_email_subject: Potvrdenie registrácie
     verify_account_error_flash: Unable to verify account
-    verify_account_notice_flash: Your account has been verified
+    verify_account_notice_flash: Váš účet úspešne overený.
     verify_account_page_title: Potvrdenie registrácie
-    verify_account_resend_button: Send Verification Email Again
+    verify_account_resend_button: Poslať overovací email ešte raz
     verify_account_resend_error_flash: Unable to resend verify account email
-    verify_account_resend_explanatory_text: "<p>If you no longer have the email to verify the account, you can request that it be resent to you:</p>"
+    verify_account_resend_explanatory_text: "<p>Ak nemáte overovací email vo vašej email schránke, môžete požiadať o jeho opätovné zaslanie.</p>"
     verify_account_resend_link_text: Resend Verify Account Information
     verify_login_change_button: Zmeniť email
     verify_login_change_duplicate_account_error_flash: Unable to change login as there is already an account with the new login
     verify_login_change_email_subject: Verify Login Change
     verify_login_change_error_flash: Unable to verify login change
-    verify_login_change_notice_flash: Your login change has been verified
+    verify_login_change_notice_flash: Zmena prihlasovacieho emailu bola úspešná.
     verify_login_change_page_title: Zmena emailu

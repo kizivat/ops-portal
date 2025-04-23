@@ -38,15 +38,7 @@
   <body data-controller="navigation intercept" data-navigation-target="toggler" data-intercept-toggle-class-value="shadow">
   <%= render "shared/header" %>
 
-  <% if notice %>
-    <div class="flash notice">
-      <%= flash[:notice] %>
-    </div>
-  <% elsif alert %>
-    <div class="flash alert">
-      <%= flash[:alert] %>
-    </div>
-  <% end %>
+  <%= render "shared/flash" %>
 
   <%= yield %>
 

@@ -49,11 +49,13 @@ sk:
 
   errors:
     messages:
-      blank: "%{attribute} je povinný"
+      blank: "%{attribute} je povinná položka"
 
   activerecord:
     attributes:
       issues/draft:
         title: Názov
         description: Popis
-
+      user:
+        firstname: Meno
+        lastname: Priezvisko
