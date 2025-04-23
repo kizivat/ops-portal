@@ -21,7 +21,7 @@ sk:
     create_account_error_flash: Pri vytváraní účtu nastala chyba.
     create_account_link_text: Vytvoriť účet
     create_account_notice_flash: Your account has been created
-    create_account_page_title: Create Account
+    create_account_page_title: Vytvoriť účeť
     email_subject_prefix: ''
     input_field_label_suffix: ''
     invalid_password_message: Zadali ste nesprávne heslo. Skúste znova.
