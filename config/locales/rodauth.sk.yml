@@ -89,7 +89,7 @@ sk:
     same_as_current_login_message: same as current login
     same_as_existing_password_message: Uvedené heslo je rovnaké ako predchádzajúce
     strftime_format: "%F %T"
-    unverified_account_message: Neoverený účet, prosím overte váš účet pred prvým prihlásením alebo kontaktujte administrátora.
+    unverified_account_message: Neoverený účet, prosím, overte váš účet pred prvým prihlásením alebo kontaktujte administrátora.
     unverified_change_login_error_flash: Please verify this account before changing the login
     verify_account_button: Potvrdiť registráciu
     verify_account_email_recently_sent_error_flash: Prednedávnom sme Vám zaslali email s odkazom na overenie účtu.
