@@ -5,8 +5,7 @@ module Legacy
     def self.find_or_create_responsible_subject(legacy_id)
       return ::ResponsibleSubject.find_by(legacy_id: legacy_id) if ::ResponsibleSubject.find_by(legacy_id: legacy_id)
 
-      Legacy::GenericModel.set_table_name("zodpovednost")
-      legacy_record = Legacy::GenericModel.where.not(nazov: [ "Iné", "Iný subjekt" ]).find_by_id(legacy_id)
+      legacy_record = Legacy::OldResponsibleSubject.where.not(nazov: [ "Iné", "Iný subjekt" ]).find_by_id(legacy_id)
 
       if legacy_record
         self.create_responsible_subject_from_legacy_record(legacy_record)
