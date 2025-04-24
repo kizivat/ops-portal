@@ -447,6 +447,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_162554) do
     t.boolean "email_notifiable", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "display_name"
     t.index ["external_id"], name: "index_legacy_agents_on_external_id", unique: true
     t.index ["municipality_id"], name: "index_legacy_agents_on_municipality_id"
     t.index ["street_id"], name: "index_legacy_agents_on_street_id"
@@ -699,6 +700,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_162554) do
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.integer "legacy_id"
     t.integer "status", default: 1, null: false
+    t.string "display_name"
     t.index ["email"], name: "index_users_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
     t.index ["external_id"], name: "index_users_on_external_id", unique: true
     t.index ["legacy_id"], name: "index_users_on_legacy_id", unique: true

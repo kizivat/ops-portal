@@ -2732,7 +2732,26 @@ section.compliment .info-block .info-block-value {
   line-height: em(28,18);
 }
 
-
+// Vyhľadávanie
+section.search-result-blank {
+  margin: 0 auto;
+  max-width: 550px;
+  text-align: center;
+}
+section.search-result-blank figure.empty-box {
+  margin: 0 per(40,280);
+}
+section.search-result-blank .notice {
+  color: $black;
+  font-family: $general;
+  font-size: em(18,16);
+  font-weight: $medium;
+  line-height: em(28,18);
+  margin-top: 40px;
+}
+section.search-result-blank .search-term {
+  font-weight: $semibold;
+}
 
 // Kontakt
 section.contact {

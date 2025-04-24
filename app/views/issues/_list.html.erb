@@ -1,7 +1,20 @@
 <!-- Zoznam podnetov -->
-<div class="wrapper-list">
-  <div class="podnet-block-con">
-    <%= render @search_results.hits %>
+<% if @search_results.hits.any? %>
+  <div class="wrapper-list">
+    <div class="podnet-block-con">
+      <%= render @search_results.hits %>
+    </div>
+    <%= ops_paginate @search_results.hits %>
   </div>
-  <%= ops_paginate @search_results.hits %>
-</div>
+<% else %>
+  <section class="search-result-blank">
+    <h1>Mrzí nás to, ale nič sa nenašlo</h1>
+
+    <figure class="empty-box">
+      <%= image_tag "krabica.png", alt: "" %>
+    </figure>
+
+    <div class="notice">Vybraným filtrom nevyhovujú žiadne dopyty. Skúste vyhľadávanie upraviť.
+    </div>
+  </section>
+<% end %>
