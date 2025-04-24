@@ -372,7 +372,12 @@
 	footer {
 		padding: em(60,16) per(40,1024);
 	}
-	
+
+	// Vyhľadávanie
+	section.search-result-blank .notice {
+		font-size: em(20,16);
+		line-height: em(30,20);
+	}
 }
 
 
