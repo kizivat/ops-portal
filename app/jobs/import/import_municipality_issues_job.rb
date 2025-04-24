@@ -34,6 +34,7 @@ module Import
             address_municipality: MunicipalityDistrict.find_by(legacy_id: legacy_record.mestska_cast)&.name,
             anonymous: legacy_record.anonymous,
             description: legacy_record.description,
+            imported_at: Time.now,
             latitude: legacy_record.map_x,
             legacy_data: {
               embed: legacy_record.embed,
@@ -75,8 +76,8 @@ module Import
               legacy_responsible_subject_id: legacy_record.zodpovednost
             },
             longitude: legacy_record.map_y,
-            reported_at: convert_timestamp_value(legacy_record.posted_time), # TODO dolezity udaj pre triaz podnetu
             title: legacy_record.heading,
+            created_at: convert_timestamp_value(legacy_record.posted_time),
             author: Legacy::User.find_or_create_user(legacy_record.posted_by),
             owner: owner,
             category: category,
