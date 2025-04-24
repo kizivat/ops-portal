@@ -11,6 +11,7 @@
 #  banned           :boolean          default(FALSE)
 #  birth            :date
 #  created_from_app :boolean          default(FALSE)
+#  display_name     :string
 #  email            :string
 #  email_notifiable :boolean          default(TRUE)
 #  exp              :integer
@@ -45,9 +46,7 @@ class Legacy::Agent < ApplicationRecord
   enum :rights, ops_admin: 1, municipality_admin: 2
   enum :sex, m: 1, f: 2
 
-  validates :external_id, uniqueness: true, allow_nil: true
+  before_create { self.display_name ||= "Anonymný agent #{self.id}" if self.anonymous? }
 
-  def fullname
-    [ firstname, lastname ].reject(&:blank?).join(" ")
-  end
+  validates :external_id, uniqueness: true, allow_nil: true
 end

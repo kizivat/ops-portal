@@ -11,6 +11,7 @@
 #  banned           :boolean          default(FALSE)
 #  birth            :date
 #  created_from_app :boolean          default(FALSE)
+#  display_name     :string
 #  email            :citext           not null
 #  email_notifiable :boolean          default(TRUE)
 #  exp              :integer
@@ -50,9 +51,7 @@ class User < ApplicationRecord
   enum :sex, m: 1, f: 2
   enum :status, { unverified: 1, verified: 2, closed: 3 }
 
-  validates :external_id, uniqueness: true, allow_nil: true
+  before_create { self.display_name ||= "Anonym #{self.id}" if self.anonymous? }
 
-  def fullname
-    [ firstname, lastname ].reject(&:blank?).join(" ")
-  end
+  validates :external_id, uniqueness: true, allow_nil: true
 end
