@@ -1953,6 +1953,23 @@ a.podnet-block {
 a.podnet-block:hover {
   background: $blue-light;
 }
+
+.podnet-block .photo {
+  position: relative;
+}
+
+.podnet-block .photo .distance {
+  position: absolute;
+  border-top-left-radius: 16px;
+  padding: 0.5em 1em;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  color: white;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
 a.podnet-block .photo figure {
   position: relative;
   height: 0;
