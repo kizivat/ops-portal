@@ -34,9 +34,9 @@ class SyncIssueActivitiesToTriageJob < ApplicationJob
   end
 
   def sender_type(user)
-    if user.is_a?(User)
+    if user.is_a?(User) || user.is_a?(::ResponsibleSubjects::User) || user.is_a?(::ResponsibleSubject)
       "Customer"
-    elsif user.is_a?(Legacy::Agent) || user.is_a?(::ResponsibleSubjects::User) || user.is_a?(::ResponsibleSubject)
+    elsif user.is_a?(Legacy::Agent)
       "Agent"
     else
       raise "Unknown author type: #{user.class.name}"
