@@ -31,7 +31,7 @@
 #  user_id                             :integer
 #
 class Legacy::Issues::Communication < ApplicationRecord
-  belongs_to :activity, class_name: "Issues::Activity"
+  belongs_to :activity, class_name: "Issues::Activity", dependent: :destroy
   belongs_to :agent_author, optional: true, class_name: "Legacy::Agent"
   belongs_to :responsible_subjects_user_author, optional: true, class_name: "ResponsibleSubjects::User"
 

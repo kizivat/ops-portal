@@ -9,7 +9,7 @@
 #  issue_id   :bigint           not null
 #
 class Legacy::Issues::CommunicationActivity < Issues::Activity
-  has_one :activity_object, class_name: "Legacy::Issues::Communication", foreign_key: :activity_id
+  has_one :activity_object, class_name: "Legacy::Issues::Communication", foreign_key: :activity_id, dependent: :destroy
 
   def import_to_triage_as_internal?
     true
