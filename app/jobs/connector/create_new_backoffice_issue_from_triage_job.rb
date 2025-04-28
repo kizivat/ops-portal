@@ -28,4 +28,3 @@ class Connector::CreateNewBackofficeIssueFromTriageJob < ApplicationJob
     "unresolved" => "closed"
   }
 end
-
