@@ -23,7 +23,7 @@ class ZammadApiClient
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
 
-  def get_ticket(ticket_id, expand: false, customer_articles: false, responsible_subject: nil)
+  def get_ticket(ticket_id, expand: false, customer_articles: false, exclude_responsible_subject_articles: false, responsible_subject: nil)
     begin
       ticket = @client.ticket.find(ticket_id)
     rescue => e
@@ -43,6 +43,7 @@ class ZammadApiClient
             ticket,
             article,
             customer_articles: customer_articles,
+            exclude_responsible_subject_articles: exclude_responsible_subject_articles,
             responsible_subject: responsible_subject
           )
         }.compact
@@ -393,7 +394,7 @@ class ZammadApiClient
     municipality = Municipality.find_by!(name: municipality_name)
     municipality_district = municipality&.municipality_districts&.find_by(name: district_name)
 
-    category = Issues::Category.find_by!(name: ticket.category)
+    category = Issues::Category.find_by(name: ticket.category) || Issues::Category.find_by(triage_external_id: ticket.category)
     subcategory = category&.subcategories&.find_by!(name: ticket.subcategory)
     subtype = subcategory&.subtypes&.find_by!(name: ticket.subtype)
 
@@ -432,7 +433,7 @@ class ZammadApiClient
     }
   end
 
-  def build_article_response(ticket, article, customer_articles: true, responsible_subject: nil, first_article: false)
+  def build_article_response(ticket, article, customer_articles: true, exclude_responsible_subject_articles: false, responsible_subject: nil, first_article: false)
     return if article.internal
 
     customer_article = article_from_customer?(article)
@@ -440,6 +441,8 @@ class ZammadApiClient
 
     portal_article = article_for_portal?(article, ticket, first_article: first_article)
     return unless portal_article || article_for_this_responsible_subject?(article, ticket, responsible_subject) || article_from_responsible_subject?(article, responsible_subject)
+
+    return if article.sender != "Agent" && !customer_article && exclude_responsible_subject_articles
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER

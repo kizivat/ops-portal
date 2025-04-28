@@ -103,6 +103,13 @@ module Connector
       end
     end
 
+    def check_import_mode!
+      response_body = raw_api_request(:get, "settings")
+      import_mode_on = response_body.select { |attribute| attribute["name"] == "import_mode" }.first["state_current"]["value"]
+
+      raise "Import mode OFF" unless import_mode_on
+    end
+
     private
 
     def create_or_find_customer(author)
@@ -220,6 +227,27 @@ module Connector
 
       @tenant.activities.create!(triage_external_id: activity["triage_identifier"], backoffice_external_id: new_article.id)
       new_article
+    end
+
+    def raw_api_request(method, endpoint, params = {})
+      url = File.join(@url, "api/v1/", endpoint)
+      connection = Faraday.new(url: url) do |conn|
+        conn.request :json
+        conn.response :json, content_type: /\bjson$/
+        conn.adapter :net_http
+      end
+
+      response = connection.send(method) do |req|
+        req.headers["Authorization"] = "Token token=#{@token}"
+        req.body = params.to_json unless params.empty?
+      end
+    rescue StandardError => error
+      raise error.response if error.respond_to?(:response) && error.response
+      raise error
+    else
+      raise "Request failed with status #{response.status}" unless response.status < 400
+
+      response.body
     end
   end
 end
