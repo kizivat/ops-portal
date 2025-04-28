@@ -5,8 +5,9 @@ module Connector
     # TODO
     ANONYMOUS_USER_ID = 1
     DEFAULT_GROUP = "Incoming"
-    IMPORT_GROUP = "Import"
+    IMPORT_GROUP = "Incoming" # TODO change to import group
     DEFAULT_STATE = "new"
+    DEFAULT_SENDER = "Customer"
     OPS_ORIGIN = "ops"
 
     def initialize(tenant)
@@ -191,7 +192,8 @@ module Connector
               "mime-type" => attachment["content_type"],
               "data" => attachment["data64"]
             }
-          end
+          end,
+          sender: DEFAULT_SENDER
         }
       }
 
@@ -203,7 +205,7 @@ module Connector
       new_ticket
     end
 
-    def find_or_create_article!(ticket, activity)
+    def find_or_create_article!(ticket, activity, sender: DEFAULT_SENDER)
       article = @tenant.activities.find_by(triage_external_id: activity["triage_identifier"])
       return @client.ticket.find(ticket.id).articles.find { |a| article.backoffice_external_id == a.id } if article
 
@@ -220,7 +222,8 @@ module Connector
             "mime-type" => attachment["content_type"],
             "data" => attachment["data64"]
           }
-        end
+        end,
+        sender: sender
       )
 
       # TODO custom error
