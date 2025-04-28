@@ -5,6 +5,7 @@ module Connector
     # TODO
     ANONYMOUS_USER_ID = 1
     DEFAULT_GROUP = "Incoming"
+    IMPORT_GROUP = "Import"
     DEFAULT_STATE = "new"
     OPS_ORIGIN = "ops"
 
@@ -15,8 +16,8 @@ module Connector
       @client = ZammadAPI::Client.new(url: @url, http_token: @token)
     end
 
-    def create_issue!(issue)
-      ticket = find_or_create_ticket!(issue)
+    def create_issue!(issue, state:, group:)
+      ticket = find_or_create_ticket!(issue, state: state, group: group)
 
       issue["activities"][1..-1].each do |activity|
         find_or_create_article!(ticket, activity)
@@ -148,14 +149,14 @@ module Connector
       end
     end
 
-    def find_or_create_ticket!(issue)
+    def find_or_create_ticket!(issue, state:, group:)
       ticket = @tenant.issues.find_by(triage_external_id: issue["triage_identifier"])
       return @client.ticket.find(ticket.backoffice_external_id) if ticket
 
       article = issue["activities"].first
       tmp_body = {
-        state: DEFAULT_STATE,
-        group: DEFAULT_GROUP,
+        state: state,
+        group: group,
         origin: OPS_ORIGIN,
         title: issue["title"],
         ops_state: issue["ops_state"],
