@@ -1,5 +1,4 @@
 module TriageZammadEnvironment
-
   OPS_PORTAL_ARTICLE_TAG = "[[ops portal]]"
   RESPONSIBLE_SUBJECT_ARTICLE_TAG = "[[pre zodpovedny subjekt]]"
 
