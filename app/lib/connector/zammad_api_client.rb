@@ -5,7 +5,7 @@ module Connector
     # TODO
     ANONYMOUS_USER_ID = 1
     DEFAULT_GROUP = "Incoming"
-    IMPORT_GROUP = "Incoming" # TODO change to import group
+    IMPORT_GROUP = "Import Odkaz pre starostu"
     DEFAULT_STATE = "new"
     DEFAULT_SENDER = "Customer"
     OPS_ORIGIN = "ops"
