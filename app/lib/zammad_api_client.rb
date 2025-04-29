@@ -14,8 +14,8 @@ class ZammadApiClient
     lastname: "",
     uuid: "11111111-1111-1111-1111-111111111111"
   }
-  RESPONSIBLE_SUBJECT_ARTICLE_TAG = ENV.fetch("RESPONSIBLE_SUBJECT_ARTICLE_TAG", "[[pre zodpovedny subjekt]]")
-  OPS_PORTAL_ARTICLE_TAG = ENV.fetch("OPS_PORTAL_ARTICLE_TAG", "[[ops portal]]")
+  RESPONSIBLE_SUBJECT_ARTICLE_TAG = TriageZammadEnvironment::RESPONSIBLE_SUBJECT_ARTICLE_TAG
+  OPS_PORTAL_ARTICLE_TAG = TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG
 
   def initialize(url:, http_token:)
     @url = url
@@ -133,18 +133,14 @@ class ZammadApiClient
 
     ticket.title = issue.title
     ticket.issue_type = issue.issue_type
-    ticket.municipality = build_ticket_municipality(issue)
-    ticket.address_lat = issue.latitude
-    ticket.address_lon = issue.longitude
-    ticket.address_county = issue.address_county
-    ticket.address_city = issue.address_city
-    ticket.address_city_district = issue.address_city_district
-    ticket.address_postcode = issue.address_postcode
-    ticket.address_suburb = issue.address_suburb
-    ticket.address_village = issue.address_village
-    ticket.address_town = issue.address_town
-    ticket.address_street =  issue.address_street
-    ticket.address_house_number = issue.address_house_number
+    ticket.address_state = issue.address_region, # TODO rename this?
+    ticket.address_county = issue.address_district, # TODO rename this?
+    ticket.address_municipality = build_ticket_municipality(issue),
+    ticket.address_postcode = issue.address_postcode,
+    ticket.address_street = issue.address_street,
+    ticket.address_house_number = issue.address_house_number,
+    ticket.address_lat = issue.latitude,
+    ticket.address_lon = issue.longitude,
     ticket.ops_state = issue.state.key
     ticket.likes_count = likes_count
 
@@ -177,7 +173,7 @@ class ZammadApiClient
     article = ticket.article(
       origin_by_id: activity_object.author&.external_id,
       content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
-      body: activity_object.activity_body,
+      body: activity_object.triage_activity_body,
       type: DEFAULT_ARTICLE_TYPE,
       attachments: activity_object.attachments.map do |attachment|
         {
