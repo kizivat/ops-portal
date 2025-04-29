@@ -16,7 +16,7 @@ class ZammadApiClient
   }
   RESPONSIBLE_SUBJECT_ARTICLE_TAG = TriageZammadEnvironment::RESPONSIBLE_SUBJECT_ARTICLE_TAG
   OPS_PORTAL_ARTICLE_TAG = TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG
-
+  OPS_APP_USER_NAME = "Aplikácia Odkaz pre starostu"
   def initialize(url:, http_token:)
     @url = url
     @http_token = http_token
@@ -364,7 +364,7 @@ class ZammadApiClient
       firstname: user.firstname,
       lastname: user.lastname,
       uuid: user.uuid
-    }
+    } if user
   end
 
   def find_or_create_user(user_id)
@@ -374,6 +374,9 @@ class ZammadApiClient
     u = get_user(user_id)
     # TODO why are we creating a user from zammad in portal? this should never happen
     # TODO handle responsible subject users for portal
+
+    return if [ u.firstname, u.lastname ].join(" ") == OPS_APP_USER_NAME
+
     User.create!(external_id: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 
