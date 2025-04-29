@@ -193,7 +193,8 @@ module Connector
               "data" => attachment["data64"]
             }
           end,
-          sender: DEFAULT_SENDER
+          sender: DEFAULT_SENDER,
+          created_at: issue["created_at"]
         }
       }
 
@@ -223,7 +224,8 @@ module Connector
             "data" => attachment["data64"]
           }
         end,
-        sender: sender
+        sender: sender,
+        created_at: activity["created_at"]
       )
 
       # TODO custom error
