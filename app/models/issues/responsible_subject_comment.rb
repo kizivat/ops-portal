@@ -28,4 +28,8 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
   def author
     responsible_subject_author
   end
+
+  def triage_activity_body
+    [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, super ].join(" ")
+  end
 end
