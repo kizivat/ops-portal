@@ -50,7 +50,7 @@ class ZammadApiClient
     })
   end
 
-  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
+  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue.issue_type,
@@ -71,6 +71,7 @@ class ZammadApiClient
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
       ops_state: issue.state.key,
+      state: state,
       # TODO set state for imported tickets?
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)

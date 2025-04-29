@@ -39,6 +39,7 @@ class SyncIssueToTriageJob < ApplicationJob
     client.create_ticket_from_issue!(
       issue,
       process_type: ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name),
+      state: ISSUE_OPS_STATE_TO_TRIAGE_STATE.fetch(issue.state.name),
       group: zammad_group,
       owner_id: issue.owner&.external_id
     )
@@ -66,11 +67,28 @@ class SyncIssueToTriageJob < ApplicationJob
   end
 
   ISSUE_STATE_TO_PROCESS_TYPE = {
-    "Neriešený" => "portal_issue_resolution",
-    "Vyriešený" => "portal_issue_resolution",
-    "V riešení" => "portal_issue_resolution",
-    "Uzavretý" => "portal_issue_resolution",
     "Čakajúci" => "portal_issue_triage",
-    "Neprijatý" => "portal_issue_triage"
+    "Zaslaný zodpovednému" => "portal_issue_resolution",
+    "V riešení" => "portal_issue_resolution",
+    "Odstúpený" => "portal_issue_resolution",
+    "Označený za vyriešený" => "portal_issue_resolution",
+    "Vyriešený" => "portal_issue_resolution",
+    "Uzavretý" => "portal_issue_resolution",
+    "Neriešený" => "portal_issue_resolution",
+    "Neprijatý" => "portal_issue_resolution",
+    "Zamietnutý" => "portal_issue_resolution"
+  }
+
+  ISSUE_OPS_STATE_TO_TRIAGE_STATE = {
+    "Čakajúci" => "new",
+    "Zaslaný zodpovednému" => "open",
+    "V riešení" => "open",
+    "Odstúpený" => "open",
+    "Označený za vyriešený" => "open",
+    "Vyriešený" => "closed",
+    "Uzavretý" => "closed",
+    "Neriešený" => "closed",
+    "Neprijatý" => "closed",
+    "Zamietnutý" => "closed"
   }
 end
