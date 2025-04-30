@@ -40,4 +40,8 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
   def backoffice_activity_body
     [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, text ].join(" ")
   end
+
+  def internal?
+    false
+  end
 end

@@ -45,4 +45,8 @@ class Legacy::Issues::ResponsibleSubjectInternalCommunication < Legacy::Issues::
   def backoffice_activity_body
     message
   end
+
+  def internal?
+    true
+  end
 end
