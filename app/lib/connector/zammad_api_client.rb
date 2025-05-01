@@ -153,6 +153,7 @@ module Connector
         attachments: legacy_data.attachments.map do |attachment|
           {
             "filename" => attachment.filename,
+            "mime-type" => attachment.mimetype,
             "data" => Base64.encode64(attachment.content)
           }
         end,

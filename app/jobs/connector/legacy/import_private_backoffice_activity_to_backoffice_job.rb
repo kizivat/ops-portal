@@ -19,6 +19,7 @@ class Connector::Legacy::ImportPrivateBackofficeActivityToBackofficeJob < Applic
           attachments: Legacy::Alerts::CommunicationAttachment.where(communication_id: legacy_record.id).map do |legacy_attachment_record|
             OpenStruct.new(
               filename: legacy_attachment_record.name,
+              mimetype: attachment_mimetype_by_name(legacy_attachment_record.name),
               content: download_from_ops_portal(legacy_attachment_record.path)
             )
           end
