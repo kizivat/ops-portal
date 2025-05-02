@@ -138,18 +138,18 @@ module Connector
       new_article
     end
 
-    def find_or_create_article_from_legacy_record!(issue, legacy_data, internal:, sender:)
-      ticket = find_ticket_for_issue!(issue)
+    def find_or_create_article_from_legacy_record!(legacy_data, tenant_issue, sender:)
+      ticket = @client.ticket.find(tenant_issue.backoffice_external_id)
 
       article = @tenant.activities.find_by(legacy_id: legacy_data.id)
-      return @client.ticket.find(ticket.id).articles.find { |a| article.backoffice_external_id == a.id } if article
+      return ticket.articles.find { |a| article.backoffice_external_id == a.id } if article
 
       new_article = ticket.article(
         origin_by_id: create_or_find_agent(legacy_data.author),
         content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
         body: legacy_data.body,
         type: DEFAULT_ARTICLE_TYPE,
-        internal: internal,
+        internal: legacy_data.internal,
         attachments: legacy_data.attachments.map do |attachment|
           {
             "filename" => attachment.filename,

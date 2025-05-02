@@ -6,6 +6,7 @@ class Connector::Legacy::ImportPrivateBackofficeActivityToBackofficeJob < Applic
     zammad_client.check_import_mode!
 
     issue = Issue.find_by(triage_external_id: triage_issue_id)
+    tenant_issue = tenant.issues.find_by(triage_external_id: triage_issue_id)
 
     raise "Missing legacy ID" unless issue.legacy_id
 
@@ -15,6 +16,7 @@ class Connector::Legacy::ImportPrivateBackofficeActivityToBackofficeJob < Applic
           id: legacy_record.id,
           author: Legacy::User.find_or_create_responsible_subjects_user(legacy_record.user),
           body: legacy_record.message,
+          internal: legacy_record.internal,
           created_at: convert_timestamp_value(legacy_record.ts),
           attachments: Legacy::Alerts::CommunicationAttachment.where(communication_id: legacy_record.id).map do |legacy_attachment_record|
             OpenStruct.new(
@@ -25,7 +27,7 @@ class Connector::Legacy::ImportPrivateBackofficeActivityToBackofficeJob < Applic
           end
         )
 
-        zammad_client.find_or_create_article_from_legacy_record!(issue, legacy_data, internal: true, sender: "Agent")
+        zammad_client.find_or_create_article_from_legacy_record!(legacy_data, tenant_issue, sender: "Agent")
       end
     end
   end
