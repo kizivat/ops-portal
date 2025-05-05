@@ -8,6 +8,7 @@ module Import
       import_updates_job: Issues::ImportIssueUpdatesJob,
       import_comments_job: Issues::ImportIssueCommentsJob,
       import_communications_job: Issues::ImportIssueCommunicationsJob,
+      import_subscriptions_job: Issues::ImportIssueSubscriptionsJob,
       import_likes_job: Issues::ImportIssueLikesJob
     )
       subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
@@ -88,6 +89,7 @@ module Import
       import_updates_job.perform_later(issue: issue)
       import_comments_job.perform_later(issue: issue)
       import_communications_job.perform_later(issue: issue)
+      import_subscriptions_job.perform_later(issue: issue)
       import_likes_job.perform_later(issue: issue)
     end
   end
