@@ -69,7 +69,7 @@ class Issue < ApplicationRecord
   validates_presence_of :title, :description
 
   pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id ], ignoring: :accents
-  scope :publicly_visible, -> { joins(:state).where.not(state: { name: [ "Čakajúci", "Neprijatý" ] }) }
+  scope :publicly_visible, -> { joins(:state).where.not(state: { key: %w[waiting rejected] }) }
 
   def votes
     # fake it
@@ -85,6 +85,10 @@ class Issue < ApplicationRecord
     return false unless editable?
 
     true
+  end
+
+  def public?
+    !state.key.in? %w[waiting rejected]
   end
 
   def editable?

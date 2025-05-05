@@ -1,6 +1,7 @@
 class IssuesController < ApplicationController
   before_action :set_issue, only: %i[ show edit update ]
-  before_action :check_permissions, only: %i[ edit update ]
+  before_action :check_show_permissions, only: :show
+  before_action :check_edit_permissions, only: %i[ edit update ]
 
   # GET /issues or /issues.json
   def index
@@ -33,7 +34,8 @@ class IssuesController < ApplicationController
   def update
     @issue.assign_attributes(issue_params)
     if @issue.save
-      redirect_to @issue, notice: "Issue was successfully updated."
+      SyncIssueToTriageJob.perform_later(@issue, sync_activities: false)
+      redirect_to @issue
     else
       render :edit, status: :unprocessable_entity
     end
@@ -47,13 +49,15 @@ class IssuesController < ApplicationController
   end
 
   def issue_params
-    params.expect(issue: [ :title, :description, :photos ])
+    params.expect(issue: [ :title, :description, photos: [] ])
   end
 
-  def check_permissions
-    unless @issue.editable_by?(current_user)
+  def check_show_permissions
+    redirect_to root_path if !@issue.public? && !@issue.editable_by?(current_user)
+  end
 
-    end
+  def check_edit_permissions
+    redirect_to root_path unless @issue.editable_by?(current_user)
   end
 
   def search_engine
