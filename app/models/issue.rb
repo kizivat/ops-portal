@@ -57,6 +57,7 @@ class Issue < ApplicationRecord
   has_many :legacy_communication_activities, class_name: "Legacy::Issues::CommunicationActivity", dependent: :destroy
   has_many :update_activities, class_name: "Issues::UpdateActivity", dependent: :destroy
   has_many :likes, class_name: "IssueLike"
+  has_many :comments, class_name: "Issues::Comment", through: :comment_activities, source: :activity_object, dependent: :destroy
 
   has_many_attached :photos do |photo|
     photo.variant :normal, resize_to_fill: [ 680, 680 ], preprocessed: true
@@ -68,6 +69,20 @@ class Issue < ApplicationRecord
 
   pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id ], ignoring: :accents
   scope :publicly_visible, -> { joins(:state).where.not(state: { name: [ "Čakajúci", "Neprijatý" ] }) }
+
+  def visible_activity_objects
+    activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object)
+
+    if triage_process?
+      activity_objects.select(&:triage_visible?)
+    else
+      activity_objects.select(&:visible?)
+    end
+  end
+
+  def triage_process?
+    resolution_external_id.nil?
+  end
 
   def votes
     # fake it

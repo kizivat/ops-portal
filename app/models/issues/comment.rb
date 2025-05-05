@@ -32,6 +32,14 @@ class Issues::Comment < ApplicationRecord
     photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
   end
 
+  def visible?
+    !hidden
+  end
+
+  def triage_visible?
+    visible?
+  end
+
   def legacy_id
     legacy_comment_id || legacy_communication_id
   end
@@ -48,5 +56,10 @@ class Issues::Comment < ApplicationRecord
 
   def editable_by?(user)
     false
+  end
+
+  def author_display_name
+    return author.display_name if author
+    author_name
   end
 end

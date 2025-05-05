@@ -32,10 +32,6 @@ class Issues::UserComment < Issues::Comment
     user_author
   end
 
-  def visible?
-    true
-  end
-
   def editable_by?(user)
     return false unless user_author == user
     return false unless within_editing_window?

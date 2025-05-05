@@ -30,11 +30,11 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
     responsible_subject_author
   end
 
-  def triage_activity_body
-    [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, super ].join(" ")
+  def author_display_name
+    responsible_subject_author.name
   end
 
-  def visible?
-    !hidden
+  def triage_activity_body
+    [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, super ].join(" ")
   end
 end

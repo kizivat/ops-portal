@@ -29,4 +29,16 @@ class Issues::AgentPrivateComment < Issues::Comment
   def author
     agent_author
   end
+
+  def author_display_name
+    "Okdaz pre starostu"
+  end
+
+  def visible?
+    false
+  end
+
+  def triage_visible?
+    !hidden
+  end
 end

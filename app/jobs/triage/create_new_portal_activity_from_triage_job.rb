@@ -8,26 +8,39 @@ class Triage::CreateNewPortalActivityFromTriageJob < ApplicationJob
 
     article = triage_zammad_client.get_article(ticket_id, article_id)
     raise "Article not found" unless article
+    return if article[:customer_activity]
 
     process_type = ticket[:process_type]
     case process_type
     when "portal_issue_triage"
       issue = Issue.find_by!(triage_external_id: ticket_id)
+      return if issue.comments.find_by(triage_external_id: article_id)
 
-      # TODO: consider using other than the Issues::Comment model
-      Issues::Comment.find_or_initialize_by(triage_external_id: article_id).tap do |comment|
-        comment.text = article[:body]
-        comment.activity ||= issue.comment_activities.create!
-      end.save!
+      Issues::AgentPrivateComment.create!(
+        triage_external_id: article_id,
+        text: article[:body],
+        activity: issue.comment_activities.create!,
+      )
 
     when "portal_issue_resolution"
       issue = Issue.find_by!(resolution_external_id: ticket_id)
+      return if issue.comments.find_by(triage_external_id: article_id)
 
-      # TODO: consider using other than the Issues::Comment model
-      Issues::Comment.find_or_initialize_by(triage_external_id: article_id).tap do |comment|
-        comment.text = article[:body]
-        comment.activity ||= issue.comment_activities.create!
-      end.save!
+      unless article[:author][:responsible_subject_identifier].nil?
+        responsible_subject = ResponsibleSubject.find_by!(id: article[:author][:responsible_subject_identifier])
+        Issues::ResponsibleSubjectComment.create!(
+          triage_external_id: article_id,
+          text: article[:body],
+          activity: issue.comment_activities.create!,
+          responsible_subject_author: responsible_subject
+        )
+      else
+        Issues::AgentComment.create!(
+          triage_external_id: article_id,
+          text: article[:body],
+          activity: issue.comment_activities.create!
+        )
+      end
     else
       # TODO add support for other process types
       raise "Process type not yet supported: #{process_type}"

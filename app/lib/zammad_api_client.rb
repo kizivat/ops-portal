@@ -358,22 +358,12 @@ class ZammadApiClient
   def get_author(user_id, anonymous: false)
     return if anonymous
 
-    user = find_or_create_user(user_id)
+    user = get_user(user_id)
     {
       firstname: user.firstname,
       lastname: user.lastname,
       uuid: user.uuid
     }
-  end
-
-  def find_or_create_user(user_id)
-    user = User.find_by(external_id: user_id)
-    return user if user
-
-    u = get_user(user_id)
-    # TODO why are we creating a user from zammad in portal? this should never happen
-    # TODO handle responsible subject users for portal
-    User.create!(external_id: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end
 
   def build_ticket_municipality(issue)
@@ -439,12 +429,21 @@ class ZammadApiClient
 
     if article.sender == "Agent"
       author = DEFAULT_OPS_ADMIN_USER
-    else
-      # TODO this anonymous logic is not correct as article.created_by is not always the same as article.origin_by
-      author = get_author(
-        article.origin_by_id || article.created_by_id,
-        anonymous: (ticket.anonymous && article.created_by == ticket.customer)
-      )
+    elsif article.sender == "Customer"
+      if customer_article
+        author = get_author(
+          article.origin_by_id || article.created_by_id,
+          anonymous: (ticket.anonymous && (article.created_by == ticket.customer || article.origin_by == ticket.customer))
+        )
+      else
+        user = get_user(article.origin_by_id || article.created_by_id)
+        author = {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          uuid: user.uuid,
+          responsible_subject_identifier: user.responsible_subject_identifier
+        }
+      end
     end
 
     {

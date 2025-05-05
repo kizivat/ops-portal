@@ -22,7 +22,7 @@ class Issues::IssuesUserCommentsController < ApplicationController
   end
 
   def create
-    @comment = Issues::UserComment.new(comment_params)
+    @comment = @issue.triage_process? ? Issues::UserPrivateComment.new(comment_params) : Issues::UserComment.new(comment_params)
     @comment.build_activity(issue: @issue, type: Issues::CommentActivity)
     @comment.user_author = current_user
 
