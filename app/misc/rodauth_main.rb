@@ -204,7 +204,7 @@ class RodauthMain < Rodauth::Rails::Auth
           municipality_id: param_or_nil("municipality_id"),
           email_notifications: param_or_nil("public_profile"),
           birth_year: param_or_nil("birth_year"),
-          gdpr_stats_accepted: param_or_nil("gdpr_stats_accepted"),
+          gdpr_stats_accepted: param_or_nil("gdpr_stats_accepted")
         }
       end
 
