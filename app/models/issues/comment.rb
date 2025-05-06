@@ -25,6 +25,7 @@ class Issues::Comment < ApplicationRecord
   belongs_to :activity, class_name: "Issues::Activity", dependent: :destroy
   belongs_to :user_author, class_name: "User", optional: true
   belongs_to :responsible_subject_author, class_name: "ResponsibleSubject", optional: true
+  delegate :issue, to: :activity
 
   has_many_attached :attachments do |photo|
     photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
