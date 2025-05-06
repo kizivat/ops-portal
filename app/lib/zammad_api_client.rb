@@ -71,7 +71,6 @@ class ZammadApiClient
       subtype: issue.subtype&.name,
       ops_state: issue.state.key,
       state: state,
-      # TODO set state for imported tickets?
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
