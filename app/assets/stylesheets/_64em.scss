@@ -370,6 +370,12 @@
 	section.podnet .share-buttons a.button-share-desktop {
 		display: flex;
 	}
+
+	// Flash messages
+	.flash-message-container {
+		right: per(40,1024);
+		top: 176px;
+	}
 	
 	// Footer
 	footer {
