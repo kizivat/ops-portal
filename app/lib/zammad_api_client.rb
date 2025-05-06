@@ -268,12 +268,17 @@ class ZammadApiClient
     begin
       zammad_user = @client.user.create(
         firstname: user.firstname,
-        lastname: user.lastname, # TODO pri agentoch je ok posielat do triage zammadu aj lastname ?
+        lastname: user.lastname,
+        email: user.email,
         roles: [ "Agent" ]
       )
       zammad_user.id
     rescue RuntimeError => e
-      raise e
+      raise e unless e.message.include? "is already used for another user."
+
+      result = find_zammad_user(user.email)
+      raise "Can't find nor create triage zammad user with email: #{user.email}" unless result
+      result.id
     end
   end
 
