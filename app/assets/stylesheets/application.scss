@@ -26,10 +26,12 @@ $blue-light: rgba(57, 232, 255, 0.3); // #39E8FF
 $blue-dark: rgba(10, 9, 73, 1); // #0A0949
 $green: rgba(0, 229, 158, 1); // #00E59E
 $green-light: rgba(0, 229, 158, 0.2); // #00E59E
+$green-middle: rgba(102, 239, 197, 1); // #00E59E
 $pink: rgba(255, 210, 230, 1); // #ffd2e6
 $pink-fifty: rgba(255, 210, 230, 0.5); // #ffd2e6
 $red: rgba(255, 71, 97, 1); // #ff4761
 $yellow: rgba(255, 212, 0, 1); // #ffd400
+$yellow-middle: rgba(255, 224, 124, 1); // #ffd400
 $white: rgba(255, 255, 255, 1); // #FFFFFF
 
 $line: rgba(28, 48, 84, 0.1); // #1C3054
@@ -189,7 +191,7 @@ a.button-transparent:hover {
 }
 
 .total { background: $cakajuce; }
-.state-zaslane { background: $zaslane; }
+.state-zaslany-zodpovednemu { background: $zaslane; }
 .state-v-rieseni { background: $riesene; }
 .state-vyrieseny { background: $vyriesene; }
 .state-nerieseny { background: $neriesene; }
@@ -1163,7 +1165,8 @@ section.report .report-map-con .search-con form button:hover {
 }
 
 
-section.report .report-summary-block-con {
+section.report .report-summary-block-con,
+.podnet-edit {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -2062,6 +2065,10 @@ a.podnet-block .inside figure {
   rotate: 10deg;
 }
 
+a.podnet-block .state-zaslany-zodpovednemu {
+  background: $zaslane;
+}
+
 a.podnet-block .state-vyrieseny {
   background: $green;
 }
@@ -2231,14 +2238,16 @@ section.podnet .podnet-pictures-con figure picture {
   right: 0;
   top: 0;
 }
-section.podnet .podnet-pictures-con figure.small-picture {
+section.podnet .podnet-pictures-con figure.small-picture,
+.uploads figure.small-picture {
   height: 80px;
   overflow: hidden;
   position: relative;
   width: 80px;
   @include rounded(10px);
 }
-section.podnet .podnet-pictures-con figure.small-picture .lens-image {
+section.podnet .podnet-pictures-con figure.small-picture .lens-image,
+.uploads figure.small-picture .lens-image {
   bottom: 50%;
   fill: $white;
   margin: 0 -19px -19px 0;
@@ -2545,7 +2554,8 @@ section.podnet .podnet-discussion .add-comment-form form textarea {
 section.podnet .podnet-discussion .add-comment-form form textarea::placeholder {
   color: $black-light;
 }
-section.podnet .podnet-discussion .add-comment-form .pictures-wrapper {
+section.podnet .podnet-discussion .add-comment-form .pictures-wrapper,
+.uploads.pictures-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -2554,7 +2564,7 @@ section.podnet .podnet-discussion .add-comment-form figure {
   height: 60px;
   width: 60px;
 }
-section.podnet .podnet-discussion .add-comment-form form .buttons-wrapper {
+.buttons-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
@@ -2880,6 +2890,64 @@ section.search-result-blank .search-term {
 .unverified-notice-con a.button:hover {
   background: $blue;
   color: $black;
+}
+
+
+// Flash messages
+.flash-message-container {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin-left: per(20,320);
+  position: fixed;
+  gap: 10px 0;
+  right: per(20,320);
+  top: 100px;
+  z-index: 10002;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+.flash-messages {
+  box-shadow: 0px 0px 5px 1px rgba(28, 48, 84, 0.3);
+  display: flex;
+  color: $black;
+  font-family: $general;
+  font-size: em(16,16);
+  font-weight: $medium;
+  line-height: em(24,18);
+  gap: 0 20px;
+  max-width: 360px;
+  padding: 20px;
+  @include rounded(15px);
+}
+.flash-messages figure {
+  margin-top: 2px;
+}
+.flash-messages figure::before {
+  display: block;
+  width: 50px;
+  height: 60px;
+}
+// Green
+.flash-messages.green {
+  background: $green-middle;
+}
+.flash-messages.green figure::before {
+  content: url("fm-smile.svg");
+}
+// Red
+.flash-messages.red {
+  background: $pink;
+}
+.flash-messages.red figure::before {
+  content: url("fm-frow.svg");
+}
+// Red
+.flash-messages.yellow {
+  background: $yellow-middle;
+}
+.flash-messages.yellow figure::before {
+  content: url("fm-smile.svg");
 }
 
 

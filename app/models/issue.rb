@@ -19,6 +19,7 @@
 #  last_synced_at           :datetime
 #  latitude                 :float
 #  legacy_data              :jsonb
+#  likes_count              :integer          default(0), not null
 #  longitude                :float
 #  title                    :string           not null
 #  created_at               :datetime         not null
@@ -66,9 +67,10 @@ class Issue < ApplicationRecord
   end
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
+  validates_presence_of :title, :description
 
   pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id ], ignoring: :accents
-  scope :publicly_visible, -> { joins(:state).where.not(state: { name: [ "Čakajúci", "Neprijatý" ] }) }
+  scope :publicly_visible, -> { joins(:state).where.not(state: { key: %w[waiting rejected] }) }
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object)
@@ -91,6 +93,21 @@ class Issue < ApplicationRecord
 
   def liked_by?(user)
     user.issue_likes.where(issue: self).exists?
+  end
+
+  def editable_by?(user)
+    return false unless user == author
+    return false unless editable?
+
+    true
+  end
+
+  def public?
+    !state.key.in? %w[waiting rejected]
+  end
+
+  def editable?
+    state.key == "waiting"
   end
 
   def should_create_resolution_process?

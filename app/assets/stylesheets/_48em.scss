@@ -140,7 +140,13 @@
 	.unverified-notice-con {
 		padding: 30px;
 	}
-	
+
+	// Flash messages
+	.flash-message-container {
+		right: per(40,768);
+		top: 130px;
+	}
+
 	// Footer
 	footer {
 		padding: em(60,16) per(40,768);

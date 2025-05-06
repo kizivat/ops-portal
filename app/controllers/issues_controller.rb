@@ -1,5 +1,7 @@
 class IssuesController < ApplicationController
-  before_action :set_issue, only: %i[ show ]
+  before_action :set_issue, only: %i[ show edit update ]
+  before_action :check_show_permissions, only: :show
+  before_action :check_edit_permissions, only: %i[ edit update ]
 
   # GET /issues or /issues.json
   def index
@@ -24,6 +26,19 @@ class IssuesController < ApplicationController
     @activity_objects = @issue.visible_activity_objects
   end
 
+  def edit
+  end
+
+  def update
+    @issue.assign_attributes(issue_params)
+    if @issue.save
+      SyncIssueToTriageJob.perform_later(@issue, sync_activities: false)
+      redirect_to @issue
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -31,12 +46,17 @@ class IssuesController < ApplicationController
     @issue = Issue.find(params.expect(:id))
   end
 
-  # Only allow a list of trusted parameters through.
   def issue_params
-    params.expect(issue: [ :title, :description, :author, :created_at ])
+    params.expect(issue: [ :title, :description, photos: [] ])
   end
 
-  private
+  def check_show_permissions
+    redirect_to root_path if !@issue.public? && !@issue.editable_by?(current_user)
+  end
+
+  def check_edit_permissions
+    redirect_to root_path unless @issue.editable_by?(current_user)
+  end
 
   def search_engine
     SearchEngine.new(
