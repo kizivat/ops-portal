@@ -271,12 +271,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_03_192457) do
     t.string "address_house_number"
     t.string "address_postcode"
     t.integer "issue_type", default: 1
+    t.integer "resolution_external_id"
     t.string "address_country"
     t.string "address_country_code"
     t.string "address_district"
-    t.integer "resolution_external_id"
-    t.integer "likes_count", default: 0, null: false
     t.datetime "imported_at"
+    t.integer "likes_count", default: 0, null: false
     t.index "((st_point(longitude, latitude, 4326))::geography)", name: "index_issues_on_location", using: :gist
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
