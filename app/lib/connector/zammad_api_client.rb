@@ -174,9 +174,7 @@ module Connector
       tmp_body = {
         state: state,
         group: group,
-        origin: "internal", # TODO aky origin pre interne backoffice tickety?
         title: legacy_data.title,
-        ops_issue_type: "internal_issue_resolution",  # TODO aky typ issue pre interne backoffice tickety?
         ops_responsible_subject: {
           "label"=> legacy_data.responsible_subject&.subject_name,
           "value"=> legacy_data.responsible_subject&.id
