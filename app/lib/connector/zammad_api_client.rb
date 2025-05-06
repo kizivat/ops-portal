@@ -178,19 +178,16 @@ module Connector
     def create_or_find_agent(author)
       return ANONYMOUS_USER_ID unless author
 
-      # TODO fix
-      user = @tenant.users.find_or_initialize_by(firstname: author.name)
-      # user = @tenant.users.find_or_initialize_by(uuid: author["uuid"])
+      user = @tenant.users.find_or_initialize_by(email: author.email)
       return user.external_id unless user.new_record?
 
       zammad_identifier = find_or_create_user!(
         firstname: author.name,
-        login: SecureRandom.uuid, # TODO change
-        # login: author.login,
+        email: author.email,
         roles: [ "Agent" ],
       ).id
 
-      user.update(external_id: zammad_identifier)
+      user.update(firstname: author.name, external_id: zammad_identifier)
 
       zammad_identifier
     end
