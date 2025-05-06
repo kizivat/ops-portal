@@ -356,7 +356,7 @@ module Connector
     else
       raise "Request failed with status #{response.status}" unless response.status < 400
 
-      [response.body, response.status]
+      [ response.body, response.status ]
     end
   end
 end

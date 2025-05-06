@@ -375,7 +375,7 @@ class ZammadApiClient
     # TODO why are we creating a user from zammad in portal? this should never happen
     # TODO handle responsible subject users for portal
 
-    return if u.id == ENV.fetch('TRIAGE_ZAMMAD_TECH_USER_ID').to_i
+    return if u.id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID").to_i
 
     User.create!(external_id: u.id, email: u.email, firstname: u.firstname, lastname: u.lastname)
   end

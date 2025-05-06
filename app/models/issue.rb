@@ -19,6 +19,7 @@
 #  last_synced_at           :datetime
 #  latitude                 :float
 #  legacy_data              :jsonb
+#  likes_count              :integer          default(0), not null
 #  longitude                :float
 #  title                    :string           not null
 #  created_at               :datetime         not null
