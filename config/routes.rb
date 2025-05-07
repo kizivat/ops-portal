@@ -67,7 +67,9 @@ Rails.application.routes.draw do
   resources :questions, path: "otazky", path_names: { new: "nova" }
   resources :praises, path: "pochvaly", path_names: { new: "nova" }
 
-  resource :profile
+  resource :profile do
+    resource :avatar, module: :profiles
+  end
 
   resources :users, path: "pouzivatelia"
 
