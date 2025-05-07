@@ -16,6 +16,8 @@ class ZammadApiClient
   }
   RESPONSIBLE_SUBJECT_ARTICLE_TAG = TriageZammadEnvironment::RESPONSIBLE_SUBJECT_ARTICLE_TAG
   OPS_PORTAL_ARTICLE_TAG = TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG
+  ATTACHMENTS_UPDATE_ARTICLE_BODY = "Aktualizované prílohy"
+  ATTACHMENTS_UPDATE_ARTICLE_TYPE = "note"
 
   def initialize(url:, http_token:)
     @url = url
@@ -125,24 +127,83 @@ class ZammadApiClient
     ticket.save
   end
 
-  def update_ticket_from_issue!(ticket_id, issue)
+  def update_ticket_from_issue!(ticket_id, issue, update_attachments: false)
     ticket = @client.ticket.find(ticket_id)
 
     ticket.title = issue.title
     ticket.body = issue.description
     ticket.issue_type = issue.issue_type
-    ticket.address_state = issue.address_region, # TODO rename this?
-    ticket.address_county = issue.address_district, # TODO rename this?
-    ticket.address_municipality = build_ticket_municipality(issue),
-    ticket.address_postcode = issue.address_postcode,
-    ticket.address_street = issue.address_street,
-    ticket.address_house_number = issue.address_house_number,
-    ticket.address_lat = issue.latitude,
-    ticket.address_lon = issue.longitude,
+    ticket.address_state = issue.address_region # TODO rename this?
+    ticket.address_county = issue.address_district # TODO rename this?
+    ticket.address_municipality = build_ticket_municipality(issue)
+    ticket.address_postcode = issue.address_postcode
+    ticket.address_street = issue.address_street
+    ticket.address_house_number = issue.address_house_number
+    ticket.address_lat = issue.latitude
+    ticket.address_lon = issue.longitude
     ticket.ops_state = issue.state.key
     ticket.likes_count = issue.likes_count
 
     ticket.save
+
+    update_ticket_attachments!(ticket_id, issue) if update_attachments
+  end
+
+  def update_ticket_attachments!(ticket_id, issue)
+    ticket = @client.ticket.find(ticket_id)
+
+    attachment_update_articles = ticket.articles.select { | article| article.type == ATTACHMENTS_UPDATE_ARTICLE_TYPE && article.body == ATTACHMENTS_UPDATE_ARTICLE_BODY }
+    first_article = ticket.articles.first
+    triage_attachments = [ first_article, attachment_update_articles ].flatten.map do |article|
+      article.attachments.map do |attachment|
+      {
+        article_id: article.id,
+        id: attachment.id,
+        filename: attachment.filename,
+        content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
+        size: attachment.size
+      }
+      end
+    end.flatten
+
+    local_attachments = issue.photos.map do |photo|
+      {
+        filename: photo.filename,
+        content_type: photo.content_type,
+        size: photo.blob.byte_size
+      }
+    end
+
+    new_attachments = local_attachments.reject do |photo|
+      triage_attachments.any? { |attachment| attachment[:filename] == photo[:filename].to_s && attachment[:size] == photo[:size].to_s && attachment[:content_type] == photo[:content_type] }
+    end
+
+    attachments_to_delete = triage_attachments.reject do |attachment|
+      local_attachments.any? { |photo| attachment[:filename] == photo[:filename].to_s && attachment[:size] == photo[:size].to_s && attachment[:content_type] == photo[:content_type] }
+    end
+
+    attachments_to_delete.each do |attachment|
+      raw_api_request(:delete, "attachments/#{attachment[:id]}")
+    end
+
+    return if new_attachments.empty?
+
+    article = ticket.article(
+      origin_by_id: issue.author.external_id,
+      content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
+      body: ATTACHMENTS_UPDATE_ARTICLE_BODY,
+      type: ATTACHMENTS_UPDATE_ARTICLE_TYPE,
+      internal: false,
+      attachments: new_attachments.map do |attachment|
+        {
+          "filename" => attachment[:filename],
+          "mime-type" => attachment[:content_type],
+          "data" => Base64.encode64(issue.photos.find { |photo| photo.filename == attachment[:filename] }.blob.download)
+        }
+      end
+    )
+
+    raise unless article.id
   end
 
   def get_article(ticket_id, article_id, customer_articles: true, responsible_subject: nil)
