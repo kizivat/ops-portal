@@ -9,7 +9,7 @@ class HomepageController < ApplicationController
 
   def ensure_user_onboarded
     if current_user
-      redirect_to edit_profile_path(onboarding: 1) unless current_user.onboarded?
+      redirect_to edit_profile_path unless current_user.onboarded?
     end
   end
 end

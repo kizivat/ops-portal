@@ -23,7 +23,7 @@
       <div class="account-item-subject">
         <figure>
           <picture>
-            <%= image_tag "ops-avatar-blue.png", alt: "Avatar" %>
+            <%= user_avatar(@user, variant: :medium) %>
           </picture>
         </figure>
         <div class="item-title"><%= @user.display_name %></div>

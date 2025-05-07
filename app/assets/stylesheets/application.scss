@@ -1440,7 +1440,7 @@ input.button {
 }
 section.forms-container .button {
   //border: none !important;
-  width: 100% !important;
+  //width: 100% !important;
 }
 .form-other-con {
   display: flex;
@@ -1658,7 +1658,7 @@ ul.dropdown-list li.active svg {
   height: 100%;
   object-fit: cover;
 }
-.form-picture-con a.button {
+.form-picture-con .button {
   margin-top: 0 !important;
   width: fit-content !important;
 }

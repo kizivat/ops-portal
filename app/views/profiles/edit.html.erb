@@ -1,15 +1,7 @@
 <% content_for :title, "Zmena osobných údajov" %>
 
 <section class="forms-container report">
-  <% if params[:onboarding] %>
-    <h1>Vitajte na portáli Odkaz&nbsp;pre&nbsp;starostu!</h1>
-    <div class="form-other-con">
-      <div class="form-description">Predtým ako začnete portál používať je dobré si upraviť osobný profil a nastaviť pár
-        vecí. <strong>Nezaberie vám to viac ako minútu.</strong>
-      </div>
-      <h1>Osobné údaje</h1>
-    </div>
-  <% else %>
+  <% if @user.onboarded? %>
     <%= link_to profile_path, class: "button-back" do %>
     <span>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 20">
@@ -19,22 +11,34 @@
       <span>Späť</span>
     <% end %>
     <h1>Osobné údaje</h1>
+  <% else %>
+    <h1>Vitajte na portáli Odkaz&nbsp;pre&nbsp;starostu!</h1>
+    <div class="form-other-con">
+      <div class="form-description">Predtým ako začnete portál používať je dobré si upraviť osobný profil a nastaviť pár
+        vecí. <strong>Nezaberie vám to viac ako minútu.</strong>
+      </div>
+      <h1>Osobné údaje</h1>
+    </div>
+  <% end %>
+
+  <%= form_with model: @user, url: profile_avatar_path, method: :patch, data: { controller: 'auto-submit' } do |f| %>
+    <div class="form-other-con">
+      <div class="form-picture-con">
+        <figure>
+          <picture>
+            <%= user_avatar @user, variant: :big %>
+          </picture>
+        </figure>
+        <%= f.label :avatar, 'Zmeniť fotku', class: 'button button-transparent' %>
+        <%= f.file_field :avatar, accept: "capture=camera;image/*", data: { action: 'auto-submit#submit' }, class: "sr-only" %>
+        <%= f.submit "Zmeniť fotku", class: 'sr-only' %>
+      </div>
+    </div>
   <% end %>
 
   <%= form_with model: @user, url: profile_path, method: :patch do |f| %>
     <%= f.hidden_field :onboarded, value: true %>
     <div class="form-other-con">
-      <div class="form-picture-con">
-        <figure>
-          <picture>
-            <%= image_tag "ops-avatar-blue.png", alt: "Avatar" %>
-          </picture>
-        </figure>
-        <!-- TODO <a href="" class="button button-transparent">Zmeniť fotku</a> -->
-      </div>
-
-      <div class="form-description">Polia označené * sú povinné.</div>
-
       <div class="form-items-con">
         <div class="form-item-wrapper">
           <%= f.label :name, "Meno*" %>

@@ -52,6 +52,12 @@ class User < ApplicationRecord
   has_many :issue_likes, foreign_key: :user_id
   has_many :issue_subscriptions, foreign_key: :subscriber_id
   has_many :issues_comments, class_name: "Issues::Comment", foreign_key: :user_author_id
+  has_one_attached :avatar do |avatar|
+    avatar.variant :tiny, resize_to_fill: [ 36, 36 ]
+    avatar.variant :normal, resize_to_fill: [ 65, 65 ], preprocessed: true
+    avatar.variant :medium, resize_to_fill: [ 80, 80 ], preprocessed: true
+    avatar.variant :big, resize_to_fill: [ 100, 100 ], preprocessed: true
+  end
 
   enum :sex, m: 1, f: 2
   enum :status, { unverified: 1, verified: 2, closed: 3 }
