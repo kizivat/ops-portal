@@ -175,11 +175,11 @@ class ZammadApiClient
     end
 
     new_attachments = local_attachments.reject do |photo|
-      triage_attachments.any? { |attachment| attachment[:filename] == photo[:filename].to_s && attachment[:size] == photo[:size].to_s && attachment[:content_type] == photo[:content_type] }
+      triage_attachments.any? { |attachment| attachment.values_at(:filename, :size, :content_type).map(&:to_s) == photo.values_at(:filename, :size, :content_type).map(&:to_s) }
     end
 
     attachments_to_delete = triage_attachments.reject do |attachment|
-      local_attachments.any? { |photo| attachment[:filename] == photo[:filename].to_s && attachment[:size] == photo[:size].to_s && attachment[:content_type] == photo[:content_type] }
+      local_attachments.any? { |photo| attachment.values_at(:filename, :size, :content_type).map(&:to_s) == photo.values_at(:filename, :size, :content_type).map(&:to_s) }
     end
 
     attachments_to_delete.each do |attachment|
