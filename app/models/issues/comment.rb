@@ -33,14 +33,6 @@ class Issues::Comment < ApplicationRecord
     photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
   end
 
-  def visible?
-    !hidden
-  end
-
-  def triage_visible?
-    visible?
-  end
-
   def legacy_id
     legacy_comment_id || legacy_communication_id
   end
