@@ -252,19 +252,13 @@ class ZammadApiClient
     begin
       # TODO what if there is existing non-portal user?
       zammad_user = @client.user.create(
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
+        firstname: user.display_name,
         roles: [ "Portal User" ],
         origin: "portal"
       )
       zammad_user.id
     rescue RuntimeError => e
-      raise e unless e.message.include? "is already used for another user."
-
-      result = find_zammad_user(user.email)
-      raise "Can't find nor create triage zammad user with email: #{user.email}" unless result
-      result.id
+      raise e
     end
   end
 
@@ -297,7 +291,7 @@ class ZammadApiClient
       raise e unless e.message.include? "is already used for another user."
 
       result = find_zammad_user(responsible_subject.subject_name)
-      raise "Can't create triage zammad user for responsible subject email: #{responsible_subject.subject_name}" unless result
+      raise "Can't create triage zammad user for responsible subject: #{responsible_subject.subject_name}" unless result
       result.id
     end
   end
