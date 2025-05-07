@@ -73,3 +73,7 @@ sk:
         name: Meno
         firstname: Meno
         lastname: Priezvisko
+      praise:
+        title: Názov
+        description: "Text pochvaly"
+        municipality_id: "Mesto alebo obec"

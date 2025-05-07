@@ -255,7 +255,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_082225) do
     t.float "latitude"
     t.float "longitude"
     t.bigint "author_id"
-    t.bigint "category_id", null: false
+    t.bigint "category_id"
     t.bigint "state_id"
     t.bigint "municipality_id"
     t.integer "legacy_id"
@@ -277,6 +277,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_082225) do
     t.integer "resolution_external_id"
     t.integer "likes_count", default: 0, null: false
     t.datetime "imported_at"
+    t.boolean "praise_public", default: false, null: false
     t.index "((st_point(longitude, latitude, 4326))::geography)", name: "index_issues_on_location", using: :gist
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"

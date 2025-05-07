@@ -66,10 +66,10 @@ class ZammadApiClient
       address_house_number: issue.address_house_number,
       address_lat: issue.latitude,
       address_lon: issue.longitude,
-      category: issue.category&.triage_external_id || issue.category.name,
+      category: issue.category&.triage_external_id || issue.category&.name,
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
-      ops_state: issue.state.key,
+      ops_state: issue.state&.key,
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
