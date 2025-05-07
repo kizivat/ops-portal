@@ -51,7 +51,7 @@ class Issues::Draft < ApplicationRecord
 
   def confirm
     # TODO handle error for unsupported areas
-    municipality, municipality_district = municipality_and_municipality_district
+    municipality, municipality_district = find_municipality_and_municipality_district
 
     issue = Issue.create!(
       title: title,
@@ -151,27 +151,14 @@ class Issues::Draft < ApplicationRecord
   end
 
   def municipality_supported
-    errors.add(:base, :municipality_unsupported) unless municipality_and_municipality_district.first
+    errors.add(:base, :municipality_unsupported) unless find_municipality_and_municipality_district.first
   end
 
-  def municipality_and_municipality_district
-    municipality_district = MunicipalityDistrict.joins(:municipality)
-      .where("municipalities.active = true")
-      .where("? = ANY(municipalities.aliases)", address_city)
-      .where("? = ANY(municipality_districts.aliases)", address_municipality)
-      .first
+  def find_municipality_and_municipality_district
+    municipality_district = MunicipalityDistrict.find_municipality_district(self)
+    return [ municipality_district.municipality, municipality_district ] if municipality_district
 
-    municipality_district = MunicipalityDistrict.joins(:municipality)
-      .where("municipalities.active = true")
-      .where("? = ANY(municipalities.aliases)", address_municipality)
-      .where("? = ANY(municipality_districts.aliases)", address_suburb)
-      .first unless municipality_district
-
-    municipality = municipality_district&.municipality
-
-    municipality = Municipality.active.where("? = ANY(aliases)", address_municipality).first unless municipality
-
-    [ municipality, municipality_district ]
+    [ Municipality.find_municipality(self), nil ]
   end
 
   def gps_to_float(gps)

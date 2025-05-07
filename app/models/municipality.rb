@@ -31,4 +31,8 @@ class Municipality < ApplicationRecord
 
   enum :municipality_type, huge: 2, other: 1
   enum :category, regional_capital: 1, town: 2, village: 3 # TODO Pomenovanie ciselnych hodnot iba podla nasho usudku
+
+  def self.find_municipality(draft)
+    active.where("? = ANY(aliases)", draft.address_municipality).first
+  end
 end
