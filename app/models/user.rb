@@ -18,10 +18,8 @@
 #  fcm_token           :string
 #  firstname           :string
 #  gdpr_accepted       :boolean
-#  gdpr_stats_accepted :boolean          default(FALSE)
 #  lastname            :string
 #  login               :string
-#  onboarded           :boolean          default(FALSE)
 #  organization        :boolean
 #  password_hash       :string
 #  phone               :string
