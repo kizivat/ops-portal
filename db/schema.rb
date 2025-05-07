@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_07_154140) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_07_161237) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -278,6 +278,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_154140) do
     t.integer "likes_count", default: 0, null: false
     t.datetime "imported_at"
     t.boolean "praise_public", default: false, null: false
+    t.string "address_suburb"
     t.index "((st_point(longitude, latitude, 4326))::geography)", name: "index_issues_on_location", using: :gist
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
@@ -381,6 +382,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_154140) do
     t.jsonb "address_data"
     t.string "address_district"
     t.boolean "submitted", default: false, null: false
+    t.string "address_suburb"
     t.index ["author_id"], name: "index_issues_drafts_on_author_id"
     t.index ["category_id"], name: "index_issues_drafts_on_category_id"
     t.index ["subcategory_id"], name: "index_issues_drafts_on_subcategory_id"
