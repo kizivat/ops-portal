@@ -51,7 +51,7 @@ class Issues::Draft < ApplicationRecord
 
   def confirm
     # TODO handle error for unsupported areas
-    municipality, municipality_district = Municipality.find_municipality_and_municipality_district
+    municipality, municipality_district = Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb)
 
     issue = Issue.create!(
       title: title,
@@ -151,7 +151,7 @@ class Issues::Draft < ApplicationRecord
   end
 
   def municipality_supported
-    errors.add(:base, :municipality_unsupported) unless Municipality.find_municipality_and_municipality_district.first
+    errors.add(:base, :municipality_unsupported) unless Municipality.find_by_address.first
   end
 
   def gps_to_float(gps)
