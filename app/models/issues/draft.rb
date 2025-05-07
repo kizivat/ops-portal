@@ -13,6 +13,7 @@
 #  address_postcode        :string
 #  address_region          :string
 #  address_street          :string
+#  address_suburb          :string
 #  anonymous               :boolean
 #  checks                  :jsonb
 #  description             :string
@@ -49,15 +50,8 @@ class Issues::Draft < ApplicationRecord
   validate :checks_passed, on: :checks_step
 
   def confirm
-    # TODO handle OSM aliases
     # TODO handle error for unsupported areas
-    if address_city.present?
-      municipality_district = MunicipalityDistrict.joins(:municipality).where(municipality: { name: address_city, active: true }, name: address_municipality).first
-      municipality = municipality_district&.municipality
-    else
-      municipality_district = nil
-      municipality = Municipality.active.find_by_name(address_municipality)
-    end
+    municipality, municipality_district = municipality_and_municipality_district
 
     issue = Issue.create!(
       title: title,
@@ -69,6 +63,7 @@ class Issues::Draft < ApplicationRecord
       address_country: address_country,
       address_country_code: address_country_code,
       address_region: address_region,
+      address_suburb: address_suburb,
       address_district: address_district,
       address_city: address_city,
       address_municipality: address_municipality,
@@ -155,19 +150,29 @@ class Issues::Draft < ApplicationRecord
     errors.add(:checks, :invalid) if checks.any?
   end
 
-  private
-
   def municipality_supported
-    if address_city.present?
-      municipality_district = MunicipalityDistrict.joins(:municipality).where(municipality: { name: address_city, active: true }, name: address_municipality).first
-      municipality = municipality_district&.municipality
-    else
-      municipality = Municipality.active.find_by_name(address_municipality)
-    end
-    errors.add(:base, :municipality_unsupported) unless municipality
+    errors.add(:base, :municipality_unsupported) unless municipality_and_municipality_district.first
   end
 
-  private
+  def municipality_and_municipality_district
+    municipality_district = MunicipalityDistrict.joins(:municipality)
+      .where("municipalities.active = true")
+      .where("? = ANY(municipalities.aliases)", address_city)
+      .where("? = ANY(municipality_districts.aliases)", address_municipality)
+      .first
+
+    municipality_district = MunicipalityDistrict.joins(:municipality)
+      .where("municipalities.active = true")
+      .where("? = ANY(municipalities.aliases)", address_municipality)
+      .where("? = ANY(municipality_districts.aliases)", address_suburb)
+      .first unless municipality_district
+
+    municipality = municipality_district&.municipality
+
+    municipality = Municipality.active.where("? = ANY(aliases)", address_municipality).first unless municipality
+
+    [ municipality, municipality_district ]
+  end
 
   def gps_to_float(gps)
     d, m, s = gps
