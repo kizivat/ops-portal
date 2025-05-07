@@ -10,6 +10,8 @@ class Connector::Legacy::ImportManualBackofficeAlertFromLegacyDbToBackofficeJob 
     zammad_client = zammad_api_client.new(tenant)
     zammad_client.check_import_mode!
 
+    tenant_responsible_subject = ::Client.find(tenant.ops_api_subject_identifier).responsible_subject
+
     subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
     subcategory = subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
     category = subcategory&.category || ::Issues::Category.find_by(legacy_id: legacy_record.kategoria)
