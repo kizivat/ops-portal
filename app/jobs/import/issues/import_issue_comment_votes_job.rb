@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueCommentVotesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(comment:)
       Legacy::Like.where(kategoria: "comments").where(remoteid: comment.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|

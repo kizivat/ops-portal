@@ -1,5 +1,7 @@
 module Import
   class Addresses::ImportMunicipalitiesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(import_municipality_districts_job: ::Import::Addresses::ImportMunicipalityDistrictsJob, chain_import: false)
       ::Legacy::City.find_in_batches do |group|
         group.each do |legacy_record|

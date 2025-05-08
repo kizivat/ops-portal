@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueLikesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(issue:)
       Legacy::Like.where(kategoria: "alerts").where(remoteid: issue.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|

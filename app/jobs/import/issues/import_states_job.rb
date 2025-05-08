@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportStatesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform
       Legacy::Status.find_in_batches do |group|
         group.each do |legacy_record|

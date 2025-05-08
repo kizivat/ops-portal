@@ -1,5 +1,7 @@
 module Import
   class ImportMunicipalityIssuesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(
       municipality:,
       municipality_district: nil,

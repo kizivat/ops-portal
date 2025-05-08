@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueUpdatesJob < ApplicationJob
+    queue_with_priority 100
+
     include ImportMethods
 
     def perform(issue:, import_photos_job: Issues::ImportIssueUpdateAttachmentsJob)

@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssuePhotoJob < ApplicationJob
+    queue_with_priority 100
+
     include ImportMethods
 
     def perform(legacy_record, issue:)

@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueCommunicationAttachmentsJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(communication:, import_attachment_job: Issues::ImportIssueCommunicationAttachmentJob)
       Legacy::Alerts::CommunicationAttachment.where(communication_id: communication.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|

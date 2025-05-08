@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportCategoriesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform
       import_categories!
       import_subcategories!

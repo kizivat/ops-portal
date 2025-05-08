@@ -1,5 +1,7 @@
 module Import
   class Addresses::ImportStreetsJob < ApplicationJob
+    queue_with_priority 100
+
     def perform
       Legacy::Street.find_in_batches do |group|
         group.each do |legacy_record|

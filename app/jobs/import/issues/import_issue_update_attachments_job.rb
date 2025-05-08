@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueUpdateAttachmentsJob < ApplicationJob
+    queue_with_priority 100
+
     include ImportMethods
 
     def perform(update:, import_attachment_job: Issues::ImportIssueUpdateAttachmentJob)
