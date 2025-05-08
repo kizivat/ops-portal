@@ -4,7 +4,7 @@ class AddCommentsCountToIssues < ActiveRecord::Migration[8.0]
 
     Issue.reset_column_information
 
-    Issue.find_each { |issue| issue.reset_counters }
+    # Issue.find_each { |issue| issue.reset_counters }
   end
 
   def down
