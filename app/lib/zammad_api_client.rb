@@ -571,8 +571,9 @@ class ZammadApiClient
         return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by)&.roles&.include?("Zodpovedný Subjekt")
         :responsible_subject_backoffice_comment
       end
+    else
+      # TODO add more process_types
+      raise "Unknown process type: #{process_type}"
     end
-
-    # TODO add more process_types
   end
 end
