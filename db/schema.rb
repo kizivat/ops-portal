@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_07_214604) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -85,6 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.integer "legacy_id"
     t.index ["backoffice_external_id"], name: "index_connector_activities_on_backoffice_external_id"
     t.index ["connector_tenant_id"], name: "index_connector_activities_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_activities_on_triage_external_id"
@@ -96,6 +97,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.integer "legacy_id"
     t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id"
     t.index ["connector_tenant_id"], name: "index_connector_issues_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_issues_on_triage_external_id"
@@ -122,6 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.string "email"
     t.index ["connector_tenant_id"], name: "index_connector_users_on_connector_tenant_id"
     t.index ["external_id"], name: "index_connector_users_on_external_id"
   end
@@ -280,6 +283,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "imported_at"
     t.boolean "praise_public", default: false, null: false
     t.string "address_suburb"
+    t.datetime "responsible_subject_last_contact_at"
     t.index "((st_point(longitude, latitude, 4326))::geography)", name: "index_issues_on_location", using: :gist
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
@@ -288,6 +292,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.index ["municipality_id"], name: "index_issues_on_municipality_id"
     t.index ["owner_id"], name: "index_issues_on_owner_id"
     t.index ["responsible_subject_id"], name: "index_issues_on_responsible_subject_id"
+    t.index ["responsible_subject_last_contact_at"], name: "index_issues_on_responsible_subject_last_contact_at"
     t.index ["state_id"], name: "index_issues_on_state_id"
     t.index ["subcategory_id"], name: "index_issues_on_subcategory_id"
     t.index ["subtype_id"], name: "index_issues_on_subtype_id"
