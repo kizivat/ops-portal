@@ -1,5 +1,7 @@
 module Import
   class ImportIssueJob < ApplicationJob
+    queue_with_priority 100
+
     include ImportMethods
 
     def perform(

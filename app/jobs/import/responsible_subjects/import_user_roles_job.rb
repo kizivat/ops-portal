@@ -1,5 +1,7 @@
 module Import
   class ResponsibleSubjects::ImportUserRolesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(import_types_job: ResponsibleSubjects::ImportTypesJob, chain_import: false)
       Legacy::Role.find_in_batches do |group|
         group.each do |legacy_record|
