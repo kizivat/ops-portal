@@ -6,7 +6,7 @@
           <%= user_avatar(comment.author) %>
         </picture>
       </figure>
-      <div class="name"><%= author_name %></div>
+      <div class="name"><%= comment.author_display_name %></div>
     </div>
     <div class="date"><%= l comment.created_at.to_date %></div>
     <div class="comment-content">
