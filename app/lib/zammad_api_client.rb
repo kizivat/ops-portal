@@ -500,7 +500,7 @@ class ZammadApiClient
   end
 
   def build_article_response(ticket, article, allowed_article_types:, responsible_subject: nil, first_article: false)
-    article_type = get_article_type(article)
+    article_type = get_article_type(article, ticket.process_type)
     return unless first_article || allowed_article_types.include?(article_type)
 
     if article_type == :agent_backoffice_comment
@@ -540,11 +540,11 @@ class ZammadApiClient
     }
   end
 
-  def get_article_type(article, zammad_api_client: @client)
+  def get_article_type(article, process_type, zammad_api_client: @client)
     return if article.internal
     return :system_note if article.sender == "System"
 
-    case ticket.process_type
+    case process_type
     when "portal_issue_triage"
       return :user_private_comment if article.sender == "Customer" && article.type == "web"
 
