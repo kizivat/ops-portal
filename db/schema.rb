@@ -85,6 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.integer "legacy_id"
     t.index ["backoffice_external_id"], name: "index_connector_activities_on_backoffice_external_id"
     t.index ["connector_tenant_id"], name: "index_connector_activities_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_activities_on_triage_external_id"
@@ -96,6 +97,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.integer "legacy_id"
     t.index ["backoffice_external_id"], name: "index_connector_issues_on_backoffice_external_id"
     t.index ["connector_tenant_id"], name: "index_connector_issues_on_connector_tenant_id"
     t.index ["triage_external_id"], name: "index_connector_issues_on_triage_external_id"
@@ -122,6 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_173456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "connector_tenant_id", null: false
+    t.string "email"
     t.index ["connector_tenant_id"], name: "index_connector_users_on_connector_tenant_id"
     t.index ["external_id"], name: "index_connector_users_on_external_id"
   end
