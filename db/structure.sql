@@ -677,7 +677,8 @@ CREATE TABLE public.issues (
     likes_count integer DEFAULT 0 NOT NULL,
     imported_at timestamp(6) without time zone,
     praise_public boolean DEFAULT false NOT NULL,
-    responsible_subject_last_contact_at timestamp(6) without time zone
+    responsible_subject_last_contact_at timestamp(6) without time zone,
+    address_suburb character varying
 );
 
 
@@ -864,7 +865,8 @@ CREATE TABLE public.issues_drafts (
     latlon_from_exif boolean DEFAULT false,
     address_data jsonb,
     address_district character varying,
-    submitted boolean DEFAULT false NOT NULL
+    submitted boolean DEFAULT false NOT NULL,
+    address_suburb character varying
 );
 
 
@@ -1185,7 +1187,6 @@ CREATE TABLE public.municipalities (
     name character varying,
     district_id bigint,
     sub character varying,
-    alias character varying,
     email character varying,
     municipality_type integer,
     has_municipality_districts boolean,
@@ -1199,7 +1200,8 @@ CREATE TABLE public.municipalities (
     logo character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    legacy_id integer
+    legacy_id integer,
+    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
@@ -1230,14 +1232,14 @@ CREATE TABLE public.municipality_districts (
     id bigint NOT NULL,
     name character varying,
     municipality_id bigint NOT NULL,
-    alias character varying,
     genitiv character varying,
     lokal character varying,
     description character varying,
     logo character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    legacy_id integer
+    legacy_id integer,
+    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
@@ -3009,13 +3011,6 @@ CREATE INDEX index_municipalities_on_active ON public.municipalities USING btree
 
 
 --
--- Name: index_municipalities_on_alias; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_municipalities_on_alias ON public.municipalities USING btree (alias);
-
-
---
 -- Name: index_municipalities_on_district_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3766,6 +3761,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250508082624'),
 ('20250507214604'),
 ('20250507173456'),
+('20250507161237'),
+('20250507154140'),
 ('20250507082225'),
 ('20250506192830'),
 ('20250506143910'),
