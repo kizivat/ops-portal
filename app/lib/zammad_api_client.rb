@@ -25,7 +25,7 @@ class ZammadApiClient
     @client = ZammadAPI::Client.new(url: url, http_token: http_token)
   end
 
-  def get_ticket(ticket_id, expand: false, customer_articles: false, responsible_subject: nil)
+  def get_ticket(ticket_id, expand: false, customer_articles: false, exclude_responsible_subject_articles: false, responsible_subject: nil)
     begin
       ticket = @client.ticket.find(ticket_id)
     rescue => e
@@ -45,13 +45,14 @@ class ZammadApiClient
             ticket,
             article,
             customer_articles: customer_articles,
+            exclude_responsible_subject_articles: exclude_responsible_subject_articles,
             responsible_subject: responsible_subject
           )
         }.compact
     })
   end
 
-  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
+  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue.issue_type,
@@ -71,6 +72,7 @@ class ZammadApiClient
       category: issue.category&.triage_external_id || issue.category&.name,
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
+      state: state,
       ops_state: issue.state&.key,
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
@@ -302,19 +304,13 @@ class ZammadApiClient
     begin
       # TODO what if there is existing non-portal user?
       zammad_user = @client.user.create(
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
+        firstname: user.display_name,
         roles: [ "Portal User" ],
         origin: "portal"
       )
       zammad_user.id
     rescue RuntimeError => e
-      raise e unless e.message.include? "is already used for another user."
-
-      result = find_zammad_user(user.email)
-      raise "Can't find nor create triage zammad user with email: #{user.email}" unless result
-      result.id
+      raise e
     end
   end
 
@@ -347,7 +343,7 @@ class ZammadApiClient
       raise e unless e.message.include? "is already used for another user."
 
       result = find_zammad_user(responsible_subject.subject_name)
-      raise "Can't create triage zammad user for responsible subject email: #{responsible_subject.subject_name}" unless result
+      raise "Can't create triage zammad user for responsible subject: #{responsible_subject.subject_name}" unless result
       result.id
     end
   end
@@ -442,9 +438,9 @@ class ZammadApiClient
     municipality = Municipality.find_by!(name: municipality_name)
     municipality_district = municipality&.municipality_districts&.find_by(name: district_name)
 
-    category = Issues::Category.find_by!(name: ticket.category)
+    category = Issues::Category.find_by(name: ticket.category) || Issues::Category.find_by(triage_external_id: ticket.category)
     subcategory = category&.subcategories&.find_by!(name: ticket.subcategory)
-    subtype = subcategory&.subtypes&.find_by!(name: ticket.subtype)
+    subtype = subcategory&.subtypes&.find_by(name: ticket.subtype)
 
     ops_state = Issues::State.find_by!(key: ticket.ops_state)
 
@@ -481,14 +477,19 @@ class ZammadApiClient
     }
   end
 
-  def build_article_response(ticket, article, customer_articles: true, responsible_subject: nil, first_article: false)
+  def build_article_response(ticket, article, customer_articles: true, exclude_responsible_subject_articles: false, responsible_subject: nil, first_article: false)
     return if article.internal
 
     customer_article = article_from_customer?(article)
-    return unless customer_articles || customer_article
+    return if !customer_articles && customer_article
+
+    article_without_author = article.origin_by_id == nil
 
     portal_article = article_for_portal?(article, ticket, first_article: first_article)
-    return unless customer_article || portal_article || article_for_this_responsible_subject?(article, ticket, responsible_subject) || article_from_responsible_subject?(article, responsible_subject)
+    return unless customer_article || portal_article || article_without_author || article_for_this_responsible_subject?(article, ticket, responsible_subject) || article_from_responsible_subject?(article, responsible_subject)
+
+    responsible_subject_article = article.sender != "Agent" && customer_article == false
+    return if exclude_responsible_subject_articles && responsible_subject_article
 
     {
       author: build_author_response(article.origin_by_id || article.created_by_id, customer_article: customer_article, sender: article.sender, anonymous: (ticket.anonymous && article.origin_by == ticket.customer)),
@@ -531,7 +532,7 @@ class ZammadApiClient
     return false if article.internal
     return false unless article.sender == "Customer"
 
-    find_zammad_user(article.origin_by)&.origin == "portal"
+    find_zammad_user_by_id(article.origin_by_id)&.origin == "portal" if article.origin_by_id
   end
 
   def article_from_responsible_subject?(article, responsible_subject)

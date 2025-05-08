@@ -14,6 +14,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
         process_type: "portal_issue_triage",
+        state: "new",
         group: "Dobrovoľníci::Trenčín",
         owner_id: nil
       }
@@ -58,6 +59,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
         process_type: "portal_issue_triage",
+        state: "new",
         group: "Dobrovoľníci::Trenčín",
         owner_id: nil
       }
@@ -107,6 +109,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
         process_type: "portal_issue_triage",
+        state: "new",
         group: "Dobrovoľníci::Trenčín",
         owner_id: 9
       }

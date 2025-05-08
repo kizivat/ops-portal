@@ -19,8 +19,9 @@ module Import
       else
         Legacy::User.find_or_create_agent(legacy_record.riesitel_new)
       end
+      backoffice_owners = Legacy::Alerts::MunicipalityUser.where(alert_id: legacy_record.id).order(:id)
 
-      issue = Issue.find_or_create_by!(
+      issue = Issue.find_or_create_by(
         legacy_id: legacy_record.id,
         address_city: Municipality.find_by(legacy_id: legacy_record.mesto)&.name,
         address_region: Municipality.find_by(legacy_id: legacy_record.mesto)&.district&.name,
@@ -37,9 +38,8 @@ module Import
           front_page: legacy_record.titulka,
           mms: legacy_record.mms,
           soft_reject: legacy_record.soft_reject,
-          owner_id: legacy_record.riesitel, # TODO nevieme referencia na ktory model by toto mala byt
-          new_owner_id: legacy_record.riesitel_new, # TODO nevieme referencia na ktory model by toto mala byt
-          modified_at: legacy_record.modified_time, # TODO nestaci updated_at?
+          owner_id: legacy_record.riesitel,
+          new_owner_id: legacy_record.riesitel_new,
           updated_by_id: legacy_record.modified_by, # TODO overit na ktory model je toto referencia
           state_changed_at: legacy_record.last_status_change_time,
           street_legacy_id: legacy_record.ulica,
@@ -66,7 +66,9 @@ module Import
           ended_at: legacy_record.end_date,
           parent_id: legacy_record.parent_id,
           organization_unit_id2: legacy_record.organizational_unit_id2,
-          legacy_responsible_subject_id: legacy_record.zodpovednost
+          legacy_responsible_subject_id: legacy_record.zodpovednost,
+          backoffice_owner_legacy_id: backoffice_owners&.last&.municipality_user_id,
+          other_backoffice_owners_legacy_ids: backoffice_owners[0..-2]&.map(&:municipality_user_id)
         },
         longitude: legacy_record.map_y,
         title: legacy_record.heading,
@@ -82,6 +84,7 @@ module Import
         state: ::Issues::State.find_by(legacy_id: legacy_record.status)
       ).tap do |issue|
         issue.imported_at = Time.now
+        issue.updated_at = convert_timestamp_value(legacy_record.modified_time) if legacy_record.modified_time
         issue.save!
       end
 

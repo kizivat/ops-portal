@@ -34,6 +34,18 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
     responsible_subject_author.name
   end
 
+  def backoffice_author
+    Legacy::User.find_or_create_responsible_subjects_user(legacy_data&.fetch("user_id"))
+  end
+
+  def triage_activity_body
+    [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, super ].join(" ")
+  end
+
+  def internal?
+    false
+  end
+
   def visible?
     !hidden
   end

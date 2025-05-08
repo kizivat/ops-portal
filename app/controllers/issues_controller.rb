@@ -10,7 +10,6 @@ class IssuesController < ApplicationController
     scope = Issue.publicly_visible
     case @tab
     when "list"
-        scope = scope.order(created_at: :desc) # TODO
         scope = scope.with_attached_photos
 
         @search_results = search_engine.search(scope, params)
@@ -130,10 +129,6 @@ class IssuesController < ApplicationController
 
             lat, lon = params[:pin].split(",", 2).map(&:to_f)
 
-            if params[:tab].blank? || params[:tab] == "list"
-              scope = scope.order_by_distance_from_point(lat, lon)
-            end
-
             scope.within_distance_from_point(lat, lon, distance)
           end
         ),
@@ -159,10 +154,81 @@ class IssuesController < ApplicationController
           filter: ->(scope, params) { scope.joins(:municipality_district).where(municipality_districts: { name: params[:cast] }) }
         ),
 
+        SearchEngine::Controls::Dropdown.new(
+          param_name: :obdobie,
+          label: "Obdobie",
+          default_label: "Celé",
+          items: [
+            "Posledných 30 dní",
+            "Tento rok",
+            "Minulý rok"
+          ],
+          multiple: false,
+          sort: false,
+          filter: ->(scope, params) do
+            case params[:obdobie]
+            when "Posledných 30 dní"
+                scope = scope.where(created_at: 30.days.ago..)
+            when "Tento rok"
+                scope = scope.where(created_at: Date.current.beginning_of_year..)
+            when "Minulý rok"
+                scope = scope.where(created_at: 1.year.ago.beginning_of_year..1.year.ago.end_of_year)
+            end
+
+            scope
+          end
+        ),
+
         SearchEngine::Controls::SearchField.new(
           param_name: :q,
           label: "Textové vyhľadávanie",
           filter: ->(scope, params) { scope.fulltext_search(params[:q]) },
+        )
+      ],
+
+      sorts: [
+        SearchEngine::Controls::Sort.new(
+          name: :nove,
+          label: "Najnovšie",
+          apply_if: ->(params) do
+            return false unless params[:sort].nil? || params[:sort] == "nove"
+            return false if params[:pin].present? && (params[:sort].nil? || params[:sort] == "vzd")
+
+            true
+          end,
+          order: ->(scope, _) { scope.order(created_at: :desc) }
+        ),
+
+        SearchEngine::Controls::Sort.new(
+          name: :oblubene,
+          label: "Najobľúbenejšie",
+          order: ->(scope, _) { scope.order(likes_count: :desc, created_at: :desc) }
+        ),
+
+        SearchEngine::Controls::Sort.new(
+          name: :zodpovedane,
+          label: "Naposledy zodpovedané",
+          order: ->(scope, _) do
+            scope.where.not(responsible_subject_last_contact_at: nil)
+              .order(responsible_subject_last_contact_at: :desc)
+          end
+        ),
+
+        SearchEngine::Controls::Sort.new(
+          name: :vzd,
+          label: "Vzdialenosť",
+          visible_if: ->(params) { params[:pin].present? },
+          apply_if: ->(params) do
+            return false unless params[:sort].nil? || params[:sort] == "vzd"
+            return false unless params[:pin].present?
+
+            true
+          end,
+          order: ->(scope, params) do
+            lat, lon = params[:pin].split(",", 2).map(&:to_f)
+
+            scope.order_by_distance_from_point(lat, lon)
+          end
         )
       ],
 
