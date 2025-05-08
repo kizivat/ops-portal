@@ -1,5 +1,7 @@
 module Import
   class Issues::ImportIssueCommunicationVotesJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(communication:)
       Legacy::Like.where(kategoria: "emails").where(remoteid: communication.legacy_id).find_in_batches do |group|
         group.each do |legacy_record|

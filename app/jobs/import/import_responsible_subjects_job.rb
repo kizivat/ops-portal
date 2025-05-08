@@ -1,5 +1,7 @@
 module Import
   class ImportResponsibleSubjectsJob < ApplicationJob
+    queue_with_priority 100
+
     def perform(
       import_categories_job: ResponsibleSubjects::ImportCategoriesJob,
       import_organization_units_job: ResponsibleSubjects::ImportOrganizationUnitsJob,
