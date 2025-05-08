@@ -679,7 +679,8 @@ CREATE TABLE public.issues (
     praise_public boolean DEFAULT false NOT NULL,
     responsible_subject_last_contact_at timestamp(6) without time zone,
     address_suburb character varying,
-    comments_count integer DEFAULT 0 NOT NULL
+    comments_count integer DEFAULT 0 NOT NULL,
+    fulltext_extra character varying
 );
 
 
@@ -3253,7 +3254,7 @@ CREATE INDEX index_users_on_street_id ON public.users USING btree (street_id);
 -- Name: issues_fulltext_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX issues_fulltext_idx ON public.issues USING gin (((((to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((title)::text, ''::text))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((description)::text, ''::text)))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((legacy_id)::text, ''::text)))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((id)::text, ''::text))))));
+CREATE INDEX issues_fulltext_idx ON public.issues USING gin ((((((to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((title)::text, ''::text))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((description)::text, ''::text)))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((legacy_id)::text, ''::text)))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((id)::text, ''::text)))) || to_tsvector('simple'::regconfig, public.f_unaccent(COALESCE((fulltext_extra)::text, ''::text))))));
 
 
 --
@@ -3759,6 +3760,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250508170305'),
 ('20250508151724'),
 ('20250508082624'),
 ('20250507214604'),
