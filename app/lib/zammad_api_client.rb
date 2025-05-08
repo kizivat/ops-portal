@@ -68,7 +68,7 @@ class ZammadApiClient
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue.issue_type,
-      title: issue.title,
+      title: issue.title.presence || "Bez názvu",
       body: issue.description,
       group: group,
       customer_id: issue.author.external_id,
@@ -554,11 +554,11 @@ class ZammadApiClient
       :agent_private_comment if article.sender == "Agent"
 
     when "portal_issue_resolution"
-      return :unknown_user_portal_comment if article.sender == "Customer" && article.origin_by_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID")
+      return :unknown_user_portal_comment if article.sender == "Customer" && article.origin_by_id == nil && article.created_by_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID")
       return :user_portal_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.origin == "portal"
 
       if article.body.include?(OPS_PORTAL_ARTICLE_TAG)
-        return :responsible_subject_portal_and_backoffice_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id)&.roles&.include?("Zodpovedný Subjekt")
+        return :responsible_subject_portal_and_backoffice_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
 
         if article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
           :agent_portal_and_backoffice_comment if article.sender == "Agent"
@@ -568,7 +568,7 @@ class ZammadApiClient
       elsif article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
         :agent_backoffice_comment if article.sender == "Agent"
       else
-        return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by)&.roles&.include?("Zodpovedný Subjekt")
+        return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
         :responsible_subject_backoffice_comment
       end
     else
