@@ -405,6 +405,7 @@ class ZammadApiClient
   def build_author_response(user_id, customer_article:, sender: "Customer", anonymous: false)
     return if anonymous
     return if sender == "System"
+    return if user_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID").to_i
     return DEFAULT_OPS_ADMIN_USER if sender == "Agent"
 
     user = @client.user.find(user_id)
