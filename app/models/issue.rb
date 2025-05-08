@@ -43,7 +43,6 @@ class Issue < ApplicationRecord
   include PgSearch::Model
 
   enum :issue_type, { issue: 1, question: 2, praise: 3 }, default: :issue
-  # TODO add triage_draft_external_id - este premenovat
 
   belongs_to :author, class_name: "User", optional: true
   belongs_to :owner, class_name: "Legacy::Agent", optional: true # TODO drop after legacy import
@@ -71,7 +70,7 @@ class Issue < ApplicationRecord
   validates :category_id, presence: true, unless: ->(issue) { issue.issue_type == "praise" }
   validates_presence_of :title, :description, unless: -> { imported_at }
 
-  pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id ], ignoring: :accents
+  pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id, :id ], ignoring: :accents
   scope :publicly_visible, -> { joins(:state).where.not(state: { key: %w[waiting rejected] }) }
 
   before_save :recalculate_computed_fields
