@@ -41,7 +41,7 @@
 #  triage_external_id                  :integer
 #
 class Issue < ApplicationRecord
-  include PgSearch::Model
+  include PgSearch::Faster
 
   enum :issue_type, { issue: 1, question: 2, praise: 3 }, default: :issue
 
@@ -72,7 +72,6 @@ class Issue < ApplicationRecord
   validates :category_id, presence: true, unless: ->(issue) { issue.issue_type == "praise" }
   validates_presence_of :title, :description, unless: -> { imported_at }
 
-  pg_search_scope :fulltext_search, against: [ :title, :description, :legacy_id, :id ], ignoring: :accents
   scope :publicly_visible, -> { joins(:state).where.not(state: { key: %w[waiting rejected] }) }
 
   before_save :recalculate_computed_fields
@@ -141,6 +140,12 @@ class Issue < ApplicationRecord
       .maximum(:created_at)
 
     self.comments_count = visible_activity_objects.count
+
+    self.fulltext_extra = [
+      category&.name, subcategory&.name, subtype&.name,
+      address_city, address_municipality, address_street,
+      state&.name
+    ].compact.join(" ")
   end
 
   def reset_counters

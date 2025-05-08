@@ -35,6 +35,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "73bd92709f02ddbd8826ec99c4c2acf9dc235503aa5a82cea6330f20e427f317",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/lib/pg_search/faster.rb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where(\"#{fulltext_index_expression(:against => against, :unaccent_f => unaccent_f)} @@ (#{query.split.compact.map do\n \"to_tsquery('simple', ''' ' || #{unaccent_f}(?) || ' ''')\"\n end.join(\" && \")})\", *query.split.compact)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PgSearch::Faster",
+        "method": "fulltext_search"
+      },
+      "user_input": "fulltext_index_expression(:against => against, :unaccent_f => unaccent_f)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
       "fingerprint": "98918b829be057af91b4ded360f2c756d07dcdf35903b8cb9dd889bb02748bf9",

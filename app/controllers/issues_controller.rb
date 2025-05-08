@@ -182,7 +182,13 @@ class IssuesController < ApplicationController
         SearchEngine::Controls::SearchField.new(
           param_name: :q,
           label: "Textové vyhľadávanie",
-          filter: ->(scope, params) { scope.fulltext_search(params[:q]).reorder(nil) },
+          filter: ->(scope, params) do
+            scope.fulltext_search(
+              params[:q],
+              against: [ :title, :description, :legacy_id, :id, :fulltext_extra ],
+              unaccent_f: :f_unaccent
+            )
+          end,
         )
       ],
 
