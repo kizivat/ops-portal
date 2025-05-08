@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_07_214604) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_08_082624) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -283,6 +283,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_214604) do
     t.datetime "imported_at"
     t.boolean "praise_public", default: false, null: false
     t.datetime "responsible_subject_last_contact_at"
+    t.index "((((to_tsvector('simple'::regconfig, f_unaccent(COALESCE((title)::text, ''::text))) || to_tsvector('simple'::regconfig, f_unaccent(COALESCE((description)::text, ''::text)))) || to_tsvector('simple'::regconfig, f_unaccent(COALESCE((legacy_id)::text, ''::text)))) || to_tsvector('simple'::regconfig, f_unaccent(COALESCE((id)::text, ''::text)))))", name: "issues_fulltext_idx", using: :gin
     t.index "((st_point(longitude, latitude, 4326))::geography)", name: "index_issues_on_location", using: :gist
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
