@@ -6,21 +6,18 @@ export default class extends Controller {
 
     connect() {
         if ('OTPCredential' in window) {
-            const input = this.inputTarget
-            const form = input.closest('form')
+            const form = this.inputTarget.closest('form')
             const ac = new AbortController()
 
-            // Abort OTP detection if form is submitted manually
-
             form.addEventListener('submit', () => {
-                ac.abort()
+                ac.abort() // Abort OTP detection if form is submitted manually
             })
 
             navigator.credentials.get({
                 otp: {transport: ['sms']},
                 signal: ac.signal
             }).then(otp => {
-                input.value = otp.code
+                this.inputTarget.value = otp.code
 
                 form.submit()
             }).catch(err => {
