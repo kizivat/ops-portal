@@ -63,6 +63,11 @@ sk:
       accepted: "musíte súhlasiť"
 
   activerecord:
+    errors:
+      models:
+        issues/draft:
+          latlon_missing: "Nastavte čo najpresnejšiu polohu podnetu na mape."
+
     attributes:
       issue:
         title: Názov

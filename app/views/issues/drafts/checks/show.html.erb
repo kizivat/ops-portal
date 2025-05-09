@@ -6,10 +6,11 @@
   <% if @draft.errors[:base].any? %>
     <div class="report-summary-block-con">
       <div class="report-warning">
-        <div class="title">Odkaz pre starostu tu ešte nefunguje</div>
+        <div class="title">Samospráva nie je zapojená do projektu Odkaz pre starostu</div>
         <div class="description">
-          <p>Snažíte sa nahlásiť podnet na adrese v&nbsp;samospráve, ktorá s projektom <strong>Odkaz pre starostu</strong> ešte nespolupracuje.</p>
+          <p>Tento podnet nemôžeme zverejniť, nakoľko samospráva nie je zapojená do projektu Odkaz pre starostu. </p>
         </div>
+        <%= link_to "Viac info", "/pridajte-sa", class: "button button-transparent" %>
       </div>
     </div>
 

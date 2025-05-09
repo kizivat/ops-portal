@@ -45,6 +45,7 @@ class Issues::Draft < ApplicationRecord
 
   validates_presence_of :photos, on: :photos_step
   validates_presence_of :title, :description, on: :details_step
+  validate :latlon_present, on: :geo_step
 
   validate :municipality_supported, on: :checks_step
   validate :checks_passed, on: :checks_step
@@ -144,7 +145,15 @@ class Issues::Draft < ApplicationRecord
     save(context: :suggestions_step)
   end
 
+  def confirmable?
+    checks.all? { |check| check["action"] == "confirm" }
+  end
+
   private
+
+  def latlon_present
+    errors.add(:base, :latlon_missing) if latitude.blank? || longitude.blank?
+  end
 
   def checks_passed
     errors.add(:checks, :invalid) if checks.any?

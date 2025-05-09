@@ -39,7 +39,6 @@ Rails.application.routes.draw do
 
   namespace :issues, path: "dopyty" do
     resources :drafts, path: "novy-podnet" do
-      post :confirm
       delete :destroy_photo
       get :thanks, on: :collection, path: "dakujeme"
       scope module: :drafts do
@@ -50,6 +49,7 @@ Rails.application.routes.draw do
         resource :geo
         resource :checks do
           get :generate
+          post :confirm
         end
         resource :summary
         resource :category
