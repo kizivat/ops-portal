@@ -278,3 +278,7 @@ select.dropdown-button:open {
 section.report .report-warning .button {
     margin-top: 0;
 }
+
+[data-controller="geo"] .geo--supported {
+    display: inline !important;
+}

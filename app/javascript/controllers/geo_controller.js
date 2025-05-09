@@ -4,9 +4,14 @@ import {LocateControl} from "leaflet.locatecontrol";
 
 // Connects to data-controller="geo"
 export default class extends Controller {
-    static targets = ["latitude", "longitude", "map", "search"]
+    static targets = ["latitude", "longitude", "map", "search", "localize", "support"]
+    static classes = ["supported"]
 
     connect() {
+        if (navigator.geolocation !== undefined) {
+            this.supportTargets.forEach(target => target.classList.add(this.supportedClass));
+        }
+
         this.map = L.map(this.mapTarget)
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -34,7 +39,9 @@ export default class extends Controller {
 
     search(event) {
         event.preventDefault();
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${this.searchTarget.value}&accept-language=sk`, {
+        var form = event.target.closest('form')
+        form.ariaBusy = true;
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${this.searchTarget.value}&accept-language=sk&countrycodes=sk`, {
             headers: {'User-Agent': 'www.odkazprestarostu.sk'}
         }).then(response => response.json())
             .then(data => {
@@ -45,7 +52,37 @@ export default class extends Controller {
                     [place.boundingbox[0], place.boundingbox[2]],
                     [place.boundingbox[1], place.boundingbox[3]]
                 ]);
+                form.ariaBusy = false;
+            })
+            .catch(() => {
+                form.ariaBusy = false;
             });
+    }
+
+    localize(event) {
+        event.preventDefault();
+        if (!navigator.geolocation) {
+            alert("Geolokácia nie je podporovaná vo vašom prehliadači.");
+            return;
+        }
+        // Get current position from GPS or fallback to defaults
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Update form inputs
+                this.latitudeTarget.value = lat;
+                this.longitudeTarget.value = lng;
+
+                // Update map view
+                this.map.setView([lat, lng], 17);
+            },
+            (error) => {
+                // Fallback to data attributes or defaults if GPS fails
+                alert("Nepodarilo sa získať GPS pozíciu.")
+            }
+        );
     }
 
     disconnect() {

@@ -6,7 +6,7 @@ class Issues::Drafts::GeosController < ApplicationController
   end
 
   def update
-    if @draft.update(geo_params)
+    if @draft.update_with_context(geo_params, :geo_step)
       if params[:next] == "summary"
         Issues::Draft::FetchAddressDetailsJob.perform_now(@draft)
         redirect_to issues_draft_summary_path(@draft)

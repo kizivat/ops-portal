@@ -198,7 +198,11 @@ Rules:
 - Podnet nahlasuje vrak vozidla a nie iba zle zaparkované auto.
 
 Title: Vulgarizmy
-Info: Podnet obsahuje vulgarizmy alebo je napísaný nevhodne.
+Info:
+```
+Podnet porušuje pravidlá komunikácie. Prosíme o úpravu textu. 
+```
+More Info: /pravidla-komunikacie
 Action: back
 Rules:
 - Podnet, ktorý obsahuje vulgarizmy sa neakceptuje.

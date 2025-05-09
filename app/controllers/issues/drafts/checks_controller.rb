@@ -5,6 +5,14 @@ class Issues::Drafts::ChecksController < ApplicationController
     @draft.valid?(:checks_step)
   end
 
+  def confirm
+    if @draft.confirmable?
+      @draft.confirm
+
+      redirect_to thanks_issues_drafts_path
+    end
+  end
+
   def create
     Issues::Draft::GenerateChecksJob.perform_now(@draft) if @draft.checks.nil?
     if @draft.valid?(:checks_step)

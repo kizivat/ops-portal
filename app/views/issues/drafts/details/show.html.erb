@@ -10,9 +10,7 @@
 
   <h1>Popis podnetu</h1>
 
-  <div class="report-suggestion-description">Slušne, vecne a jasne popíšte v čom je problém. Nahlasujte
-    <strong>len jeden problém naraz</strong>.
-  </div>
+  <div class="report-suggestion-description">Jasne, vecne a&nbsp;slušne popíšte problém vo verejnom priestore. <strong>Nahlasujte naraz len jeden problém na jednom mieste.</strong></div>
 
   <%= form_with(model: @draft, url: issues_draft_details_path(@draft)) do |form| %>
     <div class="report-summary-block-con">
@@ -20,13 +18,17 @@
         <%= form.label :title, "Názov" %>
         <%= form.text_field :title, placeholder: "Výstižný názov podnetu",
                             aria: ({ invalid: true, describedby: "title_error_message" } if @draft.errors[:title].any?) %>
-        <%= content_tag(:span, @draft.errors[:title].first, class: "error-message", id: "title_error_message") if @draft.errors[:title].any? %>
+        <% @draft.errors.full_messages_for(:title).each do |message| %>
+					<div class="error-message"><%= message %></div>
+				<% end %>
       </div>
       <div class="form-item-wrapper">
         <%= form.label :description, "Popis" %>
         <%= form.text_area :description, placeholder: "Slušný, vecný a dostatočne jasný opis problému.",
                            aria: ({ invalid: true, describedby: "description_error_message" } if @draft.errors[:description].any?) %>
-        <%= content_tag(:span, @draft.errors[:description].first, class: "error-message", id: "description_error_message") if @draft.errors[:description].any? %>
+				<% @draft.errors.full_messages_for(:description).each do |message| %>
+					<div class="error-message"><%= message %></div>
+				<% end %>
       </div>
     </div>
 
