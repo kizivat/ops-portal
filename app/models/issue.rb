@@ -63,6 +63,7 @@ class Issue < ApplicationRecord
   has_many :update_activities, class_name: "Issues::UpdateActivity", dependent: :destroy
   has_many :comments, class_name: "Issues::Comment", through: :comment_activities, source: :activity_object, dependent: :destroy
   has_many :likes, class_name: "IssueLike", dependent: :destroy
+  has_many :subscriptions, class_name: "IssueSubscription", dependent: :destroy
 
   has_many_attached :photos do |photo|
     photo.variant :normal, resize_to_fill: [ 680, 680 ], preprocessed: true
@@ -77,6 +78,7 @@ class Issue < ApplicationRecord
   scope :publicly_visible, -> { joins(:state).where.not(state: { key: %w[waiting rejected] }) }
 
   before_save :recalculate_computed_fields
+  after_update :notify_subscribers, if: :saved_change_to_state_id?
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object).compact
@@ -153,5 +155,9 @@ class Issue < ApplicationRecord
   def reset_counters
     recalculate_computed_fields
     save
+  end
+
+  def notify_subscribers
+    Notifications::PublishIssueStateChangedJob.perform_later(self, state_id_change: saved_change_to_state_id)
   end
 end
