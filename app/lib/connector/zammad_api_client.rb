@@ -189,6 +189,7 @@ module Connector
         address_lat: legacy_data.latitude,
         address_lon: legacy_data.longitude,
         created_at: legacy_data.created_at,
+        origin_by_id: create_or_find_agent(legacy_data.author),
         customer_id: create_or_find_agent(legacy_data.author),
         article: {
           body: legacy_data.description.presence || "(bez popisu)",
