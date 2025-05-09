@@ -4,6 +4,7 @@
 
   <h1>Zadajte kód</h1>
   <%= form_with url: check_code_profile_verification_path, data: { controller: :otp }, scope: :user do |f| %>
+    <%= f.hidden_field :phone_verified, value: true %>
     <div class="form-other-con">
       <div class="form-description">Zadajte bezpečnostný kód z SMS správy, ktorý vám bol doručený na váš telefón.</div>
       <div class="form-items-con">

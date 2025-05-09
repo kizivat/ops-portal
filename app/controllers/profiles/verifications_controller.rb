@@ -25,8 +25,7 @@ class Profiles::VerificationsController < ApplicationController
   def check_code
     @user = current_user
     @user.assign_attributes(verify_code_params)
-    if @user.valid?(:phone_verification_code)
-      @user.update(phone_verified: true)
+    if @user.save(context: :phone_verification_code)
       redirect_to profile_path, notice: "Váš účet bol úspešne overený."
     else
       @user.update_attribute(:phone_verification_code_attempts, @user.phone_verification_code_attempts + 1)
@@ -46,7 +45,7 @@ class Profiles::VerificationsController < ApplicationController
   end
 
   def verify_code_params
-    params.require(:user).permit(:phone_verification_code_confirmation)
+    params.require(:user).permit(:phone_verification_code_confirmation, :phone_verified)
   end
 
   def record_phone_verification_attempt(user)
