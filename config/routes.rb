@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   end
 
   resources :issues, path: "dopyty" do
+    get :relevant, on: :collection, path: :r
     resource :issue_like, as: :like
     resource :issue_subscription, as: :subscription
     resources :issues_user_comments, path: "komentare", module: :issues
@@ -38,8 +39,8 @@ Rails.application.routes.draw do
   end
 
   namespace :issues, path: "dopyty" do
-    resources :drafts, path: "novy-podnet" do
-      post :confirm
+    resources :drafts, path: "novy-dopyt", path_names: { new: "podnet" } do
+      get :new_question, on: :collection, path: "otazka"
       delete :destroy_photo
       get :thanks, on: :collection, path: "dakujeme"
       scope module: :drafts do
@@ -50,6 +51,7 @@ Rails.application.routes.draw do
         resource :geo
         resource :checks do
           get :generate
+          post :confirm
         end
         resource :summary
         resource :category
@@ -69,16 +71,23 @@ Rails.application.routes.draw do
 
   resources :uploads
 
-  resources :questions, path: "otazky", path_names: { new: "nova" }
-
   resources :praises, path: "pochvaly", path_names: { new: "nova" } do
     collection do
       get "podakovanie", action: :thanks, as: "thanks"
     end
   end
 
-  resource :profile do
+  resource :profile, path: "profil" do
+    collection do
+      get :watched_issues, path: "sledovane"
+      get :verified_issues, path: "overene"
+      get :settings, path: "nastavenia"
+    end
     resource :avatar, module: :profiles
+    resource :verification, module: :profiles do
+      get :code
+      post :check_code
+    end
   end
 
   resources :users, path: "pouzivatelia"

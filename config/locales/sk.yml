@@ -63,6 +63,25 @@ sk:
       accepted: "musíte súhlasiť"
 
   activerecord:
+    errors:
+      models:
+        issues/draft:
+          latlon_missing: "Nastavte čo najpresnejšiu polohu podnetu na mape."
+          invalid_content: "sú v nepodporovanom formáte. Odstráňte ich."
+          attributes:
+            photos:
+              blank: sú povinné. Nahrajte aspoň jednu.
+            zoom:
+              greater_than: musí byť určená presnejšie. Skúste mapu viac priblížiť.
+        user:
+          confirmation: "je nesprávny"
+          attributes:
+            phone_verification_number:
+              invalid: "je v nesprávnom formáte"
+            phone_verification_attempts:
+              less_than: "ste už prekročili"
+            phone_verification_code_attempts:
+              less_than: "ste už prekročili"
     attributes:
       issue:
         title: Názov
@@ -70,14 +89,24 @@ sk:
       issues/draft:
         title: Názov
         description: Popis
+        photos: Fotky
+        zoom: Poloha
       user:
         name: Meno
         firstname: Meno
         lastname: Priezvisko
         terms_of_service: S pravidlami používania
+        phone_verification_number: "Telefónne číslo"
+        phone_verification_code_confirmation: "Bezpečnostný kód"
+        phone_verification_attempts: "Povolený počet pokusov na overenie"
+        phone_verification_code_attempts: "Povolený počet pokusov na overenie"
       praise:
         title: Názov
         description: "Text pochvaly"
         municipality_id: "Mesto alebo obec"
       issues/user_comment:
         text: "Text komentára"
+
+  issues/drafts:
+    new_issue: "Nový podnet"
+    new_question: "Nová otázka"

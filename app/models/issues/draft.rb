@@ -17,6 +17,7 @@
 #  anonymous               :boolean
 #  checks                  :jsonb
 #  description             :string
+#  issue_type              :string           default("issue"), not null
 #  latitude                :float
 #  latlon_from_exif        :boolean          default(FALSE)
 #  longitude               :float
@@ -24,6 +25,7 @@
 #  submitted               :boolean          default(FALSE), not null
 #  suggestions             :jsonb
 #  title                   :string
+#  zoom                    :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  author_id               :bigint           not null
@@ -45,6 +47,9 @@ class Issues::Draft < ApplicationRecord
 
   validates_presence_of :photos, on: :photos_step
   validates_presence_of :title, :description, on: :details_step
+  validate :latlon_present, on: :geo_step
+  validates_numericality_of :zoom, greater_than: 14, allow_nil: true, on: :geo_step
+  validate :photos_allowed_content_type, on: :photos_step
 
   validate :municipality_supported, on: :checks_step
   validate :checks_passed, on: :checks_step
@@ -54,6 +59,7 @@ class Issues::Draft < ApplicationRecord
     municipality, municipality_district = Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb)
 
     issue = Issue.create!(
+      issue_type: issue_type,
       title: title,
       description: description,
       author: author,
@@ -78,6 +84,8 @@ class Issues::Draft < ApplicationRecord
       municipality_district: municipality_district,
     )
 
+    issue.author.subscribe_to(issue)
+
     # TODO delete draft after success
     self.update_attribute(:submitted, true)
 
@@ -93,10 +101,6 @@ class Issues::Draft < ApplicationRecord
     end
 
     SyncIssueToTriageJob.perform_later(issue)
-  end
-
-  def schedule_calculate_suggestions
-    ::Issues::Draft::GenerateSuggestionsJob.perform_later(self)
   end
 
   def needs_editing?
@@ -144,14 +148,28 @@ class Issues::Draft < ApplicationRecord
     save(context: :suggestions_step)
   end
 
+  def confirmable?
+    checks.all? { |check| check["action"] == "confirm" }
+  end
+
   private
+
+  def photos_allowed_content_type
+    errors.add(:photos, :invalid_content) if photos.any? { |file| !file.content_type.in?(UploadsController::ALLOWED_CONTENT_TYPES) }
+  end
+
+  def latlon_present
+    errors.add(:base, :latlon_missing) if latitude.blank? || longitude.blank?
+  end
 
   def checks_passed
     errors.add(:checks, :invalid) if checks.any?
   end
 
   def municipality_supported
-    errors.add(:base, :municipality_unsupported) unless Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb).first
+    active_municipality = Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb).first
+    errors.add(:base, :municipality_supported_on_old_portal) if active_municipality && active_municipality.active_on_old_portal?
+    errors.add(:base, :municipality_unsupported) unless active_municipality
   end
 
   def gps_to_float(gps)

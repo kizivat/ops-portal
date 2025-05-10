@@ -2,50 +2,56 @@
 #
 # Table name: users
 #
-#  id                             :bigint           not null, primary key
-#  about                          :string
-#  access_token                   :string
-#  active                         :boolean
-#  admin_name                     :string
-#  anonymous                      :boolean          default(FALSE)
-#  banned                         :boolean          default(FALSE)
-#  birth                          :date
-#  created_from_app               :boolean          default(FALSE)
-#  display_name                   :string
-#  email                          :citext           not null
+#  id                               :bigint           not null, primary key
+#  about                            :string
+#  access_token                     :string
+#  active                           :boolean
+#  admin_name                       :string
+#  anonymous                        :boolean          default(FALSE)
+#  banned                           :boolean          default(FALSE)
+#  birth                            :date
+#  created_from_app                 :boolean          default(FALSE)
+#  display_name                     :string
+#  email                            :citext           not null
 #  email_global_unsubscribe_token :string           not null
-#  email_notifiable               :boolean          default(TRUE)
-#  exp                            :integer
-#  fcm_token                      :string
-#  firstname                      :string
-#  gdpr_accepted                  :boolean
-#  gdpr_stats_accepted            :boolean          default(FALSE)
-#  lastname                       :string
-#  login                          :string
-#  newsletter_accepted            :boolean          default(FALSE), not null
-#  onboarded                      :boolean          default(FALSE)
-#  organization                   :boolean
-#  password_hash                  :string
-#  phone                          :string
-#  resident                       :boolean
-#  sex                            :integer
-#  signature                      :string
-#  status                         :integer          default("unverified"), not null
-#  timestamp                      :datetime
-#  uuid                           :uuid             not null
-#  verification                   :string
-#  verified                       :boolean          default(FALSE)
-#  created_at                     :datetime         not null
-#  updated_at                     :datetime         not null
-#  city_id                        :integer
-#  external_id                    :integer
-#  legacy_id                      :integer
-#  municipality_id                :bigint
-#  street_id                      :bigint
+#  email_notifiable                 :boolean          default(TRUE)
+#  exp                              :integer
+#  fcm_token                        :string
+#  firstname                        :string
+#  gdpr_accepted                    :boolean
+#  gdpr_stats_accepted              :boolean          default(FALSE)
+#  lastname                         :string
+#  login                            :string
+#  newsletter_accepted              :boolean          default(FALSE), not null
+#  onboarded                        :boolean          default(FALSE)
+#  organization                     :boolean
+#  password_hash                    :string
+#  phone                            :string
+#  phone_verification_attempted_at  :datetime
+#  phone_verification_attempts      :integer          default(0), not null
+#  phone_verification_code          :string
+#  phone_verification_code_attempts :integer          default(0), not null
+#  phone_verified                   :boolean          default(FALSE), not null
+#  resident                         :boolean
+#  sex                              :integer
+#  signature                        :string
+#  status                           :integer          default("unverified"), not null
+#  timestamp                        :datetime
+#  uuid                             :uuid             not null
+#  verification                     :string
+#  verified                         :boolean          default(FALSE)
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  city_id                          :integer
+#  external_id                      :integer
+#  legacy_id                        :integer
+#  municipality_id                  :bigint
+#  street_id                        :bigint
 #
 class User < ApplicationRecord
   include Rodauth::Rails.model
   # TODO: encrypt password field and access_token
+  attr_accessor :phone_verification_number
 
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
@@ -53,12 +59,13 @@ class User < ApplicationRecord
   has_many :issues_drafts, class_name: "Issues::Draft", foreign_key: :author_id
   has_many :issue_likes, foreign_key: :user_id
   has_many :issue_subscriptions, foreign_key: :subscriber_id
+  has_many :watched_issues, through: :issue_subscriptions, source: :issue
   has_many :issues_comments, class_name: "Issues::Comment", foreign_key: :user_author_id
   has_one_attached :avatar do |avatar|
     avatar.variant :tiny, resize_to_fill: [ 36, 36 ]
     avatar.variant :normal, resize_to_fill: [ 65, 65 ], preprocessed: true
     avatar.variant :medium, resize_to_fill: [ 80, 80 ], preprocessed: true
-    avatar.variant :big, resize_to_fill: [ 100, 100 ], preprocessed: true
+    avatar.variant :big, resize_to_fill: [ 160, 160 ], preprocessed: true
   end
 
   enum :sex, m: 1, f: 2
@@ -73,6 +80,11 @@ class User < ApplicationRecord
   validates_presence_of :name, unless: -> { legacy_id }
   validates_acceptance_of :terms_of_service, on: :onboarding
   validates :email_global_unsubscribe_token, uniqueness: true, allow_nil: false
+  validates_format_of :phone_verification_number, with: /\A\+\d{12}\z/, on: :phone_verification
+  validates_numericality_of :phone_verification_attempts, less_than: 5, on: :phone_verification, if: -> { recent_phone_verification? }
+  validates_numericality_of :phone_verification_code_attempts, less_than: 10, on: :phone_verification_code
+  validates_confirmation_of :phone_verification_code, on: :phone_verification_code
+  validates_presence_of :phone_verification_code_confirmation, on: :phone_verification_code
 
   def name
     [ firstname, lastname ].compact.join(" ")
@@ -103,8 +115,23 @@ class User < ApplicationRecord
     issue_subscriptions.where(issue: issue).exists?
   end
 
+  def subscribe_to(issue)
+    issue_subscriptions.create(issue: issue)
+  end
+
   def can_edit?(thing)
     thing.editable_by?(self)
+  end
+
+  def recent_phone_verification?
+    return true if phone_verification_attempted_at.nil?
+
+    phone_verification_attempted_at > 1.hour.ago
+  end
+
+  def regenerate_phone_verification_code!
+    code = 5.times.map { rand(9) }.join
+    update!(phone_verification_code: code)
   end
 
   private

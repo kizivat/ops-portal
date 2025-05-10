@@ -1,4 +1,4 @@
-<section class="report" data-controller="geo">
+<section class="report" data-controller="geo" data-geo-supported-class="geo--supported">
   <%= link_to edit_issues_draft_path(@draft), class: "button-back" do %>
     <span>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 20">
@@ -8,12 +8,20 @@
     <span>Späť</span>
   <% end %>
 
-  <h1>Lokalizácia podnetu</h1>
-
+  <h1>Lokalita</h1>
+  <% if @draft.errors.any? %>
+    <div class="error-summary">
+      <% @draft.errors.full_messages.each do |message| %>
+        <div class="error-message"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
   <% if @draft.latlon_from_exif? %>
     <div class="report-suggestion-description"><p>Na lokalizovanie miesta podnetu bola použitá geolokácia z fotografie.</p>
       <p>Ak nie je určenie polohy správne, použite vyhľadávanie a mapu nižšie.</p>
     </div>
+  <% else %>
+    <div class="report-suggestion-description prose">Vyberte na&nbsp;mape, napíšte ulicu a&nbsp;mesto<span class="none" data-geo-target="support"> alebo <%= link_to 'dovoľte zdieľanie aktuálnej GPS pozície', '#', data: { action: 'geo#localize' } %></span>.</div>
   <% end %>
   <!-- Mapa -->
   <div class="report-map-con">
@@ -40,6 +48,7 @@
   <%= form_with(model: @draft, url: issues_draft_geo_path(@draft, next: params[:next])) do |form| %>
     <%= form.hidden_field :latitude, data: { "geo-target": :latitude } %>
     <%= form.hidden_field :longitude, data: { "geo-target": :longitude } %>
+    <%= form.hidden_field :zoom, data: { "geo-target": :zoom } %>
     <% if params[:next] == 'summary' %>
       <%= form.submit "Uložiť", class: "button" %>
     <% else %>

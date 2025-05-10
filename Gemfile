@@ -81,6 +81,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  gem "webmock"
 end
 
 gem "good_job"
@@ -110,5 +111,6 @@ gem "kaminari"
 gem "discourse_api"
 
 gem "aws-sdk-s3"
+gem "aws-sdk-sns"
 
 gem "rollbar"

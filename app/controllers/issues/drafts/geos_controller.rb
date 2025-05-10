@@ -6,7 +6,7 @@ class Issues::Drafts::GeosController < ApplicationController
   end
 
   def update
-    if @draft.update(geo_params)
+    if @draft.update_with_context(geo_params, :geo_step)
       if params[:next] == "summary"
         Issues::Draft::FetchAddressDetailsJob.perform_now(@draft)
         redirect_to issues_draft_summary_path(@draft)
@@ -22,6 +22,6 @@ class Issues::Drafts::GeosController < ApplicationController
   private
 
   def geo_params
-    params.expect(issues_draft: [ :longitude, :latitude ])
+    params.expect(issues_draft: [ :longitude, :latitude, :zoom ])
   end
 end

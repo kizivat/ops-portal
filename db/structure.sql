@@ -849,7 +849,7 @@ CREATE TABLE public.issues_drafts (
     updated_at timestamp(6) without time zone NOT NULL,
     latitude double precision,
     longitude double precision,
-    suggestions jsonb DEFAULT '[]'::jsonb,
+    suggestions jsonb,
     picked_suggestion_index integer,
     checks jsonb,
     address_house_number character varying,
@@ -868,7 +868,9 @@ CREATE TABLE public.issues_drafts (
     address_data jsonb,
     address_district character varying,
     submitted boolean DEFAULT false NOT NULL,
-    address_suburb character varying
+    address_suburb character varying,
+    zoom integer,
+    issue_type character varying DEFAULT 'issue'::character varying NOT NULL
 );
 
 
@@ -1203,7 +1205,8 @@ CREATE TABLE public.municipalities (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     legacy_id integer,
-    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL
+    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    active_on_old_portal boolean DEFAULT false NOT NULL
 );
 
 
@@ -1730,6 +1733,11 @@ CREATE TABLE public.users (
     onboarded boolean DEFAULT false,
     newsletter_accepted boolean DEFAULT false NOT NULL,
     email_global_unsubscribe_token character varying NOT NULL,
+    phone_verified boolean DEFAULT false NOT NULL,
+    phone_verification_attempts integer DEFAULT 0 NOT NULL,
+    phone_verification_code character varying,
+    phone_verification_code_attempts integer DEFAULT 0 NOT NULL,
+    phone_verification_attempted_at timestamp(6) without time zone,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
 ]+\.[^,@; 
@@ -3778,6 +3786,11 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250510114223'),
 ('20250510114141'),
+('20250510115550'),
+('20250510095126'),
+('20250510002751'),
+('20250509230101'),
+('20250509170228'),
 ('20250509084443'),
 ('20250508170305'),
 ('20250508151724'),

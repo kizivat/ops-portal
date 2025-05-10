@@ -1,13 +1,19 @@
 class Issues::DraftsController < ApplicationController
   before_action :require_user
   before_action :ensure_user_onboarded
-  before_action :load_draft, except: [ :new, :create, :thanks ]
+  before_action :load_draft, except: [ :new, :new_question, :create, :thanks ]
 
   def new
-    @draft = Issues::Draft.new
+    @draft = Issues::Draft.new(issue_type: :issue)
+  end
+
+  def new_question
+    @draft = Issues::Draft.new(issue_type: :question)
+    render :new
   end
 
   def edit
+    @draft.valid?(:photos_step)
     render :new
   end
 
@@ -15,7 +21,7 @@ class Issues::DraftsController < ApplicationController
     @draft = Issues::Draft.new(draft_params)
     @draft.author = current_user
     if @draft.save(context: :photos_step)
-      @draft.schedule_calculate_suggestions # TODO move somehow to after_save
+      ::Issues::Draft::GenerateSuggestionsJob.perform_later(@draft)
       redirect_to issues_draft_geo_path(@draft)
     else
       render :new, status: :unprocessable_entity
@@ -32,7 +38,7 @@ class Issues::DraftsController < ApplicationController
   end
 
   def destroy_photo
-    @draft.photos.find(params[:photo_id]).purge
+    @draft.photos.find(params[:photo_id]).purge_later
     redirect_to edit_issues_draft_path(@draft, next: params[:next])
   end
 
@@ -42,7 +48,7 @@ class Issues::DraftsController < ApplicationController
   private
 
   def draft_params
-    params.expect(issues_draft: [ photos: [] ])
+    params.expect(issues_draft: [ :issue_type, { photos: [] } ])
   end
 
   def load_draft

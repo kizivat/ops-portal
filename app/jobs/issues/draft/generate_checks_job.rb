@@ -1,5 +1,6 @@
 class Issues::Draft::GenerateChecksJob < ApplicationJob
   queue_as :default
+  queue_with_priority ASAP
 
   def perform(draft)
     draft.checks = llm_generate_checks(draft)
@@ -24,7 +25,21 @@ class Issues::Draft::GenerateChecksJob < ApplicationJob
 
     Gemini.generate(
       system_prompt: Ai::Prompt.get("generatechecks"),
-      messages: [ prompt ]
+      messages: [ prompt ],
+      response_schema: {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "title": { "type": "STRING" },
+            "info": { "type": "STRING" },
+            "more_info": { "type": "STRING" },
+            "action": { "type": "STRING" },
+            "explanation": { "type": "STRING" }
+          },
+          required: [ "title", "info", "action" ]
+        }
+      }
     )
   end
 end

@@ -33,3 +33,15 @@ vrakuna_ba:
   updated_at: 2025-03-07 10:07:42.970865000 +0100
   legacy_id: 3
   aliases: [vrakuna, Vrakuňa]
+
+karlova_ves_ba:
+  name: Karlova Ves
+  municipality: bratislava
+  genitiv: Karlovej Vsi
+  lokal: Karlovej Vsi
+  description:
+  logo: public/signs/districts/ba-karlova-ves.gif
+  created_at: 2025-03-07 10:07:42.970865000 +0100
+  updated_at: 2025-03-07 10:07:42.970865000 +0100
+  legacy_id: 4
+  aliases: [karlova-ves, Karlova Ves]
