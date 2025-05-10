@@ -2,48 +2,55 @@
 #
 # Table name: users
 #
-#  id                  :bigint           not null, primary key
-#  about               :string
-#  access_token        :string
-#  active              :boolean
-#  admin_name          :string
-#  anonymous           :boolean          default(FALSE)
-#  banned              :boolean          default(FALSE)
-#  birth               :date
-#  created_from_app    :boolean          default(FALSE)
-#  display_name        :string
-#  email               :citext           not null
-#  email_notifiable    :boolean          default(TRUE)
-#  exp                 :integer
-#  fcm_token           :string
-#  firstname           :string
-#  gdpr_accepted       :boolean
-#  gdpr_stats_accepted :boolean          default(FALSE)
-#  lastname            :string
-#  login               :string
-#  onboarded           :boolean          default(FALSE)
-#  organization        :boolean
-#  password_hash       :string
-#  phone               :string
-#  resident            :boolean
-#  sex                 :integer
-#  signature           :string
-#  status              :integer          default("unverified"), not null
-#  timestamp           :datetime
-#  uuid                :uuid             not null
-#  verification        :string
-#  verified            :boolean          default(FALSE)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  city_id             :integer
-#  external_id         :integer
-#  legacy_id           :integer
-#  municipality_id     :bigint
-#  street_id           :bigint
+#  id                               :bigint           not null, primary key
+#  about                            :string
+#  access_token                     :string
+#  active                           :boolean
+#  admin_name                       :string
+#  anonymous                        :boolean          default(FALSE)
+#  banned                           :boolean          default(FALSE)
+#  birth                            :date
+#  created_from_app                 :boolean          default(FALSE)
+#  display_name                     :string
+#  email                            :citext           not null
+#  email_notifiable                 :boolean          default(TRUE)
+#  exp                              :integer
+#  fcm_token                        :string
+#  firstname                        :string
+#  gdpr_accepted                    :boolean
+#  gdpr_stats_accepted              :boolean          default(FALSE)
+#  lastname                         :string
+#  login                            :string
+#  newsletter_accepted              :boolean          default(FALSE), not null
+#  onboarded                        :boolean          default(FALSE)
+#  organization                     :boolean
+#  password_hash                    :string
+#  phone                            :string
+#  phone_verification_attempted_at  :datetime
+#  phone_verification_attempts      :integer          default(0), not null
+#  phone_verification_code          :string
+#  phone_verification_code_attempts :integer          default(0), not null
+#  phone_verified                   :boolean          default(FALSE), not null
+#  resident                         :boolean
+#  sex                              :integer
+#  signature                        :string
+#  status                           :integer          default("unverified"), not null
+#  timestamp                        :datetime
+#  uuid                             :uuid             not null
+#  verification                     :string
+#  verified                         :boolean          default(FALSE)
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  city_id                          :integer
+#  external_id                      :integer
+#  legacy_id                        :integer
+#  municipality_id                  :bigint
+#  street_id                        :bigint
 #
 class User < ApplicationRecord
   include Rodauth::Rails.model
   # TODO: encrypt password field and access_token
+  attr_accessor :phone_verification_number
 
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
@@ -69,6 +76,11 @@ class User < ApplicationRecord
   validates :external_id, uniqueness: true, allow_nil: true
   validates_presence_of :name, unless: -> { legacy_id }
   validates_acceptance_of :terms_of_service, on: :onboarding
+  validates_format_of :phone_verification_number, with: /\A\+\d{12}\z/, on: :phone_verification
+  validates_numericality_of :phone_verification_attempts, less_than: 5, on: :phone_verification, if: -> { recent_phone_verification? }
+  validates_numericality_of :phone_verification_code_attempts, less_than: 10, on: :phone_verification_code
+  validates_confirmation_of :phone_verification_code, on: :phone_verification_code
+  validates_presence_of :phone_verification_code_confirmation, on: :phone_verification_code
 
   def name
     [ firstname, lastname ].compact.join(" ")
@@ -101,5 +113,16 @@ class User < ApplicationRecord
 
   def can_edit?(thing)
     thing.editable_by?(self)
+  end
+
+  def recent_phone_verification?
+    return true if phone_verification_attempted_at.nil?
+
+    phone_verification_attempted_at > 1.hour.ago
+  end
+
+  def regenerate_phone_verification_code!
+    code = 5.times.map { rand(9) }.join
+    update!(phone_verification_code: code)
   end
 end

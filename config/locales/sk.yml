@@ -67,7 +67,15 @@ sk:
       models:
         issues/draft:
           latlon_missing: "Nastavte čo najpresnejšiu polohu podnetu na mape."
-
+        user:
+          confirmation: "je nesprávny"
+          attributes:
+            phone_verification_number:
+              invalid: "je v nesprávnom formáte"
+            phone_verification_attempts:
+              less_than: "ste už prekročili"
+            phone_verification_code_attempts:
+              less_than: "ste už prekročili"
     attributes:
       issue:
         title: Názov
@@ -80,6 +88,10 @@ sk:
         firstname: Meno
         lastname: Priezvisko
         terms_of_service: S pravidlami používania
+        phone_verification_number: "Telefónne číslo"
+        phone_verification_code_confirmation: "Bezpečnostný kód"
+        phone_verification_attempts: "Povolený počet pokusov na overenie"
+        phone_verification_code_attempts: "Povolený počet pokusov na overenie"
       praise:
         title: Názov
         description: "Text pochvaly"
