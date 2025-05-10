@@ -4,20 +4,19 @@ module Notifications
       return unless state_id_change.present?
 
       issue.subscriptions.each do |subscription|
-        user = subscription.subscriber
-        next unless user.email_notifiable?
+        next unless subscription.subscriber.email_notifiable?
 
         case issue.state.key
         when "rejected"
-          notification_mailer.issue_rejected(user, issue).deliver_later
+          notification_mailer.issue_rejected(subscription, issue).deliver_later
         when "resolved"
-          notification_mailer.issue_resolved(user, issue).deliver_later
+          notification_mailer.issue_resolved(subscription, issue).deliver_later
         when "unresolved"
-          notification_mailer.issue_unresolved(user, issue).deliver_later
+          notification_mailer.issue_unresolved(subscription, issue).deliver_later
         when "referred"
-          notification_mailer.issue_referred(user, issue).deliver_later
+          notification_mailer.issue_referred(subscription, issue).deliver_later
         when "closed"
-          notification_mailer.issue_closed(user, issue).deliver_later
+          notification_mailer.issue_closed(subscription, issue).deliver_later
         end
       end
     end

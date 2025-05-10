@@ -10,11 +10,11 @@ module Notifications
 
         case comment
         when Issues::UserComment
-          notification_mailer.new_issue_user_comment(user, comment).deliver_later
+          notification_mailer.new_issue_user_comment(subscription, comment).deliver_later
         when Issues::ResponsibleSubjectComment
-          notification_mailer.new_issue_responsible_subject_comment(user, comment).deliver_later
+          notification_mailer.new_issue_responsible_subject_comment(subscription, comment).deliver_later
         when Issues::AgentComment, Issues::AgentPrivateComment
-          notification_mailer.new_issue_agent_comment(user, comment).deliver_later
+          notification_mailer.new_issue_agent_comment(subscription, comment).deliver_later
         end
       end
     end

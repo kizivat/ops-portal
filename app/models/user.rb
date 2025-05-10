@@ -2,45 +2,46 @@
 #
 # Table name: users
 #
-#  id                  :bigint           not null, primary key
-#  about               :string
-#  access_token        :string
-#  active              :boolean
-#  admin_name          :string
-#  anonymous           :boolean          default(FALSE)
-#  banned              :boolean          default(FALSE)
-#  birth               :date
-#  created_from_app    :boolean          default(FALSE)
-#  display_name        :string
-#  email               :citext           not null
-#  email_notifiable    :boolean          default(TRUE)
-#  exp                 :integer
-#  fcm_token           :string
-#  firstname           :string
-#  gdpr_accepted       :boolean
-#  gdpr_stats_accepted :boolean          default(FALSE)
-#  lastname            :string
-#  login               :string
-#  newsletter_accepted :boolean          default(FALSE), not null
-#  onboarded           :boolean          default(FALSE)
-#  organization        :boolean
-#  password_hash       :string
-#  phone               :string
-#  resident            :boolean
-#  sex                 :integer
-#  signature           :string
-#  status              :integer          default("unverified"), not null
-#  timestamp           :datetime
-#  uuid                :uuid             not null
-#  verification        :string
-#  verified            :boolean          default(FALSE)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  city_id             :integer
-#  external_id         :integer
-#  legacy_id           :integer
-#  municipality_id     :bigint
-#  street_id           :bigint
+#  id                             :bigint           not null, primary key
+#  about                          :string
+#  access_token                   :string
+#  active                         :boolean
+#  admin_name                     :string
+#  anonymous                      :boolean          default(FALSE)
+#  banned                         :boolean          default(FALSE)
+#  birth                          :date
+#  created_from_app               :boolean          default(FALSE)
+#  display_name                   :string
+#  email                          :citext           not null
+#  email_global_unsubscribe_token :string           not null
+#  email_notifiable               :boolean          default(TRUE)
+#  exp                            :integer
+#  fcm_token                      :string
+#  firstname                      :string
+#  gdpr_accepted                  :boolean
+#  gdpr_stats_accepted            :boolean          default(FALSE)
+#  lastname                       :string
+#  login                          :string
+#  newsletter_accepted            :boolean          default(FALSE), not null
+#  onboarded                      :boolean          default(FALSE)
+#  organization                   :boolean
+#  password_hash                  :string
+#  phone                          :string
+#  resident                       :boolean
+#  sex                            :integer
+#  signature                      :string
+#  status                         :integer          default("unverified"), not null
+#  timestamp                      :datetime
+#  uuid                           :uuid             not null
+#  verification                   :string
+#  verified                       :boolean          default(FALSE)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  city_id                        :integer
+#  external_id                    :integer
+#  legacy_id                      :integer
+#  municipality_id                :bigint
+#  street_id                      :bigint
 #
 class User < ApplicationRecord
   include Rodauth::Rails.model
@@ -63,6 +64,7 @@ class User < ApplicationRecord
   enum :sex, m: 1, f: 2
   enum :status, { unverified: 1, verified: 2, closed: 3 }
 
+  before_create :set_email_global_unsubscribe_token
   before_save do
     self.display_name = self.anonymous? ? "Anonym ##{self.id}" : [ self.firstname, self.lastname ].compact.join(" ")
   end
@@ -70,6 +72,7 @@ class User < ApplicationRecord
   validates :external_id, uniqueness: true, allow_nil: true
   validates_presence_of :name, unless: -> { legacy_id }
   validates_acceptance_of :terms_of_service, on: :onboarding
+  validates :email_global_unsubscribe_token, uniqueness: true, allow_nil: false
 
   def name
     [ firstname, lastname ].compact.join(" ")
@@ -102,5 +105,14 @@ class User < ApplicationRecord
 
   def can_edit?(thing)
     thing.editable_by?(self)
+  end
+
+  private
+
+  def set_email_global_unsubscribe_token
+    loop do
+      self.email_global_unsubscribe_token = SecureRandom.urlsafe_base64(32)
+      break unless User.exists?(email_global_unsubscribe_token: email_global_unsubscribe_token)
+    end
   end
 end

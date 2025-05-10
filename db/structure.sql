@@ -613,7 +613,8 @@ CREATE TABLE public.issue_subscriptions (
     issue_id bigint NOT NULL,
     subscriber_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    email_unsubscribe_token character varying NOT NULL
 );
 
 
@@ -1728,6 +1729,7 @@ CREATE TABLE public.users (
     gdpr_stats_accepted boolean DEFAULT false,
     onboarded boolean DEFAULT false,
     newsletter_accepted boolean DEFAULT false NOT NULL,
+    email_global_unsubscribe_token character varying NOT NULL,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
 ]+\.[^,@; 
@@ -2691,6 +2693,13 @@ CREATE INDEX index_issue_likes_on_user_id ON public.issue_likes USING btree (use
 
 
 --
+-- Name: index_issue_subscriptions_on_email_unsubscribe_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_issue_subscriptions_on_email_unsubscribe_token ON public.issue_subscriptions USING btree (email_unsubscribe_token);
+
+
+--
 -- Name: index_issue_subscriptions_on_issue_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3220,6 +3229,13 @@ CREATE INDEX index_user_identities_on_user_id ON public.user_identities USING bt
 --
 
 CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email) WHERE (status = ANY (ARRAY[1, 2]));
+
+
+--
+-- Name: index_users_on_email_global_unsubscribe_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_email_global_unsubscribe_token ON public.users USING btree (email_global_unsubscribe_token);
 
 
 --
@@ -3760,6 +3776,8 @@ ALTER TABLE ONLY public.cms_categories
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250510114223'),
+('20250510114141'),
 ('20250509084443'),
 ('20250508170305'),
 ('20250508151724'),

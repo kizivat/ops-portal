@@ -1,81 +1,90 @@
 class NotificationMailer < ApplicationMailer
   layout "notification_mailer"
 
-  def new_issue_user_comment(subscriber, comment)
+  def new_issue_user_comment(subscription, comment)
     @issue = comment.issue
     @comment = comment
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Nový komentár"
+    mail to: @user.email, subject: "Odkaz pre starostu | Nový komentár", headers: list_unsubscribe_header
   end
 
-  def new_issue_responsible_subject_comment(subscriber, issue)
+  def new_issue_responsible_subject_comment(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Nová odpoveď"
+    mail to: @user.email, subject: "Odkaz pre starostu | Nová odpoveď", headers: list_unsubscribe_header
   end
 
-  def new_issue_agent_comment(subscriber, comment)
+  def new_issue_agent_comment(subscription, comment)
     @issue = comment.issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Nová odpoveď agent" # TODO: check if this should exist
+    mail to: @user.email, subject: "Odkaz pre starostu | Nová odpoveď agent", headers: list_unsubscribe_header
   end
 
-  def new_issue_update(subscriber, issue)
+  def new_issue_update(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Nová aktualizácia"
+    mail to: @user.email, subject: "Odkaz pre starostu | Nová aktualizácia", headers: list_unsubscribe_header
   end
 
-  def new_issue_verification(subscriber, issue)
+  def new_issue_verification(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Overenie podnetu"
+    mail to: @user.email, subject: "Odkaz pre starostu | Overenie podnetu", headers: list_unsubscribe_header
   end
 
-  def issue_accepted(subscriber, issue)
+  def issue_accepted(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Váš podnet bol zverejnený"
+    mail to: @user.email, subject: "Odkaz pre starostu | Váš podnet bol zverejnený", headers: list_unsubscribe_header
   end
 
-  def issue_unresolved(subscriber, issue)
+  def issue_unresolved(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Podnet bol označený ako Neriešený"
+    mail to: @user.email, subject: "Odkaz pre starostu | Podnet bol označený ako Neriešený", headers: list_unsubscribe_header
   end
 
-  def issue_resolved(subscriber, issue)
+  def issue_resolved(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Podnet bol vyriešený"
+    mail to: @user.email, subject: "Odkaz pre starostu | Podnet bol vyriešený", headers: list_unsubscribe_header
   end
 
-  def issue_referred(subscriber, issue)
+  def issue_referred(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Podnet bol odstúpený"
+    mail to: @user.email, subject: "Odkaz pre starostu | Podnet bol odstúpený", headers: list_unsubscribe_header
   end
 
-  def issue_closed(subscriber, issue)
+  def issue_closed(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Podnet bol uzavretý"
+    mail to: @user.email, subject: "Odkaz pre starostu | Podnet bol uzavretý", headers: list_unsubscribe_header
   end
 
-  def issue_rejected(subscriber, issue)
+  def issue_rejected(subscription, issue)
     @issue = issue
-    @subscriber = subscriber
+    @user = subscription.subscriber
 
-    mail to: @subscriber.email, subject: "Odkaz pre starostu | Podnet bol zamietnutý" # TODO: check if this should exist
+    mail to: @user.email, subject: "Odkaz pre starostu | Podnet bol zamietnutý", headers: list_unsubscribe_header
+  end
+
+  private
+
+  def list_unsubscribe_header
+    {
+      "List-Unsubscribe" => "<#{unsubscribe_global_url(token: @user.email_global_unsubscribe_token)}>",
+      "List-Unsubscribe-Post" => "<List-Unsubscribe=One-Click>"
+    }
   end
 end
