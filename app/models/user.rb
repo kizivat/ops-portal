@@ -13,7 +13,7 @@
 #  created_from_app                 :boolean          default(FALSE)
 #  display_name                     :string
 #  email                            :citext           not null
-#  email_global_unsubscribe_token :string           not null
+#  email_global_unsubscribe_token   :string           not null
 #  email_notifiable                 :boolean          default(TRUE)
 #  exp                              :integer
 #  fcm_token                        :string
