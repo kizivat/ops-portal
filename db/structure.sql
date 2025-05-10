@@ -1204,7 +1204,8 @@ CREATE TABLE public.municipalities (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     legacy_id integer,
-    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL
+    aliases character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    active_on_old_portal boolean DEFAULT false NOT NULL
 );
 
 
@@ -3767,6 +3768,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250510095126'),
 ('20250510002751'),
 ('20250509230101'),
 ('20250509170228'),
