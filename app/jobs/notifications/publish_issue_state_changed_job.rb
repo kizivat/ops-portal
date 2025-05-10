@@ -8,7 +8,7 @@ module Notifications
 
         case issue.state.key
         when "rejected"
-          notification_mailer.issue_rejected(subscription, issue).deliver_later
+          notification_mailer.issue_rejected(subscription, issue).deliver_later if issue.author == subscription.subscriber
         when "resolved"
           notification_mailer.issue_resolved(subscription, issue).deliver_later
         when "unresolved"

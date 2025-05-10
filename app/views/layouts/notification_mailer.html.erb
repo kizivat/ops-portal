@@ -132,27 +132,17 @@
         <tbody>
           <tr>
             <td class="ops-email-images-top-con">
-              <p class="ops-email-paragraph-top">
-                <img alt="" class="ops-email-images-top" src="./ops-logo.png">
-              </p>
+              <%= render "header" %>
             </td>
           </tr>
           <tr>
-            <%= yield %>
+            <td class="ops-email-general-con">
+              <%= yield %>
+            </td>
           </tr>
           <tr>
             <td class="ops-email-footer-con">
-              <p class="ops-email-footer-paragraph">
-                Odkaz pre starostu je projektom neziskovej mimovládnej organizácie <a href="https://www.governance.sk/" target="_blank" class="ops-email-footer-link">Inštitút pre dobre spravovanú spoločnosť</a>, ktorého cieľom je zlepšiť kvalitu miestnych samospráv a&#160;posilniť vzájomnú komunikáciu medzi občanmi a&#160;úradmi.
-              </p>
-              <p class="ops-email-paragraph-bottom">
-                <img alt="" class="ops-email-images-bottom" src="./ops-logo-sive.png">
-              </p>
-              <p class="ops-email-footer-paragraph">
-                <a href="https://www.facebook.com/odkazprestarostu" target="_blank" class="ops-email-footer-social-link">Facebook</a>
-                <a href="https://www.instagram.com/odkazprestarostu.sk" target="_blank" class="ops-email-footer-social-link">Instagram</a>
-                <a href="" target="_blank" class="ops-email-footer-social-link">Podporte nás</a>
-              </p>
+              <%= render "footer" %>
             </td>
           </tr>
         </tbody>
