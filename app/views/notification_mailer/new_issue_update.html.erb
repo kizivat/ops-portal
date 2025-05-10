@@ -6,9 +6,9 @@
   Pre detail aktualizácie, prosím, kliknite nižšie.
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Detail aktualizácie" %>
+  <%= render "button", url: "#{issue_url(@issue)}#komentar_#{@comment.id}", label: "Detail aktualizácie" %>
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Reagovať na aktualizáciu" %>
+  <%= render "button", url: "#{issue_url(@issue)}#new_issue_activity", label: "Reagovať na aktualizáciu" %>
 </p>
 <%= render "unsubscribe" %>

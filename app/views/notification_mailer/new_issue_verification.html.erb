@@ -7,6 +7,6 @@
   <b><%= "Niekto" %></b> overil riešenie tohto podnetu.
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Reagovať na overenie podnetu" %>
+  <%= render "button", url: "#{issue_url(@issue)}#new_issue_activity", label: "Reagovať na overenie podnetu" %>
 </p>
 <%= render "unsubscribe" %>

@@ -6,9 +6,9 @@
   Pre detail novej odpovede, prosím, kliknite nižšie.
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Detail odpovede" %>
+  <%= render "button", url: "#{issue_url(@issue)}#komentar_#{@comment.id}", label: "Detail odpovede" %>
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Reagovať na odpoveď" %>
+  <%= render "button", url: "#{issue_url(@issue)}#new_issue_activity", label: "Reagovať na odpoveď" %>
 </p>
 <%= render "unsubscribe" %>

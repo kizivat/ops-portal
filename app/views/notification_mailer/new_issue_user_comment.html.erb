@@ -9,6 +9,6 @@
   <%= simple_format(@comment.text) %>
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: issue_url(@issue), label: "Reagovať na komentár" %>
+  <%= render "button", url: "#{issue_url(@issue)}#new_issue_activity", label: "Reagovať na komentár" %>
 </p>
 <%= render "unsubscribe" %>
