@@ -5,12 +5,12 @@ module IssuesHelper
     [ street, draft.address_municipality, draft.address_city ].compact.join(", ")
   end
 
-  def format_issue_address(draft)
-    parts = [ draft.address_street, draft.address_municipality, draft.address_city ].map(&:presence).compact
+  def format_issue_address(issue)
+    parts = [ issue.address_street, issue.address_municipality, issue.address_city ].map(&:presence).compact
     return parts.join(", ") if parts.any?
 
     # fallback for praises and legacy tickets
-    [draft.municipality_district&.name, draft.municipality.name].compact.join(", ")
+    [ issue.municipality_district&.name, issue.municipality.name ].compact.join(", ")
   end
 
   def search_issues_path(params = {})
