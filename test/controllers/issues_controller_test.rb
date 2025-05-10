@@ -2,7 +2,7 @@ require "test_helper"
 
 class IssuesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @issue = issues(:one)
+    @issue = issues(:two)
   end
 
   test "should get search index" do
