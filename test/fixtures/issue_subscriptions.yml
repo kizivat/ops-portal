@@ -3,11 +3,14 @@
 one:
   issue: one
   subscriber: one
+  email_unsubscribe_token: one<%= SecureRandom.urlsafe_base64(32) %>
 
 two:
   issue: two
   subscriber: two
+  email_unsubscribe_token: two<%= SecureRandom.urlsafe_base64(32) %>
 
 one_legacy1:
   issue: legacy1
   subscriber: one
+  email_unsubscribe_token: one_legacy1<%= SecureRandom.urlsafe_base64(32) %>
