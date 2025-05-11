@@ -137,9 +137,6 @@ class User < ApplicationRecord
   private
 
   def set_email_global_unsubscribe_token
-    loop do
-      self.email_global_unsubscribe_token = SecureRandom.urlsafe_base64(32)
-      break unless User.exists?(email_global_unsubscribe_token: email_global_unsubscribe_token)
-    end
+    self.email_global_unsubscribe_token = "#{id}" + SecureRandom.urlsafe_base64(32)
   end
 end

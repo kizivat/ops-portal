@@ -19,9 +19,6 @@ class IssueSubscription < ApplicationRecord
   private
 
   def set_email_unsubscribe_token
-    loop do
-      self.email_unsubscribe_token = SecureRandom.hex(32)
-      break unless IssueSubscription.exists?(email_unsubscribe_token: email_unsubscribe_token)
-    end
+    self.email_unsubscribe_token = "#{id}" + SecureRandom.hex(32)
   end
 end
