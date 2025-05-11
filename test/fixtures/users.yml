@@ -7,6 +7,7 @@ one:
   password_hash: <%= RodauthApp.rodauth.allocate.password_hash("password") %>
   status: verified
   onboarded: true
+  email_global_unsubscribe_token: one<%= SecureRandom.urlsafe_base64(32) %>
   phone_verified: true
   
 two:
@@ -15,6 +16,7 @@ two:
   lastname: Queen
   password_hash: <%= RodauthApp.rodauth.allocate.password_hash("password") %>
   status: verified
+  email_global_unsubscribe_token: two<%= SecureRandom.urlsafe_base64(32) %>
 
 non_full_access:
   email: jozef@test.com
@@ -24,3 +26,4 @@ non_full_access:
   password_hash: <%= RodauthApp.rodauth.allocate.password_hash("password") %>
   status: verified
   onboarded: true
+  email_global_unsubscribe_token: non_full_access<%= SecureRandom.urlsafe_base64(32) %>

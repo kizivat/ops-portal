@@ -53,4 +53,10 @@ class Issues::Comment < ApplicationRecord
     return author.display_name if author
     author_name
   end
+
+  private
+
+  def notify_subscribers
+    Notifications::PublishNewIssueCommentJob.perform_later(self)
+  end
 end

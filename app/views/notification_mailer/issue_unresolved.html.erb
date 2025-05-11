@@ -1,0 +1,22 @@
+<%= ops_title "Podnet bol označený ako neriešený" %>
+<% if @issue.author == @user %>
+  <p class="ops-email-paragraph">
+    S ľútosťou Vám oznamujeme, že samospráva do 15 dní nijako nezareagovala na Váš podnet <%= ops_issue_link @issue %>, ktorý ste pridali <b><%= @issue.created_at.strftime("%d.%m.%Y") %></b> na portál Odkaz pre starostu. Z tohto dôvodu podnet označujeme ako neriešený.
+  </p>
+  <p class="ops-email-paragraph">
+    Nejde však o trvalý stav a v prípade, ak samospráva zareaguje, budeme Vás informovať.
+    Veríme, že Vás doterajší neúspech neodradí od pridania ďalších podnetov a ďakujeme za Váš záujem a spoluprácu, bez ktorej by riešenie podnetov prostredníctvom nášho portálu nebolo možné.
+  </p>
+<% else %>
+  <p class="ops-email-paragraph">
+    S ľútosťou Vám oznamujeme, že samospráva do 15 dní nijako nezareagovala na podnet <%= ops_issue_link @issue %>. Z tohto dôvodu podnet označujeme ako neriešený.
+  </p>
+  <p class="ops-email-paragraph">
+    Nejde však o trvalý stav a v prípade, ak samospráva zareaguje, budeme Vás informovať.
+  </p>
+<% end %>
+<p class="ops-email-paragraph">
+  <%= ops_button "Reagovať na nový status", "#{issue_url(@issue)}#new_issue_activity" %>
+</p>
+<%= render "signature" %>
+<%= render "unsubscribe" %>

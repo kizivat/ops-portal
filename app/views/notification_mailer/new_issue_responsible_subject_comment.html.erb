@@ -1,0 +1,14 @@
+<%= ops_title "Nová odpoveď" %>
+<p class="ops-email-paragraph">
+  K podnetu <%= ops_issue_link @issue %> pribudla nová odpoveď od samosprávy.
+</p>
+<p class="ops-email-paragraph">
+  Pre detail novej odpovede, prosím, kliknite nižšie.
+</p>
+<p class="ops-email-paragraph">
+  <%= ops_button "Detail odpovede", "#{issue_url(@issue)}#komentar_#{@comment.id}" %>
+</p>
+<p class="ops-email-paragraph">
+  <%= ops_button "Reagovať na odpoveď", "#{issue_url(@issue)}#new_issue_activity" %>
+</p>
+<%= render "unsubscribe" %>
