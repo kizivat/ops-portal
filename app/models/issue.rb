@@ -82,7 +82,7 @@ class Issue < ApplicationRecord
   end
 
   before_save :recalculate_computed_fields
-  after_update :notify_subscribers, if: -> { issue_type == "issue" }
+  after_update :notify_subscribers, if: -> { issue_type.in? [ "issue", "question" ] }
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object).compact
