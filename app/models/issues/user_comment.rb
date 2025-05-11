@@ -28,6 +28,8 @@ class Issues::UserComment < Issues::Comment
   validates :text, presence: true, if: -> { attachments.empty? }
   validate :edited_within_editing_window, on: :edit
 
+  after_update :notify_subscribers, unless: -> { legacy_id }, if: :saved_change_to_triage_external_id?
+
   def author
     user_author
   end
@@ -48,7 +50,7 @@ class Issues::UserComment < Issues::Comment
   end
 
   def editing_window_end
-    created_at + 5.minutes # TODO
+    created_at + ENV.fetch("COMMENT_EDITING_WINDOW_SECONDS", 300).to_i # TODO
   end
 
   def within_editing_window?

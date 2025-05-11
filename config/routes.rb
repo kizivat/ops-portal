@@ -66,6 +66,19 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :global_subscriptions, only: [] do
+    collection do
+      get "unsubscribe/:token", action: :unsubscribe, as: :unsubscribe
+      post "unsubscribe/:token", action: :unsubscribe_post
+    end
+  end
+
+  resources :subscriptions, only: [] do
+    collection do
+      get "unsubscribe/:token", action: :unsubscribe, as: :unsubscribe
+    end
+  end
+
   resources :uploads do
     patch :rotate, on: :member
   end

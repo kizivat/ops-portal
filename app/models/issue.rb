@@ -63,6 +63,7 @@ class Issue < ApplicationRecord
   has_many :update_activities, class_name: "Issues::UpdateActivity", dependent: :destroy
   has_many :comments, class_name: "Issues::Comment", through: :comment_activities, source: :activity_object, dependent: :destroy
   has_many :likes, class_name: "IssueLike", dependent: :destroy
+  has_many :subscriptions, class_name: "IssueSubscription", dependent: :destroy
 
   has_many_attached :photos do |photo|
     photo.variant :full, resize_to_limit: [ 1280, 960 ], preprocessed: true
@@ -82,6 +83,7 @@ class Issue < ApplicationRecord
   end
 
   before_save :recalculate_computed_fields
+  after_update :notify_subscribers, if: -> { issue_type.in? [ "issue", "question" ] }
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object).compact
@@ -164,5 +166,13 @@ class Issue < ApplicationRecord
   def reset_counters
     recalculate_computed_fields
     save
+  end
+
+  def notify_subscribers
+    if saved_change_to_resolution_external_id?
+      Notifications::PublishIssueAcceptedJob.perform_later(self)
+    elsif saved_change_to_state_id?
+      Notifications::PublishIssueStateChangedJob.perform_later(self, state_id_change: saved_change_to_state_id)
+    end
   end
 end

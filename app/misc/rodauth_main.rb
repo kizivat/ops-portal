@@ -156,6 +156,15 @@ class RodauthMain < Rodauth::Rails::Auth
     before_create_account {
       custom_params = build_custom_params
 
+      candidate = nil
+      loop do
+        candidate = SecureRandom.urlsafe_base64(32)
+        unless User.exists?(email_global_unsubscribe_token: candidate)
+          break
+        end
+      end
+      account[:email_global_unsubscribe_token] = candidate
+
       if validate_custom_params(custom_params)
         populate_account(custom_params)
       else

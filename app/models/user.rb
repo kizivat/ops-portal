@@ -13,6 +13,7 @@
 #  created_from_app                 :boolean          default(FALSE)
 #  display_name                     :string
 #  email                            :citext           not null
+#  email_global_unsubscribe_token   :string           not null
 #  email_notifiable                 :boolean          default(TRUE)
 #  exp                              :integer
 #  fcm_token                        :string
@@ -70,6 +71,7 @@ class User < ApplicationRecord
   enum :sex, m: 1, f: 2
   enum :status, { unverified: 1, verified: 2, closed: 3 }
 
+  before_create :set_email_global_unsubscribe_token
   before_save do
     self.display_name = self.anonymous? ? "Anonym ##{self.id}" : [ self.firstname, self.lastname ].compact.join(" ")
   end
@@ -77,6 +79,7 @@ class User < ApplicationRecord
   validates :external_id, uniqueness: true, allow_nil: true
   validates_presence_of :name, unless: -> { legacy_id }
   validates_acceptance_of :terms_of_service, on: :onboarding
+  validates :email_global_unsubscribe_token, uniqueness: true, allow_nil: false
   validates_format_of :phone_verification_number, with: /\A\+\d{12}\z/, on: :phone_verification
   validates_numericality_of :phone_verification_attempts, less_than: 5, on: :phone_verification, if: -> { recent_phone_verification? }
   validates_numericality_of :phone_verification_code_attempts, less_than: 10, on: :phone_verification_code
@@ -133,5 +136,14 @@ class User < ApplicationRecord
   def regenerate_phone_verification_code!
     code = 5.times.map { rand(9) }.join
     update!(phone_verification_code: code)
+  end
+
+  private
+
+  def set_email_global_unsubscribe_token
+    loop do
+      self.email_global_unsubscribe_token = SecureRandom.urlsafe_base64(32)
+      break unless User.exists?(email_global_unsubscribe_token: self.email_global_unsubscribe_token)
+    end
   end
 end
