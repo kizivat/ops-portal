@@ -3769,6 +3769,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250511124010'),
 ('20250510115550'),
 ('20250510095126'),
 ('20250510002751'),
