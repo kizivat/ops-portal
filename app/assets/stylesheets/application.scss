@@ -2433,7 +2433,7 @@ section.podnet .podnet-discussion .add-comment-form figure {
   width: 140px;
 }
 // Close button
-.pictures-wrapper figure .close-button {
+figure .close-button {
   box-sizing: border-box;
   cursor: pointer;
   fill: $white;
@@ -2446,7 +2446,8 @@ section.podnet .podnet-discussion .add-comment-form figure {
   z-index: 2;
   @include transition(all);
 }
-.pictures-wrapper figure .close-button:hover {
+figure .close-button:hover,
+figure .rotate-button:hover {
   opacity: 1;
 }
 // Rotate button
