@@ -8,7 +8,7 @@
 
     <figure>
       <picture>
-        <%= image_tag "pochvala-medaila.png", alt: "" %>
+        <%= praise_image_tag(issue) %>
       </picture>
     </figure>
 
@@ -21,7 +21,7 @@
     <div class="info-block">
       <div class="info-block-item">
         <div class="info-block-description">Dátum</div>
-        <div class="info-block-value"><%= l issue.created_at.to_date, format: :long %></div>
+        <div class="info-block-value"><%= l issue.created_at.to_date %></div>
       </div>
       <div class="info-block-item">
         <div class="info-block-description">Obec</div>
