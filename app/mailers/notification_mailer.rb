@@ -4,53 +4,53 @@ class NotificationMailer < ApplicationMailer
   before_action { @subscription = params[:subscription] }
   before_action { @user = @subscription.subscriber }
   before_action { @issue = @subscription.issue }
-  default to: -> { @user.email }, headers: -> { list_unsubscribe_header }
+  default to: -> { @user.email }, headers: -> { list_unsubscribe_header }, subject: -> { ops_subject }
 
   def new_issue_user_comment(comment)
     @comment = comment
-    mail subject: "Odkaz pre starostu | Nový komentár"
+    mail
   end
 
   def new_issue_responsible_subject_comment(comment)
     @comment = comment
-    mail subject: "Odkaz pre starostu | Nová odpoveď"
+    mail
   end
 
   def new_issue_update
     # TODO: remove this when issue update is implemented and view is ready
     raise NotImplementedError
-    mail subject: "Odkaz pre starostu | Nová aktualizácia"
+    mail
   end
 
   def new_issue_verification
     # TODO: remove this when issue verification is implemented and view is ready
     raise NotImplementedError
 
-    mail subject: "Odkaz pre starostu | Overenie podnetu"
+    mail
   end
 
   def issue_accepted
-    mail subject: "Odkaz pre starostu | Váš podnet bol zverejnený"
+    mail
   end
 
   def issue_unresolved
-    mail subject: "Odkaz pre starostu | Podnet bol označený ako Neriešený"
+    mail
   end
 
   def issue_resolved
-    mail subject: "Odkaz pre starostu | Podnet bol vyriešený"
+    mail
   end
 
   def issue_referred
-    mail subject: "Odkaz pre starostu | Podnet bol odstúpený"
+    mail
   end
 
   def issue_closed
-    mail subject: "Odkaz pre starostu | Podnet bol uzavretý"
+    mail
   end
 
   def issue_rejected
-    mail subject: "Odkaz pre starostu | Podnet bol zamietnutý"
+    mail
   end
 
   private
@@ -60,5 +60,16 @@ class NotificationMailer < ApplicationMailer
       "List-Unsubscribe" => "<#{unsubscribe_global_subscriptions_url(token: @user.email_global_unsubscribe_token)}>",
       "List-Unsubscribe-Post" => "<List-Unsubscribe=One-Click>"
     }
+  end
+
+  def ops_subject
+    case @issue.issue_type
+    when "issue"
+      "Odkaz pre starostu | Podnet číslo #{@issue.id}"
+    when "question"
+      "Odkaz pre starostu | Otázka číslo #{@issue.id}"
+    else
+      raise NotImplementedError
+    end
   end
 end
