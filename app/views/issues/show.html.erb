@@ -1,6 +1,3 @@
 <% content_for :title, @issue.title %>
-<% if ["issue", "question"].include?(@issue.issue_type) %>
-  <%= render partial: "issues/show_issue_type_issue", locals: { issue: @issue, activity_objects: @activity_objects } %>
-<% else %>
-  <%= render partial: "issues/show_issue_type_praise", locals: { issue: @issue } %>
-<% end %>
+
+<%= render partial: "issues/show_issue_type_#{@issue.issue_type}", locals: { issue: @issue, activity_objects: @activity_objects } %>
