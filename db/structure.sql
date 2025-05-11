@@ -1732,12 +1732,12 @@ CREATE TABLE public.users (
     gdpr_stats_accepted boolean DEFAULT false,
     onboarded boolean DEFAULT false,
     newsletter_accepted boolean DEFAULT false NOT NULL,
-    email_global_unsubscribe_token character varying NOT NULL,
     phone_verified boolean DEFAULT false NOT NULL,
     phone_verification_attempts integer DEFAULT 0 NOT NULL,
     phone_verification_code character varying,
     phone_verification_code_attempts integer DEFAULT 0 NOT NULL,
     phone_verification_attempted_at timestamp(6) without time zone,
+    email_global_unsubscribe_token character varying NOT NULL,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
 ]+\.[^,@; 
