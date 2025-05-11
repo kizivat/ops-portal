@@ -1,2 +1,13 @@
 <p class="ops-email-title">Podnet bol zamietnutý</p>
+<p class="ops-email-paragraph">
+  <% if @issue.author == @user %>
+    Ľutujeme, Váš podnet <%= ops_issue_link @issue %>, ktorý ste pridali <b><%= @issue.created_at.strftime("%d.%m.%Y") %></b> na portál Odkaz pre starostu, nespĺňal podmienky prijatia a preto bol zamietnutý.
+  <% else %>
+    Ľutujeme, podnet <%= ops_issue_link @issue %>, ktorý sledujete na portáli Odkaz pre starostu, nespĺňal podmienky prijatia a preto bol zamietnutý.
+  <% end %>
+</p>
+<p class="ops-email-paragraph">
+  Viac informácií nájdete v sekcii <%= link_to "Pravidlá", url_for('/pravidla'), class: "ops-email-link", target: "_blank" %>.
+</p>
+<%= render "signature" %>
 <%= render "unsubscribe" %>

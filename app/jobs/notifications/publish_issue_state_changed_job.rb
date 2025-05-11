@@ -9,15 +9,15 @@ module Notifications
         case Issue::State.find(state_id_change.last).key
         when "rejected"
           next unless issue.author == subscription.subscriber
-          notification_mailer.with(subscription: subscription).issue_rejected(issue).deliver_later
+          notification_mailer.with(subscription: subscription).issue_rejected.deliver_later
         when "resolved"
-          notification_mailer.with(subscription: subscription).issue_resolved(issue).deliver_later
+          notification_mailer.with(subscription: subscription).issue_resolved.deliver_later
         when "unresolved"
-          notification_mailer.with(subscription: subscription).issue_unresolved(issue).deliver_later
+          notification_mailer.with(subscription: subscription).issue_unresolved.deliver_later
         when "referred"
-          notification_mailer.with(subscription: subscription).issue_referred(issue).deliver_later
+          notification_mailer.with(subscription: subscription).issue_referred.deliver_later
         when "closed"
-          notification_mailer.with(subscription: subscription).issue_closed(issue).deliver_later
+          notification_mailer.with(subscription: subscription).issue_closed.deliver_later
         end
       end
     end

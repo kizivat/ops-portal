@@ -1,11 +1,11 @@
 <p class="ops-email-footer-paragraph">
-  Odkaz pre starostu je projektom neziskovej mimovládnej organizácie <a href="https://www.governance.sk/" target="_blank" class="ops-email-footer-link">Inštitút pre dobre spravovanú spoločnosť</a>, ktorého cieľom je zlepšiť kvalitu miestnych samospráv a&#160;posilniť vzájomnú komunikáciu medzi občanmi a&#160;úradmi.
+  Odkaz pre starostu je projektom neziskovej mimovládnej organizácie <%= link_to 'Inštitút pre dobre spravovanú spoločnosť', 'https://www.governance.sk/', target: '_blank', class: 'ops-email-footer-link' %>, ktorého cieľom je zlepšiť kvalitu miestnych samospráv a&#160;posilniť vzájomnú komunikáciu medzi občanmi a&#160;úradmi.
 </p>
 <p class="ops-email-paragraph-bottom">
-  <img alt="" class="ops-email-images-bottom" src="<%= image_url('/email/ops-logo-sive.png') %>">
+  <%= image_tag '/email/ops-logo-sive.png', alt: 'Logo odkazu pre starostu', class: 'ops-email-images-bottom' %>
 </p>
 <p class="ops-email-footer-paragraph">
-  <a href="https://www.facebook.com/odkazprestarostu" target="_blank" class="ops-email-footer-social-link">Facebook</a>
-  <a href="https://www.instagram.com/odkazprestarostu.sk" target="_blank" class="ops-email-footer-social-link">Instagram</a>
-  <a href="<%= url_for('/podporte-nas') %>" target="_blank" class="ops-email-footer-social-link">Podporte nás</a>
+  <%= link_to 'Facebook', 'https://www.facebook.com/odkazprestarostu', target: '_blank', class: 'ops-email-footer-social-link' %>
+  <%= link_to 'Instagram', 'https://www.instagram.com/odkazprestarostu.sk', target: '_blank', class: 'ops-email-footer-social-link' %>
+  <%= link_to 'Podporte nás', url_for('/podporte-nas'), target: '_blank', class: 'ops-email-footer-social-link' %>
 </p>

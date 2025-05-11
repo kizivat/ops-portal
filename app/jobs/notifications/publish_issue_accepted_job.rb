@@ -5,7 +5,7 @@ module Notifications
         user = subscription.subscriber
         next unless user.email_notifiable? && user == issue.author
 
-        notification_mailer.with(subscription: subscription).issue_accepted(issue).deliver_later
+        notification_mailer.with(subscription: subscription).issue_accepted.deliver_later
       end
     end
   end

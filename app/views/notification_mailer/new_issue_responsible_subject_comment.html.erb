@@ -1,14 +1,14 @@
-<%= render "title", title: "Nová odpoveď" %>
+<%= ops_title "Nová odpoveď" %>
 <p class="ops-email-paragraph">
-  K podnetu <b><%= @issue.title %></b> pribudla nová odpoveď od samosprávy.
+  K podnetu <%= ops_issue_link @issue %> pribudla nová odpoveď od samosprávy.
 </p>
 <p class="ops-email-paragraph">
   Pre detail novej odpovede, prosím, kliknite nižšie.
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: "#{issue_url(@issue)}#komentar_#{@comment.id}", label: "Detail odpovede" %>
+  <%= ops_button "Detail odpovede", "#{issue_url(@issue)}#komentar_#{@comment.id}" %>
 </p>
 <p class="ops-email-paragraph">
-  <%= render "button", url: "#{issue_url(@issue)}#new_issue_activity", label: "Reagovať na odpoveď" %>
+  <%= ops_button "Reagovať na odpoveď", "#{issue_url(@issue)}#new_issue_activity" %>
 </p>
 <%= render "unsubscribe" %>
