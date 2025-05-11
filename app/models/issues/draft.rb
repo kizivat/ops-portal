@@ -92,20 +92,8 @@ class Issues::Draft < ApplicationRecord
     # TODO delete draft after success
     self.update_attribute(:submitted, true)
 
-    # TODO consider moving to background job
     photos.each do |photo|
-      # move attachments between different storage services
-      io = StringIO.new(photo.download)
-      issue.photos.attach(
-        io: io,
-        filename: photo.filename,
-        content_type: photo.content_type
-      )
-    end
-
-    # preserve rotations
-    issue.photos.blobs.each_with_index do |blob, index|
-      blob.update(rotation: photos[index].blob.rotation)
+      issue.photos.append photo
     end
 
     SyncIssueToTriageJob.perform_later(issue)
