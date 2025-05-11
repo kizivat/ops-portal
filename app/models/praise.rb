@@ -50,7 +50,7 @@ class Praise < Issue
   end
 
   before_create do |praise|
-    praise.state = Issues::State.find_by(name: "Čakajúci")
+    praise.state = Issues::State.find_by!(key: "waiting")
   end
 
   after_create do |question|
