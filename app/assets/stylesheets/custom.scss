@@ -391,3 +391,8 @@ body:has(dialog[data-zoombox-target="dialog"][open]) {
     animation: fade-out 200ms forwards;
   }
 }
+
+// Rounded image in prose
+.rounded-image {
+  border-radius: 15px;
+}
