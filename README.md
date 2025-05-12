@@ -17,7 +17,7 @@ Tip: Use [CyberChef](https://gchq.github.io/CyberChef/#recipe=Pseudo-Random_Numb
 Example:
 
 ```ruby
-data = {
+new_backoffice_data = {
   name: "Malacky",
   url: "https://ops.dev.slovensko.digital/connector/webhook",
   connector_zammad_url: "https://malacky.ops.dev.slovensko.digital/",
@@ -26,33 +26,40 @@ data = {
   connector_zammad_webhook_secret: "iQxdK0egeIWRFEghWqbNz7WnF1cSzCOGWynrjc2htRr"
 }
 
-responsible_subject = ResponsibleSubject.find_by!(name: data[:name])
-responsible_subject.update_columns(
-  subject_name: data[:name],
-  active: true,
-  pro: true
-)
+def connect_backoffice(data)
+  responsible_subject = ResponsibleSubject.find_by!(name: data[:name])
 
-client = Client.find_or_create_by!(name: data[:name])
-tenant = Connector::Tenant.find_or_create_by!(name: data[:name])
+  raise "ResponsibleSubject already PRO"
 
-api_key = OpenSSL::PKey::EC.generate("prime256v1")
-webhook_key = OpenSSL::PKey::EC.generate("prime256v1")
+  responsible_subject.update_columns(
+    subject_name: data[:name],
+    active: true,
+    pro: true
+  )
 
-client.update_columns(
-  api_token_public_key: api_key.public_to_pem,
-  webhook_private_key: webhook_key.to_pem,
-  url: data[:url],
-  responsible_subject_id: responsible_subject.id
-)
+  client = Client.find_or_create_by!(name: data[:name])
+  tenant = Connector::Tenant.find_or_create_by!(name: data[:name])
 
-tenant.update_columns(
-  backoffice_api_token: data[:connector_zammad_api_token],
-  backoffice_webhook_secret: data[:connector_zammad_webhook_secret],
-  ops_api_token_private_key: api_key.to_pem,
-  ops_webhook_public_key: webhook_key.public_to_pem,
-  ops_api_subject_identifier: client.id,
-  backoffice_url: data[:connector_zammad_url],
-  receive_customer_activities: data[:receive_customer_activities]
-)
+  api_key = OpenSSL::PKey::EC.generate("prime256v1")
+  webhook_key = OpenSSL::PKey::EC.generate("prime256v1")
+
+  client.update_columns(
+    api_token_public_key: api_key.public_to_pem,
+    webhook_private_key: webhook_key.to_pem,
+    url: data[:url],
+    responsible_subject_id: responsible_subject.id
+  )
+
+  tenant.update_columns(
+    backoffice_api_token: data[:connector_zammad_api_token],
+    backoffice_webhook_secret: data[:connector_zammad_webhook_secret],
+    ops_api_token_private_key: api_key.to_pem,
+    ops_webhook_public_key: webhook_key.public_to_pem,
+    ops_api_subject_identifier: client.id,
+    backoffice_url: data[:connector_zammad_url],
+    receive_customer_activities: data[:receive_customer_activities]
+  )
+end
+
+connect_backoffice new_backoffice_data
 ```
