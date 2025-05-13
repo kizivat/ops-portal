@@ -419,32 +419,32 @@ class ZammadApiClient
 
     if [ :user_portal_comment ].include?(article_type)
       user_id = author.is_a?(User) ? author.external_id : author
-      user = zammad_api_client.user.find(user_id)
-      unless user.nil?
+      user = User.find_by(external_id: user_id)
+      if user.nil?
+        Rails.logger.warn("User with id: #{user_id} not found in Triage Zammad")
+        nil
+      else
         {
           firstname: user.firstname,
           lastname: user.lastname,
           uuid: user.uuid
         }
-      else
-        Rails.logger.warn("User with id: #{user_id} not found in Triage Zammad")
-        nil
       end
     elsif [ :agent_portal_comment, :agent_portal_and_backoffice_comment, :agent_backoffice_comment ].include?(article_type)
       DEFAULT_OPS_ADMIN_USER
 
     elsif [ :responsible_subject_portal_and_backoffice_comment, :responsible_subject_backoffice_comment ].include?(article_type)
       responsible_subject = zammad_api_client.user.find(author.external_id)
-      unless responsible_subject.nil?
+      if responsible_subject.nil?
+        Rails.logger.warn("Responsible subject with id: #{author.external_id} not found in Triage Zammad")
+        nil
+      else
         {
           firstname: responsible_subject.firstname,
           lastname: responsible_subject.lastname,
           uuid: responsible_subject.uuid,
           responsible_subject_identifier: responsible_subject.id
         }
-      else
-        Rails.logger.warn("Responsible subject with id: #{author.external_id} not found in Triage Zammad")
-        nil
       end
     end
   end
