@@ -8,6 +8,6 @@ class Issues::SyncUserCommentToTriageJob < ApplicationJob
       return
     end
 
-    ::SyncIssueActivitiesToTriageJob.perform_later(user_comment.issue)
+    ::SyncIssueActivityObjectToTriageJob.perform_later(issue: user_comment.issue, activity_object: user_comment)
   end
 end
