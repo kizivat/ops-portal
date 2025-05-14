@@ -58,6 +58,7 @@ module Legacy
         lastname: legacy_record.priezvisko.presence,
         login: legacy_record.login,
         organization: legacy_record.is_organization,
+        password_hash: generate_dummy_password,
         phone: legacy_record.telefon,
         resident: legacy_record.residency,
         sex: legacy_record.sex,
@@ -68,7 +69,8 @@ module Legacy
         city_id: legacy_record.cityid,
         municipality: ::Municipality.find_by(legacy_id: legacy_record.mesto),
         street: ::Street.find_by(legacy_id: legacy_record.streetid),
-        onboarded: true
+        onboarded: true,
+        status: "verified"
       }
     end
 
