@@ -131,7 +131,7 @@ Rails.application.routes.draw do
     def self.matches?(request)
       user = request.env["rodauth"].rails_account
 
-      ENV["ADMIN_EMAILS"].to_s.split(",").include?(user&.email)
+      ENV["ADMIN_EMAILS"].to_s.split(",").include?(user&.email) || Rails.env.development?
     end
   end
 
