@@ -838,8 +838,10 @@ article ul li::before {
   font-weight: $medium;
   margin-right: 17px;
 }
-article figure {
+article img {
   margin-bottom: 30px;
+  width: auto;
+  height: auto;
 }
 article figure figcaption {
   color: $black-light;
