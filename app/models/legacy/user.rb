@@ -58,7 +58,6 @@ module Legacy
         lastname: legacy_record.priezvisko.presence,
         login: legacy_record.login,
         organization: legacy_record.is_organization,
-        password_hash: ENV["EMAILS_IMPORT"] == "ON" ? legacy_record.password : generate_dummy_password, # TODO check
         phone: legacy_record.telefon,
         resident: legacy_record.residency,
         sex: legacy_record.sex,
