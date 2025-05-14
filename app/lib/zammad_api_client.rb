@@ -564,7 +564,7 @@ class ZammadApiClient
     when "portal_issue_triage"
       return :user_private_comment if article.sender == "Customer" && article.type == "web"
 
-      :agent_private_comment if article.sender == "Agent"
+      return :agent_private_comment if article.sender == "Agent"
 
     when "portal_issue_resolution"
       return :unknown_user_portal_comment if article.sender == "Customer" && article.origin_by_id == nil && article.created_by_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID").to_i
