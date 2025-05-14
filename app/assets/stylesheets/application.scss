@@ -1604,6 +1604,7 @@ section.report .button {
 }
 .dropdown-button svg {
   fill: $black;
+  width: 100%;
 }
 ul.dropdown-list {
   background: $white;
@@ -1907,7 +1908,8 @@ section.podnety nav.suggestions .button-location {
   padding: 18px 20px;
   @include rounded(15px);
 }
-.statistics-con .statistics-block .general-title a {
+
+.statistics-con .statistics-block .general-title {
   color: $black;
 }
 

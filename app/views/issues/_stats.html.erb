@@ -36,10 +36,10 @@
       <% end %>
 
       <% @search_results.stats[:by_state].value.each do |status, count| %>
-        <div class="statistics-block state-<%= status.name.parameterize %>">
+        <%= link_to search_issues_path(stav: status.name, tab: :list), class: "statistics-block state-#{status.name.parameterize}" do %>
           <div class="general-value-con">
             <div class="general-title-con">
-              <div class="general-title"><%= link_to status.name, search_issues_path(stav: status.name, tab: :list) %></div>
+              <div class="general-title"><%= status.name %></div>
               <div class="statistics-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <polyline points="2 18 8.67 8.9 15.33 14.62 22 6" fill="none" stroke-miterlimit="10" stroke-width="1.5"/>
@@ -63,20 +63,19 @@
             </div>
           </div>
           -->
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
-
 
   <h2 class="stats-heading">Podľa kategórie</h2>
   <div class="wrapper-statistics">
     <div class="statistics-con">
       <% @search_results.stats[:by_category].value.each do |category, count| %>
-        <div class="statistics-block statistics-block-<%= category ? "category-#{category.name.parameterize}" : 'undefined' %>">
+        <%= link_to search_issues_path(kategoria: category&.name || "Bez kategórie", tab: :list), class: class_names("statistics-block", "statistics-block-undefined": !category, "statistics-block-category-#{category&.name&.parameterize}": category) do %>
           <div class="general-value-con">
             <div class="general-title-con">
-              <div class="general-title"><% if category %><%= link_to category.name, search_issues_path(kategoria: category.name, tab: :list) %><% else %>Bez kategórie<% end %></div>
+              <div class="general-title"><%= category&.name || "Bez kategórie" %></div>
               <div class="statistics-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <polyline points="2 18 8.67 8.9 15.33 14.62 22 6" fill="none" stroke-miterlimit="10" stroke-width="1.5"/>
@@ -89,20 +88,19 @@
             </div>
             <div class="general-value"><%= count %></div>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
-
 
   <h2 class="stats-heading">Podľa zodpovedného subjektu</h2>
   <div class="wrapper-statistics">
     <div class="statistics-con">
       <% @search_results.stats[:by_responsible_subject].value.each do |responsible_subject, count| %>
-        <div class="statistics-block statistics-block-undefined">
+        <%= link_to search_issues_path(zodpovedny: responsible_subject&.subject_name || "Neznámy", tab: :list), class: "statistics-block statistics-block-undefined" do %>
           <div class="general-value-con">
             <div class="general-title-con">
-              <div class="general-title"><% if responsible_subject %><%= link_to responsible_subject.subject_name, search_issues_path(zodpovedny: responsible_subject.subject_name, tab: :list) %><% else %>Neznámy<% end %></div>
+              <div class="general-title"><%= responsible_subject&.subject_name || "Neznámy" %></div>
               <div class="statistics-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <polyline points="2 18 8.67 8.9 15.33 14.62 22 6" fill="none" stroke-miterlimit="10" stroke-width="1.5"/>
@@ -115,7 +113,7 @@
             </div>
             <div class="general-value"><%= count %></div>
           </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
