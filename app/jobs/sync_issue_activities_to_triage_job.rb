@@ -8,7 +8,7 @@ class SyncIssueActivitiesToTriageJob < ApplicationJob
     issue.activities.includes(:activity_object).find_each do |activity|
       next if activity.activity_object.triage_external_id.present?
 
-      sync_activity_object_job.perform_later(issue: issue, activity_object: activity.activity_object, triage_group: triage_group, import: import)
+      sync_activity_object_job.perform_now(issue: issue, activity_object: activity.activity_object, triage_group: triage_group, import: import)
     end
   end
 end
