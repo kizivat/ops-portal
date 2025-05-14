@@ -474,7 +474,7 @@ class ZammadApiClient
     municipality_district = municipality&.municipality_districts&.find_by(name: district_name)
 
     category = Issues::Category.find_by(name: ticket.category) || Issues::Category.find_by(triage_external_id: ticket.category)
-    subcategory = category&.subcategories&.find_by!(name: ticket.subcategory)
+    subcategory = category&.subcategories&.find_by(name: ticket.subcategory)
     subtype = subcategory&.subtypes&.find_by(name: ticket.subtype)
 
     ops_state = Issues::State.find_by!(key: ticket.ops_state)
@@ -574,19 +574,21 @@ class ZammadApiClient
         return :responsible_subject_portal_and_backoffice_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
 
         if article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
-          :agent_portal_and_backoffice_comment if article.sender == "Agent"
+          return :agent_portal_and_backoffice_comment if article.sender == "Agent"
         else
-          :agent_portal_comment if article.sender == "Agent"
+          return :agent_portal_comment if article.sender == "Agent"
         end
       elsif article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
-        :agent_backoffice_comment if article.sender == "Agent"
+        return :agent_backoffice_comment if article.sender == "Agent"
       else
         return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
-        :responsible_subject_backoffice_comment
+        return :responsible_subject_backoffice_comment
       end
     else
       # TODO add more process_types
       raise "Unknown process type: #{process_type}"
     end
+
+    raise "Unknown article type: #{article.type} for process type: #{process_type}"
   end
 end
