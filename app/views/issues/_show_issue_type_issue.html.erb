@@ -140,33 +140,32 @@
           <% end %>
         <% end %>
 
-        <% if issue.discussion_closed? %>
-          <div class="no-login-notice-con">
-            <p>Diskusia k tomuto podnetu bola uzatvorená</p>
-          </div>
-        <% else %>
-          <% if logged_in? %>
+        <% if logged_in? %>
+          <% if issue.discussion_closed? %>
+            <div class="no-login-notice-con">
+              <p>Diskusia k tomuto podnetu bola uzatvorená</p>
+            </div>
+          <% else %>
             <% if current_user.full_access? %>
               <%= render partial: "issues/new_issue_activity_buttons" %>
             <% else %>
               <%= render partial: "issues/comments_verified_profile_required" %>
             <% end %>
-          <% else %>
-            <div class="no-login-notice-con">
-              <div class="no-login-notice">Chcete pridať komentár alebo overiť podnet? Prihláste sa!</div>
-              <div class="no-login-notice-buttons-con">
-                <div class="login-con">
-                  <%= link_to "Prihlásiť", rodauth.login_path, class: "button", data: { turbo_frame: "_top" } %>
-                </div>
-                <div class="registration-con">
-                  <div class="registration-notice">Ešte nemáte účet?</div>
-                  <%= link_to "Vytvoriť účet", rodauth.create_account_path, class: "button button-transparent", data: { turbo_frame: "_top" } %>
-                </div>
+          <% end %>
+        <% else %>
+          <div class="no-login-notice-con">
+            <div class="no-login-notice">Chcete pridať komentár alebo overiť podnet? Prihláste sa!</div>
+            <div class="no-login-notice-buttons-con">
+              <div class="login-con">
+                <%= link_to "Prihlásiť", rodauth.login_path, class: "button", data: { turbo_frame: "_top" } %>
+              </div>
+              <div class="registration-con">
+                <div class="registration-notice">Ešte nemáte účet?</div>
+                <%= link_to "Vytvoriť účet", rodauth.create_account_path, class: "button button-transparent", data: { turbo_frame: "_top" } %>
               </div>
             </div>
-          <% end %>
+          </div>
         <% end %>
-
       </div>
     </div>
 

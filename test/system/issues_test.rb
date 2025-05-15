@@ -26,11 +26,11 @@ class IssuesTest < ApplicationSystemTestCase
     assert_text "Pridať komentár"
   end
 
-  test "user cannot add comment to issue discussion if discussion closed" do
+  test "discussion closed info not showed unless user logged in" do
     visit issue_path(issues(:legacy_discussion_closed))
 
-    assert_text "Diskusia k tomuto podnetu bola uzatvorená"
-    assert_no_text "Chcete pridať komentár alebo overiť podnet? Prihláste sa!"
+    assert_text "Chcete pridať komentár alebo overiť podnet? Prihláste sa!"
+    assert_no_text "Diskusia k tomuto podnetu bola uzatvorená"
   end
 
   test "not even logged in user can add comment to issue discussion if discussion closed" do
