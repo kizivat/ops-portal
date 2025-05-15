@@ -132,32 +132,41 @@
             </svg>
           </button>-->
         </div>
+
+        <% if issue.discussion_closed? %>
+          <div>
+            <p>Diskusia k tomuto podnetu bola uzatvorená.</p>
+          </div>
+        <% end %>
+
         <%= turbo_frame_tag "activities", class: 'comment-con' do %>
           <%= render activity_objects %>
-          <% if activity_objects.empty? %>
+          <% if activity_objects.empty? && !issue.discussion_closed? %>
             <div class="be-first-comment-notice">Buďte prvý kto overí podnet alebo napíše komentár!</div>
           <% end %>
         <% end %>
 
-        <% if logged_in? %>
-          <% if current_user.full_access? %>
-            <%= render partial: "issues/new_issue_activity_buttons" %>
+        <% unless issue.discussion_closed? %>
+          <% if logged_in? %>
+            <% if current_user.full_access? %>
+              <%= render partial: "issues/new_issue_activity_buttons" %>
+            <% else %>
+              <%= render partial: "issues/comments_verified_profile_required" %>
+            <% end %>
           <% else %>
-            <%= render partial: "issues/comments_verified_profile_required" %>
-          <% end %>
-        <% else %>
-          <div class="no-login-notice-con">
-            <div class="no-login-notice">Chcete pridať komentár alebo overiť podnet? Prihláste sa!</div>
-            <div class="no-login-notice-buttons-con">
-              <div class="login-con">
-                <%= link_to "Prihlásiť", rodauth.login_path, class: "button", data: { turbo_frame: "_top" } %>
-              </div>
-              <div class="registration-con">
-                <div class="registration-notice">Ešte nemáte účet?</div>
-                <%= link_to "Vytvoriť účet", rodauth.create_account_path, class: "button button-transparent", data: { turbo_frame: "_top" } %>
+            <div class="no-login-notice-con">
+              <div class="no-login-notice">Chcete pridať komentár alebo overiť podnet? Prihláste sa!</div>
+              <div class="no-login-notice-buttons-con">
+                <div class="login-con">
+                  <%= link_to "Prihlásiť", rodauth.login_path, class: "button", data: { turbo_frame: "_top" } %>
+                </div>
+                <div class="registration-con">
+                  <div class="registration-notice">Ešte nemáte účet?</div>
+                  <%= link_to "Vytvoriť účet", rodauth.create_account_path, class: "button button-transparent", data: { turbo_frame: "_top" } %>
+                </div>
               </div>
             </div>
-          </div>
+          <% end %>
         <% end %>
 
       </div>
