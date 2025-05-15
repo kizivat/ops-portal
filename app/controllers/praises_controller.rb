@@ -22,7 +22,7 @@ class PraisesController < ApplicationController
   private
 
   def praise_params
-    params.require(:praise).permit(:title, :description, :municipality_id, :praise_public)
+    params.require(:praise).permit(:title, :description, :municipality_id, :public)
   end
 
   def set_form_dependencies

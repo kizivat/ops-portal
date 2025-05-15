@@ -11,6 +11,11 @@ class Triage::UpdatePortalIssueFromTriageJob < ApplicationJob
       raise "Invalid process type"
     end
 
+    ops_state = ticket[:ops_state]
+    if ticket[:issue_type] == "praise" && ops_state.key == "unresolved"
+      ops_state = Issues::State.find_by!(key: "resolved_private")
+    end
+
     issue.update!(
       title: ticket[:title],
       description: ticket[:description],
@@ -26,7 +31,7 @@ class Triage::UpdatePortalIssueFromTriageJob < ApplicationJob
       category: ticket[:category],
       subcategory: ticket[:subcategory],
       subtype: ticket[:subtype],
-      state: ticket[:ops_state],
+      state: ops_state,
       responsible_subject: ticket[:responsible_subject],
       issue_type: ticket[:issue_type],
     )

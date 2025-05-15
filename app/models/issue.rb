@@ -24,7 +24,7 @@
 #  legacy_data                         :jsonb
 #  likes_count                         :integer          default(0), not null
 #  longitude                           :float
-#  praise_public                       :boolean          default(FALSE), not null
+#  public                              :boolean          default(FALSE), not null
 #  responsible_subject_last_contact_at :datetime
 #  title                               :string           not null
 #  created_at                          :datetime         not null
@@ -83,7 +83,7 @@ class Issue < ApplicationRecord
   end
 
   before_save :recalculate_computed_fields
-  after_update :notify_subscribers, if: -> { issue_type.in? [ "issue", "question" ] }
+  after_update :notify_subscribers
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object).compact
@@ -122,7 +122,12 @@ class Issue < ApplicationRecord
     state.key == "waiting"
   end
 
+  def showing_comments_count?
+    issue_type.in?(%w[issue question]) && comments_count.nonzero?
+  end
+
   def should_create_resolution_process?
+    return false if issue_type == "praise"
     return false if resolution_external_id.present?
 
     # TODO: revise this logic
@@ -169,7 +174,16 @@ class Issue < ApplicationRecord
   end
 
   def notify_subscribers
-    if saved_change_to_resolution_external_id?
+    if issue_type == "praise"
+      return unless saved_change_to_state_id?
+      return unless saved_change_to_state_id.first == Issues::State.find_by(key: "waiting").id
+
+      if state.key.in? %w[resolved resolved_private]
+        Notifications::PublishIssueAcceptedJob.perform_later(self)
+      elsif state.key == "rejected"
+        Notifications::PublishIssueStateChangedJob.perform_later(self, state_id_change: saved_change_to_state_id)
+      end
+    elsif saved_change_to_resolution_external_id?
       Notifications::PublishIssueAcceptedJob.perform_later(self)
     elsif saved_change_to_state_id?
       Notifications::PublishIssueStateChangedJob.perform_later(self, state_id_change: saved_change_to_state_id)

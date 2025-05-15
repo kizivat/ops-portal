@@ -38,7 +38,7 @@ class ZammadApiClientTest < ActiveSupport::TestCase
 
   test "portal_issue_triage process_type attachment update note article from customer returns nil" do
     article = @article_struct.new(sender: "Customer", type: "note")
-    assert_nil @subject.send(:get_article_type, article, "portal_issue_triage")
+    assert_equal :user_attachment_update, @subject.send(:get_article_type, article, "portal_issue_triage")
   end
 
   test "portal_issue_triage process_type web article from agent returns agent_private_comment" do

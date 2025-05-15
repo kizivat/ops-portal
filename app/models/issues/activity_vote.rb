@@ -13,5 +13,5 @@ class Issues::ActivityVote < ApplicationRecord
   belongs_to :activity
   belongs_to :voter, class_name: "User"
 
-  after_commit { activity.reset_counters }
+  after_commit { activity&.reset_counters }
 end

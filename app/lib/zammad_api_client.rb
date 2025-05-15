@@ -47,24 +47,55 @@ class ZammadApiClient
     end
 
     result = build_ticket_response(ticket)
-
     return unless result.present?
-    return result unless expand
 
-    result.merge({
-      activities: [ build_article_response(ticket, ticket.articles.first, allowed_article_types: allowed_article_types, first_article: true) ] +
-        ticket.articles[1..].map { |article|
-          build_article_response(
-            ticket,
-            article,
-            allowed_article_types: allowed_article_types,
-            responsible_subject: responsible_subject
-          )
-        }.compact
-    })
+    if ticket.issue_type == "praise"
+      result.merge({
+        activities: [
+          {
+            article_type: :user_portal_comment,
+            author: result[:author],
+            author_response: result[:author_response],
+            triage_identifier: ticket.articles.first.id,
+            content_type: ticket.articles.first.content_type,
+            body: result[:description],
+            created_at: result[:created_at],
+            updated_at: result[:updated_at],
+            attachments: ticket.articles.first.attachments.map do |attachment|
+              {
+                triage_identifier: attachment.id,
+                filename: attachment.filename,
+                content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
+                data64: Base64.strict_encode64(attachment.download)
+              }
+            end
+          }
+        ]
+      })
+
+    else
+      return result unless expand
+
+      result.merge({
+        activities: [ build_article_response(ticket, ticket.articles.first, allowed_article_types: allowed_article_types, first_article: true) ] +
+          ticket.articles[1..].map { |article|
+            build_article_response(
+              ticket,
+              article,
+              allowed_article_types: allowed_article_types,
+              responsible_subject: responsible_subject
+            )
+          }.compact
+      })
+    end
   end
 
   def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
+    ops_state = issue.state&.key
+    if issue.issue_type == "praise" && ops_state == "resolved_private"
+      ops_state = "unresolved"
+    end
+
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue.issue_type,
@@ -85,7 +116,7 @@ class ZammadApiClient
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
       state: state,
-      ops_state: issue.state&.key,
+      ops_state: ops_state,
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
@@ -95,6 +126,7 @@ class ZammadApiClient
       owner_id: owner_id,
       created_at: issue.created_at,
       likes_count: issue.likes.count,
+      portal_public: issue.public,
       origin: DEFAULT_ORIGIN,
       article: {
         origin_by_id: issue.author.external_id,
@@ -103,7 +135,7 @@ class ZammadApiClient
         attachments: issue.photos.map do |photo|
           {
             "filename" => photo.filename.to_s,
-            "data" => Base64.encode64(photo.blob.download),
+            "data" => Base64.encode64(photo.variant(:full).processed.download),
             "mime-type" => photo.content_type
           }
         end,
@@ -126,6 +158,7 @@ class ZammadApiClient
       when "ops_state"
         ticket.ops_state = value
       when "responsible_subject"
+        next if value[:label] == ticket.responsible_subject[:label] && value[:value].to_s == ticket.responsible_subject[:value].to_s
         ticket.responsible_subject = value
       when "investment"
         ticket.investment = value
@@ -182,9 +215,9 @@ class ZammadApiClient
 
     local_attachments = issue.photos.map do |photo|
       {
-        filename: photo.filename,
+        filename: photo.filename.to_s,
         content_type: photo.content_type,
-        size: photo.blob.byte_size
+        size: photo.variant(:full).processed.send(:record).image.blob.byte_size
       }
     end
 
@@ -212,7 +245,7 @@ class ZammadApiClient
         {
           "filename" => attachment[:filename],
           "mime-type" => attachment[:content_type],
-          "data" => Base64.encode64(issue.photos.find { |photo| photo.filename == attachment[:filename] }.blob.download)
+          "data" => Base64.encode64(issue.photos.find { |photo| photo.filename == attachment[:filename] }.variant(:full).processed.download)
         }
       end
     )
@@ -250,7 +283,7 @@ class ZammadApiClient
         {
           "filename" => attachment.filename,
           "mime-type" => attachment.content_type,
-          "data" => Base64.encode64(attachment.blob.download)
+          "data" => Base64.encode64(attachment.variant(:full).processed.download)
         }
       end,
       created_at: activity_object.created_at,
@@ -474,7 +507,7 @@ class ZammadApiClient
     municipality_district = municipality&.municipality_districts&.find_by(name: district_name)
 
     category = Issues::Category.find_by(name: ticket.category) || Issues::Category.find_by(triage_external_id: ticket.category)
-    subcategory = category&.subcategories&.find_by!(name: ticket.subcategory)
+    subcategory = category&.subcategories&.find_by(name: ticket.subcategory)
     subtype = subcategory&.subtypes&.find_by(name: ticket.subtype)
 
     ops_state = Issues::State.find_by!(key: ticket.ops_state)
@@ -563,8 +596,8 @@ class ZammadApiClient
     case process_type
     when "portal_issue_triage"
       return :user_private_comment if article.sender == "Customer" && article.type == "web"
-
-      :agent_private_comment if article.sender == "Agent"
+      return :agent_private_comment if article.sender == "Agent"
+      return :user_attachment_update if article.sender == "Customer" && article.type == ATTACHMENTS_UPDATE_ARTICLE_TYPE
 
     when "portal_issue_resolution"
       return :unknown_user_portal_comment if article.sender == "Customer" && article.origin_by_id == nil && article.created_by_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID").to_i
@@ -574,19 +607,21 @@ class ZammadApiClient
         return :responsible_subject_portal_and_backoffice_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
 
         if article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
-          :agent_portal_and_backoffice_comment if article.sender == "Agent"
+          return :agent_portal_and_backoffice_comment if article.sender == "Agent"
         else
-          :agent_portal_comment if article.sender == "Agent"
+          return :agent_portal_comment if article.sender == "Agent"
         end
       elsif article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
-        :agent_backoffice_comment if article.sender == "Agent"
+        return :agent_backoffice_comment if article.sender == "Agent"
       else
         return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
-        :responsible_subject_backoffice_comment
+        return :responsible_subject_backoffice_comment
       end
     else
       # TODO add more process_types
       raise "Unknown process type: #{process_type}"
     end
+
+    raise "Unknown article type: #{article.type} for process type: #{process_type}"
   end
 end

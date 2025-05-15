@@ -24,7 +24,7 @@
 #  legacy_data                         :jsonb
 #  likes_count                         :integer          default(0), not null
 #  longitude                           :float
-#  praise_public                       :boolean          default(FALSE), not null
+#  public                              :boolean          default(FALSE), not null
 #  responsible_subject_last_contact_at :datetime
 #  title                               :string           not null
 #  created_at                          :datetime         not null
@@ -45,15 +45,16 @@
 class Praise < Issue
   validates :title, :description, :municipality_id, presence: true
 
-  after_initialize do |question|
-    question.issue_type = "praise"
+  after_initialize do |praise|
+    praise.issue_type = "praise"
   end
 
   before_create do |praise|
     praise.state = Issues::State.find_by!(key: "waiting")
   end
 
-  after_create do |question|
-    SyncIssueToTriageJob.perform_later(question)
+  after_create do |praise|
+    author.subscribe_to(praise)
+    SyncIssueToTriageJob.perform_later(praise)
   end
 end
