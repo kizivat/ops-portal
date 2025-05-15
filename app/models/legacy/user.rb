@@ -58,7 +58,7 @@ module Legacy
         user.city_id = legacy_record.cityid
         user.municipality = ::Municipality.find_by(legacy_id: legacy_record.mesto)
         user.street = ::Street.find_by(legacy_id: legacy_record.streetid)
-        user.onboarded = true
+        user.onboarded ||= false
         user.status = "verified"
 
         user.save!
