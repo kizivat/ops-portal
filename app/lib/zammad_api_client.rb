@@ -66,7 +66,7 @@ class ZammadApiClient
                 triage_identifier: attachment.id,
                 filename: attachment.filename,
                 content_type: attachment.preferences.dig(:"Mime-Type") || attachment.preferences.dig(:"Content-Type"),
-                data64: Base64.strict_encode64(attachment.variant(:full).processed.download)
+                data64: Base64.strict_encode64(attachment.download)
               }
             end
           }
