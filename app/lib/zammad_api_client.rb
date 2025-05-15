@@ -91,6 +91,11 @@ class ZammadApiClient
   end
 
   def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
+    ops_state = issue.state&.key
+    if issue.issue_type == "praise" && ops_state == "resolved_private"
+      ops_state = "unresolved"
+    end
+
     ticket = @client.ticket.create(
       process_type: process_type,
       issue_type: issue.issue_type,
@@ -111,7 +116,7 @@ class ZammadApiClient
       subcategory: issue.subcategory&.name,
       subtype: issue.subtype&.name,
       state: state,
-      ops_state: issue.state&.key,
+      ops_state: ops_state,
       portal_url: Rails.application.routes.url_helpers.issue_url(issue),
       anonymous: issue.anonymous, # TODO add logic to handle legacy logic here (anonymous user)
       responsible_subject: {
@@ -121,6 +126,7 @@ class ZammadApiClient
       owner_id: owner_id,
       created_at: issue.created_at,
       likes_count: issue.likes.count,
+      portal_public: issue.public,
       origin: DEFAULT_ORIGIN,
       article: {
         origin_by_id: issue.author.external_id,

@@ -90,6 +90,10 @@ end
     key: "resolved"
   },
   {
+    name: "Vyriešený (skrytý)",
+    key: "resolved_private"
+  },
+  {
     name: "Neriešený",
     key: "unresolved"
   },
@@ -98,7 +102,7 @@ end
     key: "in_progress"
   },
   {
-    name: "Neprijatý",
+    name: "Zamietnutý",
     key: "rejected"
   },
   {
@@ -110,8 +114,8 @@ end
     key: "marked_as_resolved"
   }
 ].each do |state_data|
-  Issues::State.find_or_create_by!(name: state_data[:name]).tap do |issues_state|
-    issues_state.update(key: state_data[:key])
+  Issues::State.find_or_create_by!(key: state_data[:key]).tap do |issues_state|
+    issues_state.update(name: state_data[:name])
   end
 end
 

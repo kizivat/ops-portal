@@ -57,20 +57,4 @@ class Praise < Issue
     author.subscribe_to(praise)
     SyncIssueToTriageJob.perform_later(praise)
   end
-
-  after_update :notify_subscribers, if: :saved_change_to_state_id?
-
-  def should_create_resolution_process?
-    false
-  end
-
-  private
-
-  def notify_subscribers
-    if state.key.in? %w[resolved unresolved]
-      Notifications::PublishIssueAcceptedJob.perform_later(self)
-    elsif state.key == "rejected"
-      Notifications::PublishIssueStateChangedJob.perform_later(self, state_id_change: saved_change_to_state_id)
-    end
-  end
 end
