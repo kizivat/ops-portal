@@ -410,3 +410,22 @@ turbo-frame[autoscroll] > :first-child {
   }
 }
 
+.map--swiping::after {
+  content: 'Na výber presnej polohy použite dva prsty.';
+  text-align: center;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 300;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  pointer-events: none;
+}
