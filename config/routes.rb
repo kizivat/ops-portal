@@ -131,13 +131,16 @@ Rails.application.routes.draw do
     def self.matches?(request)
       user = request.env["rodauth"].rails_account
 
-      ENV["ADMIN_EMAILS"].to_s.split(",").include?(user&.email)
+      ENV["ADMIN_EMAILS"].to_s.split(",").include?(user&.email) || Rails.env.development?
     end
   end
 
   constraints(GoodJobAdmin) do
     mount GoodJob::Engine => "admin/good_job"
   end
+
+  match "/404", to: "errors#render_404", via: :all
+  match "/500", to: "errors#render_500", via: :all
 
   constraints lambda { |req| !req.xhr? && req.format.html? && (req.path =~ %r{^/(rails|assets)/}).nil? } do
     get "*path" => "cms/pages#index", as: :cms_page

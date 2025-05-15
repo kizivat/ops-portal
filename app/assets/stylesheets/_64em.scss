@@ -130,6 +130,8 @@
 	}
 	header nav .search-con input {
 		border: 1px solid $black;
+		background-color: transparent;
+		appearance: none;
 		box-sizing: border-box;
 		color: $black;
 		display: flex;
@@ -375,6 +377,11 @@
 	.flash-message-container {
 		right: per(40,1024);
 		top: 176px;
+	}
+
+	// 404 error page
+	section.error-page-con {
+		padding: 80px;
 	}
 	
 	// Footer
