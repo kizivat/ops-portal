@@ -10,6 +10,10 @@ module ImportMethods
       URI.parse("#{ENV.fetch("LEGACY_PORTAL_URL")}/#{path}").open
     end
 
+    def download_avatar_from_ops_portal(user_legacy_id)
+      URI.parse("#{ENV.fetch("LEGACY_PORTAL_URL")}/public/avatar/#{user_legacy_id}.jpg").open
+    end
+
     def attachment_persisted?(name:, content:, persisted_records:)
       blob = ActiveStorage::Blob.new(filename: name)
       blob.unfurl(content)
