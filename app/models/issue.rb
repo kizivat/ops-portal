@@ -122,6 +122,10 @@ class Issue < ApplicationRecord
     state.key == "waiting"
   end
 
+  def showing_comments?
+    issue_type.in?(%w[issue question]) && comments_count.nonzero?
+  end
+
   def should_create_resolution_process?
     return false if issue_type == "praise"
     return false if resolution_external_id.present?
