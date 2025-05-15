@@ -133,12 +133,6 @@
           </button>-->
         </div>
 
-        <% if issue.discussion_closed? %>
-          <div>
-            <p>Diskusia k tomuto podnetu bola uzatvorená.</p>
-          </div>
-        <% end %>
-
         <%= turbo_frame_tag "activities", class: 'comment-con' do %>
           <%= render activity_objects %>
           <% if activity_objects.empty? && !issue.discussion_closed? %>
@@ -146,7 +140,11 @@
           <% end %>
         <% end %>
 
-        <% unless issue.discussion_closed? %>
+        <% if issue.discussion_closed? %>
+          <div class="no-login-notice-con">
+            <p>Diskusia k tomuto podnetu bola uzatvorená</p>
+          </div>
+        <% else %>
           <% if logged_in? %>
             <% if current_user.full_access? %>
               <%= render partial: "issues/new_issue_activity_buttons" %>
