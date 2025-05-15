@@ -677,7 +677,7 @@ CREATE TABLE public.issues (
     address_district character varying,
     imported_at timestamp(6) without time zone,
     likes_count integer DEFAULT 0 NOT NULL,
-    praise_public boolean DEFAULT false NOT NULL,
+    public boolean DEFAULT false NOT NULL,
     address_suburb character varying,
     responsible_subject_last_contact_at timestamp(6) without time zone,
     comments_count integer DEFAULT 0 NOT NULL,
@@ -3799,6 +3799,7 @@ ALTER TABLE ONLY public.cms_categories
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250515000136'),
 ('20250514113116'),
 ('20250512170034'),
 ('20250512072300'),

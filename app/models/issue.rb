@@ -24,7 +24,7 @@
 #  legacy_data                         :jsonb
 #  likes_count                         :integer          default(0), not null
 #  longitude                           :float
-#  praise_public                       :boolean          default(FALSE), not null
+#  public                              :boolean          default(FALSE), not null
 #  responsible_subject_last_contact_at :datetime
 #  title                               :string           not null
 #  created_at                          :datetime         not null
