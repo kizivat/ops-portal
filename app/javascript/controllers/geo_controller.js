@@ -12,11 +12,23 @@ export default class extends Controller {
             this.supportTargets.forEach(target => target.classList.add(this.supportedClass));
         }
 
-        this.map = L.map(this.mapTarget)
+        this.map = L.map(this.mapTarget, {dragging: !L.Browser.mobile, scrollWheelZoom: false})
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(this.map);
+
+        const onTwoFingerDrag = (e) => {
+            if (e.type === 'touchstart' && e.touches.length === 1) {
+                e.currentTarget.classList.add('map--swiping')
+            } else {
+                e.currentTarget.classList.remove('map--swiping')
+            }
+        }
+
+        this.mapTarget.addEventListener("touchstart", onTwoFingerDrag);
+        this.mapTarget.addEventListener("touchend", onTwoFingerDrag);
+
 
         new LocateControl({strings: {title: 'Aktuálna poloha'}}).addTo(this.map);
 
