@@ -74,7 +74,9 @@ class Issue < ApplicationRecord
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
   validates :category_id, presence: true, unless: ->(issue) { issue.issue_type == "praise" }
-  validates_presence_of :title, :description, unless: -> { imported_at }
+  validates_presence_of :title, :description, :photos, unless: :imported?
+  validates_length_of :title, minimum: 10, maximum: 80, allow_blank: true, unless: :imported?
+  validates_length_of :description, minimum: 25, maximum: 1800, allow_blank: true, unless: :imported?
 
   scope :newest, -> { order(created_at: :desc) }
   scope :publicly_visible, -> { where.not(state_id: Issues::State.not_visible.pluck(:id)) }
@@ -84,6 +86,10 @@ class Issue < ApplicationRecord
 
   before_save :recalculate_computed_fields
   after_update :notify_subscribers
+
+  def imported?
+    imported_at.present?
+  end
 
   def visible_activity_objects
     activity_objects = activities.includes(:activity_object).order(created_at: :asc).map(&:activity_object).compact
