@@ -45,7 +45,7 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
   end
 
   def backoffice_activity_body
-    text
+    [ TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG, text ].join(" ")
   end
 
   def internal?
