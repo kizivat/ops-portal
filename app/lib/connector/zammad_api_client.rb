@@ -351,7 +351,7 @@ module Connector
     end
 
     def find_ticket_for_issue!(issue)
-      ticket = @tenant.issues.find_by(triage_external_id: issue.triage_external_id)
+      ticket = @tenant.issues.find_by(triage_external_id: issue.resolution_external_id)
       @client.ticket.find(ticket.backoffice_external_id)
     end
 

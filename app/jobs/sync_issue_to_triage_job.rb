@@ -13,13 +13,19 @@ class SyncIssueToTriageJob < ApplicationJob
       issue.touch(:last_synced_at)
 
     else
-      ticket_id = create_new_triage_ticket(issue, triage_group, client, import)
+      process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
+      ticket_id = create_new_triage_ticket(issue, triage_group: triage_group, process_type: process_type, client: client, import: import)
       raise unless ticket_id
 
-      issue.update!(
-        last_synced_at: Time.now,
-        triage_external_id: ticket_id
-      )
+      issue.last_synced_at = Time.now
+
+      if process_type == "portal_issue_triage"
+        issue.triage_external_id = ticket_id
+      else
+        issue.resolution_external_id = ticket_id
+      end
+
+      issue.save!
     end
 
     sync_activities_to_triage_job.perform_later(issue, triage_group: triage_group, import: import) if sync_activities
@@ -27,7 +33,7 @@ class SyncIssueToTriageJob < ApplicationJob
 
   private
 
-  def create_new_triage_ticket(issue, triage_group, client, import)
+  def create_new_triage_ticket(issue, triage_group:, process_type:, client:, import:)
     find_or_create_triage_portal_user!(issue.author, client) unless issue.author.external_id
 
     return client.create_ticket_from_issue!(issue) unless import
@@ -39,7 +45,7 @@ class SyncIssueToTriageJob < ApplicationJob
 
     client.create_ticket_from_issue!(
       issue,
-      process_type: ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name),
+      process_type: process_type,
       state: ISSUE_OPS_STATE_TO_TRIAGE_STATE.fetch(issue.state.name),
       group: triage_group,
       owner_id: issue.owner&.external_id

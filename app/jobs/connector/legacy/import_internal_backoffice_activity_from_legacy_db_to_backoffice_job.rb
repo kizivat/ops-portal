@@ -5,7 +5,7 @@ class Connector::Legacy::ImportInternalBackofficeActivityFromLegacyDbToBackoffic
     zammad_client = zammad_api_client.new(tenant)
     zammad_client.check_import_mode!
 
-    issue = Issue.find_by(triage_external_id: triage_issue_id)
+    issue = Issue.find_by(resolution_external_id: triage_issue_id)
     tenant_issue = tenant.issues.find_by(triage_external_id: triage_issue_id)
 
     raise "Missing legacy ID" unless issue.legacy_id

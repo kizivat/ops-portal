@@ -8,7 +8,7 @@ module Import
 
       Issue.where.not(legacy_id: nil).where(responsible_subject: responsible_subject).find_in_batches do |group|
         group.each do |issue|
-          import_issue_from_triage_job.perform_later(tenant, issue.triage_external_id, import: true)
+          import_issue_from_triage_job.perform_later(tenant, issue.resolution_external_id, import: true)
         end
       end
 
