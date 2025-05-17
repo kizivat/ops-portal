@@ -313,6 +313,7 @@ module Connector
 
       zammad_identifier = find_or_create_user!(
         firstname: author.name,
+        login: author.email,
         email: author.email,
         roles: [ "Agent" ],
         active: author.deleted_at.nil?
