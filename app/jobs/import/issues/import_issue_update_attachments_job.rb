@@ -6,6 +6,8 @@ module Import
 
     def perform(update:)
       Issue.transaction do
+        update.attachments.purge
+
         hrefs = Legacy::Alerts::UpdateImage.where(update_id: update.legacy_id).pluck(:href)
         update.attachments.attach(download_attachables_from_ops_portal(hrefs))
       end

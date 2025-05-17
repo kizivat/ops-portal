@@ -6,8 +6,9 @@ module Import
 
     def perform(issue:)
       Issue.transaction do
-        paths = Legacy::Alerts::Image.where(alert_id: issue.legacy_id).order(:position).pluck(:original)
+        issue.photos.purge
 
+        paths = Legacy::Alerts::Image.where(alert_id: issue.legacy_id).order(:position).pluck(:original)
         issue.photos.attach(download_attachables_from_ops_portal(paths))
       end
     end
