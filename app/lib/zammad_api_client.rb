@@ -362,7 +362,7 @@ class ZammadApiClient
       # TODO what if there is existing non-portal user?
       zammad_user = @client.user.create(
         firstname: user.display_name,
-        login: "ops_portal_user_#{user.id}",
+        login: "ops-user-#{user.id}",
         roles: [ "Portal User" ],
         origin: "portal"
       )
@@ -395,7 +395,7 @@ class ZammadApiClient
     begin
       zammad_user = @client.user.create(
         firstname: responsible_subject.subject_name,
-        login: "responsible_subject_#{responsible_subject.id}",
+        login: "ops-zodpovedny-#{responsible_subject.id}",
         roles: [ "Zodpovedný Subjekt" ],
       )
       zammad_user.id
