@@ -1,6 +1,5 @@
 module Import
   class SyncLegacyUsersJob < ApplicationJob
-
     include ImportMethods
 
     def perform
