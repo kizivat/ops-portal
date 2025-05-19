@@ -24,6 +24,12 @@ class Legacy::PrefetchedBlob < ApplicationRecord
     )
     prefetched_blob = create!(url: url, attachment: blob)
 
+    if blob.variable?
+      variants.each do |variant|
+        ActiveStorage::TransformJob.perform_later(blob, variant)
+      end
+    end
+
     prefetched_blob.attachment.blob
   end
 end
