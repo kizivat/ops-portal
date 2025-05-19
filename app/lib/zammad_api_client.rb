@@ -96,7 +96,18 @@ class ZammadApiClient
       ops_state = "unresolved"
     end
 
+    case process_type
+    when "portal_issue_triage"
+      number_prefix = "T"
+    when "portal_issue_resolution"
+      number_prefix = "R"
+    else
+      raise "Unsupported process type: #{process_type}"
+    end
+
     ticket = @client.ticket.create(
+      number: "#{number_prefix}-#{issue.id.to_s.rjust(4, '0')}",
+      ops_issue_identifier: issue.id,
       process_type: process_type,
       issue_type: issue.issue_type,
       title: issue.title.presence || "Bez názvu",
@@ -525,6 +536,7 @@ class ZammadApiClient
 
     {
       triage_identifier: ticket.id,
+      ops_issue_identifier: ticket.ops_issue_identifier,
       triage_group: ticket.group,
       triage_owner_id: ticket.owner_id,
       ops_state: ops_state,
