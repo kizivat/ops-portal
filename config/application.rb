@@ -37,7 +37,7 @@ module Ops
     config.good_job.cleanup_preserved_jobs_before_seconds_ago = 1.days
     config.good_job.cleanup_discarded_jobs = false
 
-    if ENV['AUTO_SYNC_LEGACY_USERS'] == "ON"
+    if ENV["AUTO_SYNC_LEGACY_USERS"] == "ON"
       config.good_job.cron = {
         sync_legacy_users: {
           cron: "0 */1 * * *", # run every hour
