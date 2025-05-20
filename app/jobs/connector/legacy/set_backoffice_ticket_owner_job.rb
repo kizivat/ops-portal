@@ -1,6 +1,5 @@
 class Connector::Legacy::SetBackofficeTicketOwnerJob < ApplicationJob
-  def perform(tenant, triage_issue_id, zammad_environment: Connector::BackofficeZammadEnvironment)
-    zammad_client = zammad_environment.client(tenant)
+  def perform(tenant, triage_issue_id, zammad_client: Connector::BackofficeZammadEnvironment.client(tenant))
     zammad_client.check_import_mode!
 
     issue = Issue.find_by(resolution_external_id: triage_issue_id)
