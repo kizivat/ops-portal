@@ -31,25 +31,25 @@ module ImportMethods
     def attachment_mimetype_by_name(name)
       case File.extname(name.to_s).downcase
       when ".pdf"
-        "application/pdf"
+          "application/pdf"
       when ".xml"
-        "application/xml"
+          "application/xml"
       when ".zip"
-        "application/x-zip-compressed"
+          "application/x-zip-compressed"
       when ".txt"
-        "text/plain"
+          "text/plain"
       when ".doc"
-        "application/msword"
+          "application/msword"
       when ".docx"
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       when ".jpg", ".jpeg"
-        "image/jpeg"
+          "image/jpeg"
       when ".png"
-        "image/png"
+          "image/png"
       when ".tiff", ".tif"
-        "image/tiff"
+          "image/tiff"
       else
-        "application/octet-stream"
+          "application/octet-stream"
       end
     end
   end
