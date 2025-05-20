@@ -47,3 +47,5 @@
 /Dockerfile*
 
 /.github/
+
+/README.md
