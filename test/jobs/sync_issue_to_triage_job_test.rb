@@ -13,6 +13,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
+        issue_number: "T-#{issue.id}",
         process_type: "portal_issue_triage",
         state: "new",
         group: "Dobrovoľníci::Trenčín",
@@ -58,6 +59,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :create_customer!, 9, [ issue.author ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
+        issue_number: "T-#{issue.id}",
         process_type: "portal_issue_triage",
         state: "new",
         group: "Dobrovoľníci::Trenčín",
@@ -108,6 +110,7 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
     triage_zammad_client_mock.expect :add_user_to_group, nil, [ 9, "Dobrovoľníci::Trenčín" ]
     triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
       **{
+        issue_number: "T-#{issue.id}",
         process_type: "portal_issue_triage",
         state: "new",
         group: "Dobrovoľníci::Trenčín",

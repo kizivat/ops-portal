@@ -13,19 +13,44 @@ class SyncIssueToTriageJob < ApplicationJob
       issue.touch(:last_synced_at)
 
     else
-      process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
-      ticket_id = create_new_triage_ticket(issue, triage_group: triage_group, process_type: process_type, client: client, import: import)
-      raise unless ticket_id
+      begin
+        process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
+        ticket_id = create_new_triage_ticket(issue, triage_group: triage_group, process_type: process_type, client: client, import: import)
+        raise unless ticket_id
 
-      issue.last_synced_at = Time.now
+        issue.last_synced_at = Time.now
 
-      if process_type == "portal_issue_triage"
-        issue.triage_external_id = ticket_id
-      else
-        issue.resolution_external_id = ticket_id
+        if process_type == "portal_issue_triage"
+          issue.triage_external_id = ticket_id
+        else
+          issue.resolution_external_id = ticket_id
+        end
+
+        issue.save!
+
+      rescue RuntimeError => e
+        raise e unless /.*This object already exists/.match?(e.message)
+
+        issue_number = generate_issue_number(issue, process_type: process_type)
+
+        search_result = client.client.ticket.search(query: "\"#{issue_number}\"").select { |r| r.number == issue_number }
+
+        raise e if search_result.count == 0
+
+        raise "Found multiple matches for ticket!" unless search_result.count == 1
+
+        ticket = search_result.first
+
+        issue.last_synced_at = Time.now
+
+        if process_type == "portal_issue_triage"
+          issue.triage_external_id = ticket.id
+        else
+          issue.resolution_external_id = ticket.id
+        end
+
+        issue.save!
       end
-
-      issue.save!
     end
 
     sync_activities_to_triage_job.perform_later(issue, triage_group: triage_group, import: import) if sync_activities
@@ -45,6 +70,7 @@ class SyncIssueToTriageJob < ApplicationJob
 
     client.create_ticket_from_issue!(
       issue,
+      issue_number: generate_issue_number(issue, process_type: process_type),
       process_type: process_type,
       state: ISSUE_OPS_STATE_TO_TRIAGE_STATE.fetch(issue.state.name),
       group: triage_group,
@@ -63,6 +89,19 @@ class SyncIssueToTriageJob < ApplicationJob
     user.save!
 
     user
+  end
+
+  def generate_issue_number(issue, process_type:)
+    case process_type
+    when "portal_issue_triage"
+      number_prefix = "T"
+    when "portal_issue_resolution"
+      number_prefix = "R"
+    else
+      raise "Unsupported process type: #{process_type}"
+    end
+
+    "#{number_prefix}-#{issue.id.to_s.rjust(4, '0')}"
   end
 
   def find_municipality_group(issue, client)

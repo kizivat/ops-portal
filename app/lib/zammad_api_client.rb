@@ -90,23 +90,14 @@ class ZammadApiClient
     end
   end
 
-  def create_ticket_from_issue!(issue, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
+  def create_ticket_from_issue!(issue, issue_number:, process_type: DEFAULT_PROCESS_TYPE, state: nil, group: DEFAULT_GROUP, sender: DEFAULT_SENDER, owner_id: nil)
     ops_state = issue.state&.key
     if issue.issue_type == "praise" && ops_state == "resolved_private"
       ops_state = "unresolved"
     end
 
-    case process_type
-    when "portal_issue_triage"
-      number_prefix = "T"
-    when "portal_issue_resolution"
-      number_prefix = "R"
-    else
-      raise "Unsupported process type: #{process_type}"
-    end
-
     ticket = @client.ticket.create(
-      number: "#{number_prefix}-#{issue.id.to_s.rjust(4, '0')}",
+      number: issue_number,
       ops_issue_identifier: issue.id,
       process_type: process_type,
       issue_type: issue.issue_type,
