@@ -30,16 +30,14 @@ class SyncIssueToTriageJob < ApplicationJob
 
       rescue RuntimeError => e
         issue_number = generate_issue_number(issue, process_type: process_type)
-
-        search_result = client.client.ticket.search(query: "\"#{issue_number}\"")
+        
+        search_result = client.client.ticket.search(query: "\"#{issue_number}\"").select { |r| r.number == issue_number }
 
         raise e if search_result.count == 0
 
         raise "Found multiple matches for ticket!" unless search_result.count == 1
 
         ticket = search_result.first
-
-        raise "Issue number mismatch!" unless ticket.number == issue_number
 
         issue.last_synced_at = Time.now
 
