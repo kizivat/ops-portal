@@ -8,15 +8,15 @@ module ImportMethods
 
     def download_attachables_from_ops_portal(paths)
       paths.map do |path|
-        {
-          io: download_from_ops_portal(path),
-          filename: attachment_filename(path)
-        }
+        Legacy::PrefetchedBlob.get(
+          "#{ENV.fetch("LEGACY_PORTAL_URL")}/#{path}",
+          attachment_filename(path)
+        )
       end
     end
 
     def download_from_ops_portal(path)
-      URI.parse("#{ENV.fetch("LEGACY_PORTAL_URL")}/#{path}").open
+      URI.parse().open
     end
 
     def download_avatar_from_ops_portal(user_legacy_id)
