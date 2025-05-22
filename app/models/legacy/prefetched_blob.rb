@@ -8,7 +8,9 @@
 #  updated_at :datetime         not null
 #
 class Legacy::PrefetchedBlob < ApplicationRecord
-  has_one_attached :attachment
+  has_one_attached :attachment do |attachment|
+    attachment.variant :full, resize_to_limit: [ 1280, 960 ]
+  end
 
   def self.get(url, filename, variants: [])
     cached = find_by(url: url)
@@ -24,11 +26,7 @@ class Legacy::PrefetchedBlob < ApplicationRecord
     )
     prefetched_blob = create!(url: url, attachment: blob)
 
-    if blob.variable?
-      variants.each do |variant|
-        ActiveStorage::TransformJob.perform_later(blob, variant)
-      end
-    end
+    prefetched_blob.attachment.variant(:full).processed
 
     prefetched_blob.attachment.blob
   end
