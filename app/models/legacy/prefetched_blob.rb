@@ -8,7 +8,9 @@
 #  updated_at :datetime         not null
 #
 class Legacy::PrefetchedBlob < ApplicationRecord
-  has_one_attached :attachment
+  has_one_attached :attachment do |attachment|
+    attachment.variant :full, resize_to_limit: [ 1280, 960 ]
+  end
 
   def self.get(url, filename, variants: [])
     cached = find_by(url: url)
