@@ -36,7 +36,10 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       OpenStruct.new(name: "Dobrovoľníci::Trenčín"),
       OpenStruct.new(name: "Dobrovoľníci::Prešov")
     ]
-    triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ]
+    triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
+    **{
+      issue_number: "T-#{issue.id}"
+    }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
       SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
@@ -85,7 +88,10 @@ class SyncIssueToTriageJobTest < ActiveJob::TestCase
       OpenStruct.new(name: "Dobrovoľníci::Prešov")
     ]
     triage_zammad_client_mock.expect :create_customer!, 9, [ issue.author ]
-    triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ]
+    triage_zammad_client_mock.expect :create_ticket_from_issue!, 99, [ issue ],
+    **{
+      issue_number: "T-#{issue.id}"
+    }
 
     ZammadApiClient.stub :new, triage_zammad_client_mock do
       SyncIssueToTriageJob.perform_now(issue, client: triage_zammad_client_mock)
