@@ -61,7 +61,9 @@ class SyncIssueToTriageJob < ApplicationJob
   def create_new_triage_ticket(issue, triage_group:, process_type:, client:, import:)
     find_or_create_triage_portal_user!(issue.author, client) unless issue.author.external_id
 
-    return client.create_ticket_from_issue!(issue) unless import
+    issue_number = generate_issue_number(issue, process_type: process_type)
+
+    return client.create_ticket_from_issue!(issue, issue_number: issue_number) unless import
 
     if issue.owner
       find_or_create_triage_portal_user!(issue.owner, client, customer: false) unless issue.owner.external_id
@@ -70,7 +72,7 @@ class SyncIssueToTriageJob < ApplicationJob
 
     client.create_ticket_from_issue!(
       issue,
-      issue_number: generate_issue_number(issue, process_type: process_type),
+      issue_number: issue_number,
       process_type: process_type,
       state: ISSUE_OPS_STATE_TO_TRIAGE_STATE.fetch(issue.state.name),
       group: triage_group,
