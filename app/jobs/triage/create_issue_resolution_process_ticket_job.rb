@@ -2,6 +2,7 @@ class Triage::CreateIssueResolutionProcessTicketJob < ApplicationJob
   def perform(issue, triage_group:, triage_owner_id:, triage_zammad_client: TriageZammadEnvironment.client)
     resolution_external_id = triage_zammad_client.create_ticket_from_issue!(
       issue,
+      issue_number: "R-#{issue.id.to_s.rjust(4, '0')}",
       process_type: "portal_issue_resolution",
       **{
         group: triage_group,
