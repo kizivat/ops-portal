@@ -136,9 +136,6 @@ module Connector
 
         # TODO custom error
         raise unless new_article.id
-
-        @tenant.activities.create!(triage_external_id: activity_object.triage_external_id, backoffice_external_id: new_article.id)
-        new_article
       rescue RuntimeError => e
         raise e unless /.*This object already exists/.match?(e.message)
 
@@ -146,9 +143,11 @@ module Connector
 
         raise e unless search_result.count == 1
 
-        @tenant.activities.create!(triage_external_id: activity_object.triage_external_id, backoffice_external_id: search_result.first.id)
-        search_result.first
+        new_article = search_result.first
       end
+
+      @tenant.activities.create!(triage_external_id: activity_object.triage_external_id, backoffice_external_id: new_article.id)
+      new_article
     end
 
     def find_or_create_article_from_legacy_data!(legacy_data, tenant_issue, sender:)
@@ -158,7 +157,6 @@ module Connector
       return ticket.articles.find { |a| article.backoffice_external_id == a.id } if article
 
       new_article = ticket.article(
-        # TODO no uuid?
         origin_by_id: create_or_find_agent(legacy_data.author),
         content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
         body: legacy_data.body,
@@ -460,9 +458,6 @@ module Connector
 
         # TODO custom error
         raise unless new_article.id
-
-        @tenant.activities.create!(triage_external_id: activity["triage_identifier"], backoffice_external_id: new_article.id)
-        new_article
       rescue RuntimeError => e
         raise e unless /.*This object already exists/.match?(e.message)
 
@@ -470,9 +465,11 @@ module Connector
 
         raise e unless search_result.count == 1
 
-        @tenant.activities.create!(triage_external_id: activity["triage_identifier"], backoffice_external_id: search_result.first.id)
-        search_result.first
+        new_article = search_result.first
       end
+
+      @tenant.activities.create!(triage_external_id: activity["triage_identifier"], backoffice_external_id: new_article.id)
+      new_article
     end
 
     def get_user(identifier)
