@@ -583,7 +583,7 @@ class ZammadApiClient
         User.find_by(external_id: article.origin_by_id || article.created_by_id)
       end
     when :responsible_subject_portal_and_backoffice_comment, :responsible_subject_backoffice_comment
-      ResponsibleSubject.find_by(external_id: article.origin_by_id)
+      ResponsibleSubject.find_by(external_id: article.origin_by_id || article.created_by_id)
     end
 
     {
