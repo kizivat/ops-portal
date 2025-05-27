@@ -185,8 +185,10 @@ module Connector
       tenant_issue = @tenant.issues.find_by(legacy_id: legacy_data.id)
       return @client.ticket.find(tenant_issue.backoffice_external_id) if tenant_issue
 
+      issue_number = "M-#{legacy_data.id.to_s.rjust(4, '0')}"
+
       tmp_body = {
-        number: "M-#{legacy_data.id.to_s.rjust(4, '0')}",
+        number: issue_number,
         state: state,
         group: group,
         title: legacy_data.title,
@@ -220,9 +222,21 @@ module Connector
         }
       }
 
-      new_ticket = @client.ticket.create(tmp_body)
-      # TODO custom error
-      raise unless new_ticket.id
+      begin
+        new_ticket = @client.ticket.create(tmp_body)
+        # TODO custom error
+        raise unless new_ticket.id
+      rescue RuntimeError => e
+        raise e unless /.*This object already exists/.match?(e.message)
+
+        search_result = @client.ticket.search(query: "\"#{issue_number}\"").select { |r| r.number == issue_number }
+
+        raise e if search_result.count == 0
+
+        raise "Found multiple matches for ticket!" unless search_result.count == 1
+
+        new_ticket = search_result.first
+      end
 
       @tenant.issues.create!(legacy_id: legacy_data.id, backoffice_external_id: new_ticket.id)
 
@@ -379,9 +393,11 @@ module Connector
       activity = @tenant.activities.find_by(triage_external_id: issue["triage_identifier"])
       return @client.ticket.find(ticket.backoffice_external_id) if ticket && activity
 
+      issue_number = "OPS-#{issue['ops_issue_identifier'].to_s.rjust(4, '0')}"
+
       article = issue["activities"].first
       tmp_body = {
-        number: "OPS-#{issue['ops_issue_identifier'].to_s.rjust(4, '0')}",
+        number: issue_number,
         state: state,
         group: group,
         origin: OPS_ORIGIN,
@@ -425,9 +441,21 @@ module Connector
         }
       }
 
-      new_ticket = @client.ticket.create(tmp_body)
-      # TODO custom error
-      raise unless new_ticket.id
+      begin
+        new_ticket = @client.ticket.create(tmp_body)
+        # TODO custom error
+        raise unless new_ticket.id
+      rescue RuntimeError => e
+        raise e unless /.*This object already exists/.match?(e.message)
+
+        search_result = @client.ticket.search(query: "\"#{issue_number}\"").select { |r| r.number == issue_number }
+
+        raise e if search_result.count == 0
+
+        raise "Found multiple matches for ticket!" unless search_result.count == 1
+
+        new_ticket = search_result.first
+      end
 
       @tenant.issues.create!(triage_external_id: issue["triage_identifier"], backoffice_external_id: new_ticket.id)
       @tenant.activities.create!(triage_external_id: issue["triage_identifier"], backoffice_external_id: new_ticket.articles.first.id)
