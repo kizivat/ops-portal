@@ -596,6 +596,7 @@ class ZammadApiClient
 
     {
       article_type: article_type,
+      uuid: article.uuid,
       author: author,
       author_response: build_author_response(article_type, author),
       triage_identifier: article.id,
