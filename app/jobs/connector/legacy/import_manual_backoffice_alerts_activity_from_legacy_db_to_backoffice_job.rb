@@ -28,7 +28,7 @@ class Connector::Legacy::ImportManualBackofficeAlertsActivityFromLegacyDbToBacko
         zammad_client.find_or_create_article_from_legacy_data!(
           legacy_data,
           backoffice_issue,
-          uuid: "00000000-0000-0000-0000-#{legacy_data.id.to_s.rjust(12,'0')}",
+          uuid: "00000000-0000-0000-0000-#{legacy_data.id.to_s.rjust(12,"0")}",
           sender: "Agent"
         )
       end
