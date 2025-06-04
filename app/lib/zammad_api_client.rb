@@ -627,10 +627,12 @@ class ZammadApiClient
 
     when "portal_issue_resolution"
       return :unknown_user_portal_comment if article.sender == "Customer" && article.origin_by_id == nil && article.created_by_id == ENV.fetch("TRIAGE_ZAMMAD_TECH_USER_ID").to_i
-      return :user_portal_comment if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.origin == "portal"
+
+      article_author = zammad_api_client.user.find(article.origin_by_id || article.created_by_id)
+      return :user_portal_comment if article.sender == "Customer" && article_author&.origin == "portal"
 
       if article.body.include?(OPS_PORTAL_ARTICLE_TAG)
-        if article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
+        if article.sender == "Customer" && (article_author&.roles & [ "Zodpovedný Subjekt", "Externý zodpovedný subjekt" ]).present?
           if article.type == "email"
             body = EmailParser.parse_text(article.body)
             if body.first(100).include?(OPS_PORTAL_ARTICLE_TAG)
@@ -651,7 +653,7 @@ class ZammadApiClient
       elsif article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
         return :agent_backoffice_comment if article.sender == "Agent"
       else
-        return nil unless article.sender == "Customer" && zammad_api_client.user.find(article.origin_by_id || article.created_by_id)&.roles&.include?("Zodpovedný Subjekt")
+        return nil unless article.sender == "Customer" && (article_author&.roles & [ "Zodpovedný Subjekt", "Externý zodpovedný subjekt" ]).present?
         return :responsible_subject_backoffice_comment
       end
     else
