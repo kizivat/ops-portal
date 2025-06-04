@@ -53,17 +53,26 @@ class ZammadApiClientTest < ActiveSupport::TestCase
 
   test "portal_issue_resolution process_type article from agent returns agent_portal_and_backoffice_comment" do
     article = @article_struct.new(sender: "Agent", body: "text with #{ZammadApiClient::OPS_PORTAL_ARTICLE_TAG} and #{ZammadApiClient::RESPONSIBLE_SUBJECT_ARTICLE_TAG}")
-    assert_equal :agent_portal_and_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution")
+    zammad_user = OpenStruct.new(origin: "portal", roles: [ "Agent" ])
+    zammad_user_client = DummyUserClient.new(zammad_user)
+    zammad_api_client = OpenStruct.new(user: zammad_user_client)
+    assert_equal :agent_portal_and_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
   end
 
   test "portal_issue_resolution process_type article from agent returns agent_portal_comment" do
     article = @article_struct.new(sender: "Agent", body: "text with #{ZammadApiClient::OPS_PORTAL_ARTICLE_TAG}")
-    assert_equal :agent_portal_comment, @subject.send(:get_article_type, article, "portal_issue_resolution")
+    zammad_user = OpenStruct.new(origin: "portal", roles: [ "Agent" ])
+    zammad_user_client = DummyUserClient.new(zammad_user)
+    zammad_api_client = OpenStruct.new(user: zammad_user_client)
+    assert_equal :agent_portal_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
   end
 
   test "portal_issue_resolution process_type article from agent returns agent_backoffice_comment" do
     article = @article_struct.new(sender: "Agent", body: "text with #{ZammadApiClient::RESPONSIBLE_SUBJECT_ARTICLE_TAG}")
-    assert_equal :agent_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution")
+    zammad_user = OpenStruct.new(origin: "portal", roles: [ "Agent" ])
+    zammad_user_client = DummyUserClient.new(zammad_user)
+    zammad_api_client = OpenStruct.new(user: zammad_user_client)
+    assert_equal :agent_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
   end
 
   test "portal_issue_resolution process_type web article from customer with portal tag returns user_portal_comment" do
