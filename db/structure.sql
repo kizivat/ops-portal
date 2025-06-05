@@ -1047,7 +1047,9 @@ CREATE TABLE public.issues_updates (
     legacy_id integer,
     triage_external_id integer,
     imported_at timestamp(6) without time zone,
-    uuid uuid
+    uuid uuid,
+    confirmed boolean DEFAULT false,
+    external_id character varying
 );
 
 
@@ -3044,6 +3046,13 @@ CREATE INDEX index_issues_updates_on_confirmed_by_id ON public.issues_updates US
 
 
 --
+-- Name: index_issues_updates_on_external_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_issues_updates_on_external_id ON public.issues_updates USING btree (external_id);
+
+
+--
 -- Name: index_issues_updates_on_legacy_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3889,6 +3898,10 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250605192922'),
+('20250605190746'),
+('20250522185556'),
+('20250522184502'),
 ('20250522111247'),
 ('20250522105736'),
 ('20250522105410'),
