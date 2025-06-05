@@ -54,6 +54,7 @@ class Issues::Draft < ApplicationRecord
   validates_numericality_of :zoom, greater_than: 14, allow_nil: true, on: :geo_step
   validate :photos_allowed_content_type, on: :photos_step
 
+  validate :no_duplicates_nearby, on: :checks_step
   validate :municipality_supported, on: :checks_step
   validate :checks_passed, on: :checks_step
 
@@ -158,6 +159,16 @@ class Issues::Draft < ApplicationRecord
 
   def latlon_present
     errors.add(:base, :latlon_missing) if latitude.blank? || longitude.blank?
+  end
+
+  def no_duplicates_nearby
+    if Issue
+         .publicly_visible
+         .within_distance_from_point(latitude, longitude, 500)
+         .where(category: category, subcategory: subcategory, subtype: subtype).count > 0
+
+      errors.add(:base, :duplicates_nearby)
+    end
   end
 
   def checks_passed

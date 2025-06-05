@@ -4,6 +4,8 @@ class Issues::DraftsController < ApplicationController
   before_action :load_draft, except: [ :new, :new_question, :create, :thanks ]
 
   def new
+    @previous_draft = current_user.issues_drafts.last
+    @previous_draft = nil if @previous_draft.submitted? || @previous_draft.created_at < 2.hours.ago
     @draft = Issues::Draft.new(issue_type: :issue)
   end
 
