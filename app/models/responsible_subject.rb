@@ -5,7 +5,6 @@
 #  id                           :bigint           not null, primary key
 #  active                       :boolean
 #  code                         :string
-#  deleted_at                   :datetime
 #  email                        :string
 #  name                         :string
 #  pro                          :boolean
@@ -27,7 +26,7 @@ class ResponsibleSubject < ApplicationRecord
   belongs_to :municipality, optional: true
   belongs_to :municipality_district, optional: true
 
-  scope :active, -> { where(deleted_at: nil) }
+  scope :active, -> { where(active: true) }
 
   def self.search(query)
     where("unaccent(lower(subject_name)) LIKE unaccent(lower(?))", "#{query}%").or(
