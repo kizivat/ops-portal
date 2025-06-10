@@ -19,10 +19,10 @@ class Connector::Legacy::ImportManualBackofficeAlertFromLegacyDbToBackofficeJob 
       Legacy::User.find_or_create_responsible_subjects_user(subscriber.municipality_user_id)
     end&.compact
     tags = if legacy_record.label_id
-       Legacy::Label.find_by(legacy_id: legacy_record.label_id)&.name
-     else
-       nil
-     end
+      Legacy::Label.find_by(legacy_id: legacy_record.label_id)&.name
+    else
+      nil
+    end
 
     legacy_data = OpenStruct.new(
       id: legacy_record.id,
