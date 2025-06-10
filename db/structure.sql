@@ -1133,6 +1133,39 @@ ALTER SEQUENCE public.legacy_agents_id_seq OWNED BY public.legacy_agents.id;
 
 
 --
+-- Name: legacy_alerts_sources; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.legacy_alerts_sources (
+    id bigint NOT NULL,
+    legacy_id integer,
+    responsible_subject_id bigint NOT NULL,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: legacy_alerts_sources_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.legacy_alerts_sources_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: legacy_alerts_sources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.legacy_alerts_sources_id_seq OWNED BY public.legacy_alerts_sources.id;
+
+
+--
 -- Name: legacy_issues_communications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2001,6 +2034,13 @@ ALTER TABLE ONLY public.legacy_agents ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: legacy_alerts_sources id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_alerts_sources ALTER COLUMN id SET DEFAULT nextval('public.legacy_alerts_sources_id_seq'::regclass);
+
+
+--
 -- Name: legacy_issues_communications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2364,6 +2404,14 @@ ALTER TABLE ONLY public.issues_updates
 
 ALTER TABLE ONLY public.legacy_agents
     ADD CONSTRAINT legacy_agents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: legacy_alerts_sources legacy_alerts_sources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_alerts_sources
+    ADD CONSTRAINT legacy_alerts_sources_pkey PRIMARY KEY (id);
 
 
 --
@@ -3128,6 +3176,20 @@ CREATE INDEX index_legacy_agents_on_street_id ON public.legacy_agents USING btre
 
 
 --
+-- Name: index_legacy_alerts_sources_on_legacy_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_legacy_alerts_sources_on_legacy_id ON public.legacy_alerts_sources USING btree (legacy_id);
+
+
+--
+-- Name: index_legacy_alerts_sources_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_legacy_alerts_sources_on_responsible_subject_id ON public.legacy_alerts_sources USING btree (responsible_subject_id);
+
+
+--
 -- Name: index_legacy_issues_communications_on_activity_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3456,6 +3518,14 @@ ALTER TABLE ONLY public.municipalities
 
 ALTER TABLE ONLY public.issues
     ADD CONSTRAINT fk_rails_05f1e72feb FOREIGN KEY (author_id) REFERENCES public.users(id);
+
+
+--
+-- Name: legacy_alerts_sources fk_rails_0e2f527795; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_alerts_sources
+    ADD CONSTRAINT fk_rails_0e2f527795 FOREIGN KEY (responsible_subject_id) REFERENCES public.responsible_subjects(id);
 
 
 --
@@ -3948,6 +4018,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250610121625'),
 ('20250609144952'),
 ('20250522111247'),
 ('20250522105736'),
