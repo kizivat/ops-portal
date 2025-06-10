@@ -381,7 +381,8 @@ CREATE TABLE public.connector_tenants (
     backoffice_url character varying,
     backoffice_api_token character varying,
     backoffice_webhook_secret character varying,
-    receive_customer_activities boolean DEFAULT false NOT NULL
+    receive_customer_activities boolean DEFAULT false NOT NULL,
+    migrate_legacy_labels boolean DEFAULT true
 );
 
 
@@ -3218,6 +3219,13 @@ CREATE UNIQUE INDEX index_legacy_issues_communications_on_uuid ON public.legacy_
 
 
 --
+-- Name: index_legacy_labels_on_legacy_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_legacy_labels_on_legacy_id ON public.legacy_labels USING btree (legacy_id);
+
+
+--
 -- Name: index_legacy_labels_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4018,6 +4026,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250610165558'),
 ('20250610121625'),
 ('20250609144952'),
 ('20250522111247'),
