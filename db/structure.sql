@@ -1188,6 +1188,40 @@ ALTER SEQUENCE public.legacy_issues_communications_id_seq OWNED BY public.legacy
 
 
 --
+-- Name: legacy_labels; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.legacy_labels (
+    id bigint NOT NULL,
+    legacy_id integer,
+    responsible_subject_id bigint NOT NULL,
+    name character varying,
+    color character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: legacy_labels_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.legacy_labels_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: legacy_labels_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.legacy_labels_id_seq OWNED BY public.legacy_labels.id;
+
+
+--
 -- Name: legacy_prefetched_blobs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1974,6 +2008,13 @@ ALTER TABLE ONLY public.legacy_issues_communications ALTER COLUMN id SET DEFAULT
 
 
 --
+-- Name: legacy_labels id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_labels ALTER COLUMN id SET DEFAULT nextval('public.legacy_labels_id_seq'::regclass);
+
+
+--
 -- Name: legacy_prefetched_blobs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2331,6 +2372,14 @@ ALTER TABLE ONLY public.legacy_agents
 
 ALTER TABLE ONLY public.legacy_issues_communications
     ADD CONSTRAINT legacy_issues_communications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: legacy_labels legacy_labels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_labels
+    ADD CONSTRAINT legacy_labels_pkey PRIMARY KEY (id);
 
 
 --
@@ -3107,6 +3156,13 @@ CREATE UNIQUE INDEX index_legacy_issues_communications_on_uuid ON public.legacy_
 
 
 --
+-- Name: index_legacy_labels_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_legacy_labels_on_responsible_subject_id ON public.legacy_labels USING btree (responsible_subject_id);
+
+
+--
 -- Name: index_legacy_prefetched_blobs_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3676,10 +3732,13 @@ ALTER TABLE ONLY public.issue_likes
 
 --
 -- Name: connector_activities fk_rails_90e9990402; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: legacy_labels fk_rails_91c3a6c92e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.connector_activities
     ADD CONSTRAINT fk_rails_90e9990402 FOREIGN KEY (connector_tenant_id) REFERENCES public.connector_tenants(id);
+ALTER TABLE ONLY public.legacy_labels
+    ADD CONSTRAINT fk_rails_91c3a6c92e FOREIGN KEY (responsible_subject_id) REFERENCES public.responsible_subjects(id);
 
 
 --
@@ -3889,6 +3948,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250609144952'),
 ('20250522111247'),
 ('20250522105736'),
 ('20250522105410'),
