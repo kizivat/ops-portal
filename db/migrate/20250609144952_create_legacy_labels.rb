@@ -7,6 +7,8 @@ class CreateLegacyLabels < ActiveRecord::Migration[8.0]
       t.string :color
 
       t.timestamps
+
+      t.index :legacy_id, unique: true
     end
   end
 end
