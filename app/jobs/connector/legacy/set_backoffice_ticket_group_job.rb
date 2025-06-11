@@ -16,6 +16,11 @@ class Connector::Legacy::SetBackofficeTicketGroupJob < ApplicationJob
 
     group = zammad_client.find_or_create_group(selected_organization_unit.name)
     zammad_client.add_ticket_to_group(issue, group.name)
-    zammad_client.add_ticket_owner_to_group(issue.backoffice_owner, group.name) if issue.backoffice_owner
+    zammad_client.add_agent_to_group(issue.backoffice_owner, group.name) if issue.backoffice_owner
+
+    issue.legacy_data&.fetch("other_backoffice_owners_legacy_ids")&.each do |other_legacy_owner_id|
+      backoffice_agent = Legacy::User.find_or_create_responsible_subjects_user(other_legacy_owner_id)
+      zammad_client.add_agent_to_group(backoffice_agent, group.name)
+    end
   end
 end

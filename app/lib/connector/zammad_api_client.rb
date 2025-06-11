@@ -271,7 +271,7 @@ module Connector
       ticket.save
     end
 
-    def add_ticket_owner_to_group(owner, group_name)
+    def add_agent_to_group(owner, group_name)
       user_id = create_or_find_agent(owner)
       add_user_to_group(user_id, group_name)
     end
@@ -343,9 +343,10 @@ module Connector
 
       return group if group
 
-      @client.group.create(name: group_name)
+      group = @client.group.create(name: group_name)
       # add tech user to the new group
       add_user_to_group(get_tech_user_id, group_name)
+      group
     end
 
     def add_ticket_to_group(issue, group_name)
