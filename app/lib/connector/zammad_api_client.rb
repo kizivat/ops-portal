@@ -271,6 +271,12 @@ module Connector
       ticket.save
     end
 
+    def add_ticket_owner_to_group(owner, group_name)
+      user_id = create_or_find_agent(owner)
+      add_user_to_group(user_id, group_name)
+
+    end
+
     def add_ticket_tag(issue, tag_name)
       ticket = find_ticket_for_issue!(issue)
 
@@ -333,6 +339,23 @@ module Connector
       @last_import_mode_check = Time.now
     end
 
+    def find_or_create_group(group_name)
+      group = @client.group.all.select{ |g| g.name == group_name }&.first
+
+      return group if group
+
+      @client.group.create(name: group_name)
+      # add tech user to the new group
+      add_user_to_group(get_tech_user_id, group_name)
+    end
+
+    def add_ticket_to_group(issue, group_name)
+      ticket = find_ticket_for_issue!(issue)
+
+      ticket.group = group_name
+      ticket.save
+    end
+
     private
 
     def create_or_find_customer(author)
@@ -388,6 +411,10 @@ module Connector
         raise "Can't find nor create zammad user with email: #{user_params["email"]}" unless zammad_user
         zammad_user
       end
+    end
+
+    def get_tech_user_id
+      @client.user.all.select{|u| u.firstname == "Aplikácia" && u.lastname == "Odkaz pre starostu" && "OPS Tech Account".in?(u.roles)}.first.id
     end
 
     def add_user_to_group(user_identifier, group_name)
