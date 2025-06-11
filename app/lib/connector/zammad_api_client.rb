@@ -199,7 +199,7 @@ module Connector
         ops_subcategory: legacy_data.subcategory&.name,
         ops_subtype: legacy_data.subtype&.name,
         address_municipality: legacy_data.municipality&.name,
-        address_municipality_district: legacy_data.municipality_district.name,
+        address_municipality_district: legacy_data.municipality_district&.name,
         address_street: legacy_data.address_street,
         address_lat: legacy_data.latitude,
         address_lon: legacy_data.longitude,
@@ -274,7 +274,6 @@ module Connector
     def add_ticket_owner_to_group(owner, group_name)
       user_id = create_or_find_agent(owner)
       add_user_to_group(user_id, group_name)
-
     end
 
     def add_ticket_tag(issue, tag_name)
@@ -351,6 +350,13 @@ module Connector
 
     def add_ticket_to_group(issue, group_name)
       ticket = find_ticket_for_issue!(issue)
+
+      ticket.group = group_name
+      ticket.save
+    end
+
+    def add_manual_ticket_to_group(tenant_issue, group_name)
+      ticket = @client.ticket.find(tenant_issue.backoffice_external_id)
 
       ticket.group = group_name
       ticket.save
