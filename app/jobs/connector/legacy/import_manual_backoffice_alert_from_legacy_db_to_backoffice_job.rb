@@ -19,10 +19,11 @@ class Connector::Legacy::ImportManualBackofficeAlertFromLegacyDbToBackofficeJob 
       Legacy::User.find_or_create_responsible_subjects_user(subscriber.municipality_user_id)
     end&.compact
     tags = if legacy_record.label_id && tenant.migrate_legacy_labels?
-      Legacy::Label.find_or_create_by_legacy_id(legacy_record.label_id)&.name
+      [ Legacy::Label.find_or_create_by_legacy_id(legacy_record.label_id)&.name ]
     else
-      nil
+      []
     end
+    tags << Legacy::Alerts::Source.find_or_create_by_legacy_id(legacy_record.source_id)&.name if legacy_record.source_id
 
     legacy_data = OpenStruct.new(
       id: legacy_record.id,
@@ -43,7 +44,7 @@ class Connector::Legacy::ImportManualBackofficeAlertFromLegacyDbToBackofficeJob 
       latitude: legacy_record.map_x,
       longitude: legacy_record.map_y,
       created_at: convert_timestamp_value(legacy_record.posted_time),
-      tags: tags,
+      tags: tags.compact.join(","),
       attachments: Legacy::Alerts::Image.where(alert_id: legacy_record.id).order(:position).map do |legacy_attachment_record|
         OpenStruct.new(
           filename: File.basename(legacy_attachment_record.original),
