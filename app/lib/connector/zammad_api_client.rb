@@ -271,7 +271,7 @@ module Connector
       ticket.save
     end
 
-    def add_ticket_owner_to_group(owner, group_name)
+    def add_agent_to_group(owner, group_name)
       user_id = create_or_find_agent(owner)
       add_user_to_group(user_id, group_name)
     end
