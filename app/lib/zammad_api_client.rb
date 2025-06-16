@@ -643,7 +643,7 @@ class ZammadApiClient
       return :user_portal_comment if article.sender == "Customer" && article_author&.origin == "portal"
 
       if article.body.include?(OPS_PORTAL_ARTICLE_TAG)
-        if article.sender == "Customer" && article_author&.organization.present?
+        if article.sender == "Customer" && (article_author&.organization.present? || article_author&.roles&.include?("Zodpovedný Subjekt"))
           if article.type == "email"
             body = EmailParser.parse_text(article.body)
             if body.first(100).include?(OPS_PORTAL_ARTICLE_TAG)
@@ -664,7 +664,7 @@ class ZammadApiClient
       elsif article.body.include?(RESPONSIBLE_SUBJECT_ARTICLE_TAG)
         return :agent_backoffice_comment if article.sender == "Agent"
       else
-        return nil unless article.sender == "Customer" && article_author&.organization.present?
+        return nil unless article.sender == "Customer" && (article_author&.organization.present? || article_author&.roles&.include?("Zodpovedný Subjekt"))
         return :responsible_subject_backoffice_comment
       end
     else

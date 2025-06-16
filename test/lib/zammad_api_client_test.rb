@@ -154,4 +154,20 @@ class ZammadApiClientTest < ActiveSupport::TestCase
     zammad_api_client = OpenStruct.new(user: zammad_user_client)
     assert_equal :responsible_subject_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
   end
+
+  test "article from PRO responsible subject without portal tag returns responsible_subject_backoffice_comment" do
+    article = @article_struct.new(sender: "Customer", type: "email", origin_by_id: 123, body: "Some text without portal tag")
+    zammad_user = OpenStruct.new(origin: nil, organization: nil, roles: [ "Zodpovedný Subjekt" ])
+    zammad_user_client = DummyUserClient.new(zammad_user)
+    zammad_api_client = OpenStruct.new(user: zammad_user_client)
+    assert_equal :responsible_subject_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
+  end
+
+  test "article from PRO responsible subject with portal tag in the main part returns responsible_subject_portal_and_backoffice_comment" do
+    article = @article_struct.new(sender: "Customer", type: "email", origin_by_id: 123, body: "[[ops portal]] Some text with portal tag")
+    zammad_user = OpenStruct.new(origin: nil, organization: nil, roles: [ "Zodpovedný Subjekt" ])
+    zammad_user_client = DummyUserClient.new(zammad_user)
+    zammad_api_client = OpenStruct.new(user: zammad_user_client)
+    assert_equal :responsible_subject_portal_and_backoffice_comment, @subject.send(:get_article_type, article, "portal_issue_resolution", zammad_api_client: zammad_api_client)
+  end
 end
