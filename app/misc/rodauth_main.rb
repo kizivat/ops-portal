@@ -6,7 +6,7 @@ class RodauthMain < Rodauth::Rails::Auth
     enable :create_account, :verify_account,
            :login, :logout, :remember,
            :reset_password, :change_password, :change_login, :verify_login_change,
-           :close_account
+           :close_account, :active_sessions
 
     # Omniauth
     enable :omniauth
@@ -36,6 +36,8 @@ class RodauthMain < Rodauth::Rails::Auth
 
     # Change prefix of table and foreign key column names from default "account"
     accounts_table :users
+    active_sessions_table :user_active_session_keys
+    active_sessions_account_id_column :user_id
     verify_account_table :user_verification_keys
     verify_login_change_table :user_login_change_keys
     reset_password_table :user_password_reset_keys
@@ -112,6 +114,7 @@ class RodauthMain < Rodauth::Rails::Auth
     # create_account_notice_flash "Your account has been created. Please verify your account by visiting the confirmation link sent to your email address."
     # require_login_error_flash "Login is required for accessing this page"
     # login_notice_flash nil
+    active_sessions_error_flash nil
 
     # ==> Validation
     # Override default validation error messages.
@@ -140,6 +143,14 @@ class RodauthMain < Rodauth::Rails::Auth
     # ==> Remember Feature
     # Remember all logged in users.
     after_login { remember_login }
+
+    # Check for banned users before login
+    before_login do
+      if account[:banned]
+        set_redirect_error_flash "Váš účet bol zablokovaný."
+        redirect login_path
+      end
+    end
 
     # Or only remember users that have ticked a "Remember Me" checkbox on login.
     # after_login { remember_login if param_or_nil("remember") }
