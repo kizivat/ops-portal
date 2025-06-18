@@ -156,25 +156,35 @@ module Connector
       article = @tenant.activities.find_by(legacy_id: legacy_data.id)
       return ticket.articles.find { |a| article.backoffice_external_id == a.id } if article
 
-      new_article = ticket.article(
-        uuid: uuid,
-        origin_by_id: create_or_find_agent(legacy_data.author),
-        content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
-        body: legacy_data.body,
-        type: DEFAULT_ARTICLE_TYPE,
-        internal: legacy_data.internal,
-        attachments: legacy_data.attachments.map do |attachment|
-          {
-            "filename" => attachment.filename,
-            "mime-type" => attachment.mimetype,
-            "data" => Base64.encode64(attachment.content)
-          }
-        end,
-        sender: sender,
-        created_at: legacy_data.created_at
-      )
+      begin
+        new_article = ticket.article(
+          uuid: uuid,
+          origin_by_id: create_or_find_agent(legacy_data.author),
+          content_type: DEFAULT_ARTICLE_CONTENT_TYPE,
+          body: legacy_data.body,
+          type: DEFAULT_ARTICLE_TYPE,
+          internal: legacy_data.internal,
+          attachments: legacy_data.attachments.map do |attachment|
+            {
+              "filename" => attachment.filename,
+              "mime-type" => attachment.mimetype,
+              "data" => Base64.encode64(attachment.content)
+            }
+          end,
+          sender: sender,
+          created_at: legacy_data.created_at
+        )
 
-      raise unless new_article.id
+        raise unless new_article.id
+      rescue RuntimeError => e
+        raise e unless /.*This object already exists/.match?(e.message)
+
+        search_result = ticket.articles.select { |a| a.uuid == uuid }
+
+        raise e unless search_result.count == 1
+
+        new_article = search_result.first
+      end
 
       @tenant.activities.create!(legacy_id: legacy_data.id, backoffice_external_id: new_article.id)
       new_article
