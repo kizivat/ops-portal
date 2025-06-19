@@ -14,10 +14,10 @@ class Connector::Legacy::ImportBackofficeActivityFromTriageToBackofficeJob < App
       author = activity.activity_object.backoffice_author
 
       author_id = if author&.responsible_subject == tenant_responsible_subject
-                    zammad_client.find_or_create_imported_article_agent_author(author)
-                  else
-                    zammad_client.find_or_create_inactive_responsible_subject_user(author&.responsible_subject)
-                  end
+        zammad_client.find_or_create_imported_article_agent_author(author)
+      else
+        zammad_client.find_or_create_inactive_responsible_subject_user(author&.responsible_subject)
+      end
 
       zammad_client.find_or_create_article_from_activity_object!(issue, activity.activity_object, author_id: author_id, internal: activity.activity_object.internal?, sender: "Agent")
     end
