@@ -299,6 +299,23 @@ module Connector
       user_id
     end
 
+    def find_or_create_inactive_responsible_subject_user(responsible_subject)
+      return ANONYMOUS_USER_ID unless responsible_subject
+
+      user = @tenant.users.find_or_initialize_by(email: responsible_subject.email)
+      return user.external_id unless user.new_record?
+
+      zammad_identifier = find_or_create_user!(
+        firstname: responsible_subject.subject_name,
+        login: "ops-rs-#{responsible_subject.id}",
+        active: false
+      ).id
+
+      user.update(firstname: responsible_subject.name, external_id: zammad_identifier)
+
+      zammad_identifier
+    end
+
     def subscribe_ticket(agent, issue)
       ticket = find_ticket_for_issue!(issue)
 
