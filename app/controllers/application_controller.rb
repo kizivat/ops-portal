@@ -32,8 +32,7 @@ class ApplicationController < ActionController::Base
   def require_full_access_user
     require_user
 
-    # TODO temporarily disabled due to quota
-    # redirect_to_with_turbo please_verify_profile_path if logged_in? && !current_user.full_access?
+    redirect_to_with_turbo please_verify_profile_path if logged_in? && !current_user.full_access?
   end
 
   def ensure_user_onboarded
