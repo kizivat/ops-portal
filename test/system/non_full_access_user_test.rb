@@ -7,8 +7,6 @@ class NonFullAccessUserTest < ApplicationSystemTestCase
   end
 
   test "unverified user cannot create issue, question or praise" do
-    skip "quota limit exceeded"
-
     visit root_path
     click_on "Nahlásiť podnet"
     assert_text "overený účet"
@@ -23,8 +21,6 @@ class NonFullAccessUserTest < ApplicationSystemTestCase
   end
 
   test "unverified user cannot comment, like or vote on issue but cam subscribe" do
-    skip "quota limit exceeded"
-
     visit issue_path(issues(:two))
     assert_text "Chcete pridať komentár alebo overiť podnet? Musíme overiť váš účet"
 
