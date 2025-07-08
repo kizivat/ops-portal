@@ -58,7 +58,7 @@ class Triage::UpdatePortalTicketFromTriageJob < ApplicationJob
     case ticket[:ops_state].key
     when "rejected"
       issue_update.update!(confirmed: false, published: false)
-    when "resolved"
+    when "accepted"
       issue_update.update!(confirmed: true, published: true)
     end
 
