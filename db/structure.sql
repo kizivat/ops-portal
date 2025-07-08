@@ -1049,7 +1049,8 @@ CREATE TABLE public.issues_updates (
     imported_at timestamp(6) without time zone,
     uuid uuid,
     confirmed boolean DEFAULT false,
-    external_id character varying
+    external_id character varying,
+    hidden boolean DEFAULT false
 );
 
 
@@ -4025,6 +4026,7 @@ ALTER TABLE ONLY public.cms_categories
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250708140537'),
 ('20250708113955'),
 ('20250610165558'),
 ('20250610121625'),
