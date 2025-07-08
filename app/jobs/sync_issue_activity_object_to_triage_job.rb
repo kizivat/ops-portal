@@ -39,7 +39,7 @@ class SyncIssueActivityObjectToTriageJob < ApplicationJob
     issue_update.update!(external_id: external_id)
 
   rescue RuntimeError => e
-    raise e unless /.*This object already exists/.match?(e.message)
+    raise e unless /.*This object already exists/.match?(e.message) || /.*Can't save object \(ZammadAPI::Resources::Ticket\): Error ID.*/.match?(e.message)
 
     search_result = client.client.ticket.search(query: "\"#{issue_update.ticket_number}\"").select { |r| r.number == issue_update.ticket_number }
 
@@ -48,6 +48,8 @@ class SyncIssueActivityObjectToTriageJob < ApplicationJob
 
     ticket = search_result.first
     issue_update.update!(external_id: ticket.id)
+
+    client.link_tickets!(parent_ticket_id: issue_update.issue.resolution_external_id, child_ticket_id: ticket.id) if issue_update.issue.resolution_external_id
   end
 
   def find_or_create_triage_portal_user!(user, client, user_group: nil)

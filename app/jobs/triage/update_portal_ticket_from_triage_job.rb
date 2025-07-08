@@ -54,7 +54,7 @@ class Triage::UpdatePortalTicketFromTriageJob < ApplicationJob
 
   def update_issue_update(ticket)
     issue_update = Issues::Update.find_by!(external_id: ticket[:triage_identifier])
-    issue_update.update!(description: ticket[:description])
+    issue_update.update!(text: ticket[:description])
     case ticket[:ops_state].key
     when "rejected"
       issue_update.update!(confirmed: false, published: false)

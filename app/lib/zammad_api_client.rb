@@ -179,7 +179,7 @@ class ZammadApiClient
       ops_issue_identifier: issue_update.id,
       process_type: "portal_issue_verification",
       title: "Aktualizácia podnetu #{issue.title || 'Bez názvu'}",
-      body: issue.description.presence || "(bez popisu)",
+      body: issue_update.text.presence || "(bez popisu)",
       group: issue_ticket.group,
       customer_id: issue_update.author.external_id,
       origin_by_id: issue_update.author.external_id,
@@ -191,7 +191,7 @@ class ZammadApiClient
         origin_by_id: issue_update.author.external_id,
         sender: DEFAULT_SENDER,
         type: DEFAULT_ARTICLE_TYPE,
-        body: issue.description.presence || "(bez popisu)",
+        body: issue_update.text.presence || "(bez popisu)",
         attachments: issue_update.attachments.map do |photo|
           {
             "filename" => photo.filename.to_s,
@@ -203,6 +203,9 @@ class ZammadApiClient
     )
 
     raise unless ticket.id
+
+    link_tickets!(parent_ticket_id: issue.resolution_external_id, child_ticket_id: ticket.id)
+
     ticket.id
   end
 
