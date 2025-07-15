@@ -131,7 +131,7 @@
           </button>-->
         </div>
 
-        <% if activity_objects.any? %>
+        <% if !issue.discussion_closed? && !issue.archived? %>
           <%= turbo_frame_tag "activities", class: 'comment-con' do %>
             <%= render activity_objects %>
             <% if activity_objects.empty? && !issue.discussion_closed? && !issue.archived? %>
