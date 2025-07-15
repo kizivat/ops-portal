@@ -3526,20 +3526,6 @@ CREATE INDEX issues_fulltext_idx ON public.issues USING gin ((((((to_tsvector('s
 
 
 --
--- Name: test_js_g1; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX test_js_g1 ON public.issues USING btree (public.st_geohash(public.st_point(longitude, latitude), 6));
-
-
---
--- Name: test_js_geo; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX test_js_geo ON public.issues USING btree (public.st_geohash(public.st_point(longitude, latitude, 4326), 6));
-
-
---
 -- Name: municipalities fk_rails_03f4031592; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
