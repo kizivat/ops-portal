@@ -18,7 +18,14 @@ class RateLimitingTest < ApplicationSystemTestCase
     end
 
     visit new_issues_draft_path
+    assert_current_path please_wait_profile_path
+    assert_text "Dosiahli ste limit pre túto funkciu!"
 
+    visit new_question_issues_drafts_path
+    assert_current_path please_wait_profile_path
+    assert_text "Dosiahli ste limit pre túto funkciu!"
+
+    visit new_praise_path
     assert_current_path please_wait_profile_path
     assert_text "Dosiahli ste limit pre túto funkciu!"
   end
