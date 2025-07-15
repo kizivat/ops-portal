@@ -607,7 +607,7 @@ DEPENDENCIES
   propshaft
   pry (~> 0.15.0)
   puma (>= 5.0)
-  rack-cors (~> 3.0)
+  rack-cors
   rails (~> 8.0.0)
   rails-i18n (~> 8.0.0)
   rodauth-i18n
