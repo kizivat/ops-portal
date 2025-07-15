@@ -1,6 +1,6 @@
 class Triage::UpdatePortalIssueUpdateFromTriageJob < ApplicationJob
   def perform(ticket)
-    issue_update = Issues::Update.find_by!(triage_external_id: ticket[:triage_identifier])
+    issue_update = Issues::Update.find_by!(external_id: ticket[:triage_identifier])
     issue_update.update!(text: ticket[:description])
 
     case ticket[:ops_state_key]
