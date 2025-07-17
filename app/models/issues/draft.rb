@@ -17,6 +17,7 @@
 #  anonymous               :boolean
 #  checks                  :jsonb
 #  description             :string
+#  duplicates_shown        :boolean          default(FALSE), not null
 #  issue_type              :string           default("issue"), not null
 #  latitude                :float
 #  latlon_from_exif        :boolean          default(FALSE)
@@ -54,7 +55,7 @@ class Issues::Draft < ApplicationRecord
   validates_numericality_of :zoom, greater_than: 14, allow_nil: true, on: :geo_step
   validate :photos_allowed_content_type, on: :photos_step
 
-  validate :no_duplicates_nearby, on: :checks_step
+  validate :no_duplicates_nearby, on: :checks_step, unless: :duplicates_shown?
   validate :municipality_supported, on: :checks_step
   validate :checks_passed, on: :checks_step
 

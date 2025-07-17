@@ -2,9 +2,9 @@
   <% if @previous_draft %>
     <div class="report-summary-block-con">
       <div class="report-warning">
-        <div class="title">Rozpracovaný podnet</div>
-        <div class="description">Našiel sa predchádzajúci neodoslaný podnet. Chcete sa k nemu vrátiť alebo nahlásiť nový podnet?</div>
-        <%= link_to "Upraviť rozpracovaný podnet", issues_draft_summary_path(@previous_draft), class: "button button-transparent" %>
+        <div class="title">Máte neodoslaný podnet</div>
+        <div class="description">Máte jeden rozpracovaný neodoslaný podnet. Chcete sa k nemu vrátiť alebo nahlásiť nový podnet?</div>
+        <%= link_to "Zobraziť neodoslaný podnet", issues_draft_summary_path(@previous_draft), class: "button button-transparent" %>
       </div>
     </div>
 

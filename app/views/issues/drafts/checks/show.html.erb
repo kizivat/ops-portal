@@ -30,15 +30,14 @@
   <% elsif @draft.errors.added?(:base, :duplicates_nearby)  %>
     <div class="report-summary-block-con">
       <div class="report-warning">
-        <div class="title">Podobné podnety nablízku</div>
+        <div class="title">Skontrolujte podobné podnety nablízku</div>
         <div class="description">
-          <p>V blízkosti polohy podnetu, ktorý chcete nahlásiť sa nachádzajú podnety z rovnakej kategórie. Skontrolujte, či nenahlasujete duplicitný podnet.</p>
-          <p>K tomuto rozpracovanému podnetu sa &nbsp;môžete neskôr jednoducho vrátiť.</p>
+          <p>V blízkosti podnetu sa už nachádzajú podnety z&nbsp;rovnakej kategórie. Skontrolujte, prosím, či nenahlasujete rovnaký podnet.</p>
+          <p><strong>K tomuto rozpracovanému neodoslanému podnetu sa môžete neskôr jednoducho vrátiť.</strong></p>
         </div>
-        <%= link_to "Zobraziť podobné podnety", search_issues_path(pin: "#{@draft.latitude},#{@draft.longitude}", kategoria: @draft.category&.name, podkategoria: @draft.subcategory&.name, typ: @draft.subtype&.name), class: "button button-transparent" %>
+        <%= button_to "Zobraziť podobné podnety", issues_draft_duplicates_path(@draft), method: :patch, class: "button" %>
       </div>
     </div>
-    <%= button_to "Odoslať podnet aj tak", confirm_issues_draft_checks_path(@draft), class: "button" %>
   <% elsif @draft.errors[:checks].any? %>
     <%= render partial: 'checks', object: @draft.checks %>
   <% end %>
