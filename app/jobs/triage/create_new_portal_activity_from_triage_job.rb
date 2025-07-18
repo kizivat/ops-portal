@@ -10,7 +10,8 @@ class Triage::CreateNewPortalActivityFromTriageJob < ApplicationJob
       :agent_portal_comment,
       :agent_portal_and_backoffice_comment,
       :responsible_subject_portal_and_backoffice_comment,
-      :agent_private_comment
+      :agent_private_comment,
+      :system_note
     ]
 
     article = triage_zammad_client.get_article(ticket_id, article_id, allowed_article_types: allowed_article_types)
@@ -45,7 +46,7 @@ class Triage::CreateNewPortalActivityFromTriageJob < ApplicationJob
         article[:attachments].each do |attachment|
           comment.attachments.attach(io: StringIO.new(Base64.strict_decode64(attachment[:data64])), filename: attachment[:filename])
         end
-      elsif [ :agent_portal_comment, :agent_portal_and_backoffice_comment ].include?(article[:article_type])
+      elsif [ :agent_portal_comment, :agent_portal_and_backoffice_comment, :system_note ].include?(article[:article_type])
         comment = Issues::AgentComment.create!(
           triage_external_id: article_id,
           text: article[:body],

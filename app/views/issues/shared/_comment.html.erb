@@ -1,5 +1,5 @@
 <%= turbo_frame_tag comment do %>
-  <div class="<%= class_names("comment", government: responsible_subject) %>" id="komentar_<%= comment.id %>">
+  <div class="<%= class_names("comment", government: comment.responsible_subject?, duplicate: comment.duplicate?) %>" id="komentar_<%= comment.id %>">
     <div class="subject">
       <figure>
         <picture>
