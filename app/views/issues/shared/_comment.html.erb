@@ -12,7 +12,7 @@
     <% if comment.text.present? %>
       <div class="comment-content">
         <% if comment.legacy_data.blank? %>
-          <div class="prose"><%= simple_format(comment.text) %></div>
+          <div class="prose"><%= simple_format(comment.text, {}, { sanitize_options: { attributes: %w[target href] } }) %></div>
         <% else %>
           <div class="comment-legacy">
             <div class="comment-legacy-text">

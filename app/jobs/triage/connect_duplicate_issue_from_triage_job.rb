@@ -33,7 +33,8 @@ class Triage::ConnectDuplicateIssueFromTriageJob < ApplicationJob
       ticket_id,
       "[[ops portal]][[pre zodpovedny subjekt]]Podnet bol označený ako duplicitný. Jeho obsah bol pridaný ako komentár k pôvodnému podnetu: <a href=\"#{parent_ticket[:portal_url]}\" target=\"_blank\">##{parent_ticket[:ops_issue_identifier]} #{parent_ticket[:title]}</a>",
       content_type: "text/html",
-      internal: false
+      internal: false,
+      sender: "Agent"
     )
 
     comment_params = {
@@ -50,6 +51,11 @@ class Triage::ConnectDuplicateIssueFromTriageJob < ApplicationJob
     comment = Issues::DuplicateComment.new(comment_params)
     comment.build_activity(issue: parent_issue, type: Issues::CommentActivity)
     comment.save!
+
+    issue.subscriptions.each do |subscription|
+      user = subscription.subscriber
+      user.subscribe_to(parent_issue) unless user.subscribed_to?(parent_issue)
+    end
 
     ::SyncIssueActivityObjectToTriageJob.perform_later(issue: parent_issue, activity_object: comment)
   end

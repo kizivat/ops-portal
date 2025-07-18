@@ -334,6 +334,8 @@ class ZammadApiClient
 
   def get_article(ticket_id, article_id, allowed_article_types: DEFAULT_ALLOWED_ARTICLE_TYPES, customer_articles: true, responsible_subject: nil)
     ticket, article = find_article(ticket_id, article_id)
+    return unless ticket && article
+
     result = build_article_response(ticket, article, allowed_article_types: allowed_article_types, responsible_subject: responsible_subject)
     return unless result.present?
     result
