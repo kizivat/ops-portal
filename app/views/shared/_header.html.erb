@@ -111,7 +111,7 @@
 
     <div class="nav-wrap-main">
       <div class="nav-con-main">
-        <%= link_to current_user.current_draft ? "Upraviť podnet" : "Nahlásiť&nbsp;podnet".html_safe, new_issues_draft_path, class: "button-main" %>
+        <%= link_to current_user.current_draft ? "Neodoslaný podnet" : "Nahlásiť&nbsp;podnet".html_safe, new_issues_draft_path, class: "button-main" %>
         <%= link_to "Položiť otázku".html_safe, new_question_issues_drafts_path %>
         <%= link_to "Dať pochvalu".html_safe, new_praise_path %>
         <div class="search-con">

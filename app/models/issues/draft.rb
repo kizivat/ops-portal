@@ -39,6 +39,8 @@ class Issues::Draft < ApplicationRecord
     photo.variant :llm, resize_to_limit: [ 800, 600 ], preprocessed: true
     photo.variant :thumb, resize_to_limit: [ 320, 240 ], preprocessed: true
     photo.variant :square, resize_to_fill: [ 320, 320 ], preprocessed: true
+    photo.variant :normal, resize_to_fill: [ 800, 800 ]
+    photo.variant :small, resize_to_fill: [ 360, 360 ]
   end
 
   belongs_to :category, class_name: "Issues::Category", optional: true
@@ -163,14 +165,13 @@ class Issues::Draft < ApplicationRecord
   end
 
   def no_duplicates_nearby
-    if Issue
+    nearby_issues = Issue
       .publicly_visible
       .within_distance_from_point(latitude, longitude, 500)
-      .where(category: category, subcategory: subcategory, subtype: subtype)
-      .any?
+      .where(category: category, subcategory: subcategory)
+    nearby_issues = nearby_issues.where(subtype: subtype) if subtype.present?
 
-      errors.add(:base, :duplicates_nearby)
-    end
+    errors.add(:base, :duplicates_nearby) if nearby_issues.any?
   end
 
   def checks_passed
