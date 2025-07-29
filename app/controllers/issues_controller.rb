@@ -226,11 +226,22 @@ class IssuesController < ApplicationController
           param_name: :q,
           label: "Textové vyhľadávanie",
           filter: ->(scope, params) do
-            scope.fulltext_search(
-              params[:q],
-              against: [ :title, :description, :legacy_id, :id, :fulltext_extra ],
-              unaccent_f: :f_unaccent
-            )
+            query = params[:q].to_s.strip
+            id_match = query[/Tiket#T-(\d+)/, 1]
+
+            if id_match.present?
+              scope.where(id: id_match).or(scope.fulltext_search(
+                query,
+                against: [:title, :description, :legacy_id, :id, :fulltext_extra],
+                unaccent_f: :f_unaccent
+              ))
+            else
+              scope.fulltext_search(
+                query,
+                against: [ :title, :description, :legacy_id, :id, :fulltext_extra ],
+                unaccent_f: :f_unaccent
+              )
+            end
           end,
         )
       ],
