@@ -15,6 +15,12 @@ class Legacy::RedirectsTest < ApplicationSystemTestCase
     assert_current_path issues_path(obec: "Bratislava")
   end
 
+  test "user gets redirected from non-existent legacy municipality all issues list to issues path" do
+    visit "/r/non-existent/vsetky-podnety"
+
+    assert_current_path issues_path
+  end
+
   test "user gets redirected from legacy all issues in municipality district to municipality district issues path if exists" do
     visit "/r/bratislava/podnety/stare-mesto"
 
