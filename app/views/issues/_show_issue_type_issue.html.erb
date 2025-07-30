@@ -133,12 +133,10 @@
           </button>-->
         </div>
 
-        <% if !issue.discussion_closed? && !issue.archived? %>
-          <%= turbo_frame_tag "activities", class: 'comment-con' do %>
-            <%= render activity_objects %>
-            <% if activity_objects.empty? && !issue.discussion_closed? && !issue.archived? %>
-              <div class="be-first-comment-notice">Buďte prvý kto overí podnet alebo napíše komentár!</div>
-            <% end %>
+        <%= turbo_frame_tag "activities", class: 'comment-con' do %>
+          <%= render activity_objects %>
+          <% if activity_objects.empty? && !issue.discussion_closed? && !issue.archived? %>
+            <div class="be-first-comment-notice">Buďte prvý kto overí podnet alebo napíše komentár!</div>
           <% end %>
         <% end %>
 
