@@ -82,7 +82,7 @@ class CategoryMapper
     [ "Dopravné značenie", "betónová zábrana (biskupský klobúk)", "poškodená" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "poškodená" ],
     [ "Dopravné značenie", "stĺpik", "chýbajúci" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "chýbajúca" ],
     [ "Dopravné značenie", "stĺpik", "poškodený" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "poškodená" ],
-    [ "Dopravné značenie", "stĺpik", "nadbytočný" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", ""], # TODO
+    [ "Dopravné značenie", "stĺpik", "nadbytočný" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", nil ], # TODO
     [ "Dopravné značenie", "iné", nil ] => [], # TODO
     [ "Mestský mobiliár", "lavička", "chýbajúca" ] => [ "Mobiliár", "lavička", "chýbajúca" ],
     [ "Mestský mobiliár", "lavička", "poškodená" ] => [ "Mobiliár", "lavička", "poškodená" ],
@@ -161,7 +161,7 @@ class CategoryMapper
     [ "Verejný poriadok", "reklama", "vylepené plagáty" ] => [ "Verejný poriadok", "reklama", "nelegálna reklama" ],
     [ "Verejný poriadok", "reklama", "nebezpečná (na spadnutie a pod.)" ] => [ "Verejný poriadok", "reklama", "nebezpečná (na spadnutie a pod)" ],
     [ "Verejný poriadok", "iné", nil ] => [], # TODO
-    [ "Všetko ostatné", nil, nil ] => [], # TODO
+    [ "Všetko ostatné", nil, nil ] => [] # TODO
   }
 
   def self.new_category_set(old_category_name, old_subcategory_name, old_subtype_name)
