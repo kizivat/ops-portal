@@ -6,6 +6,13 @@ const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" f
 export default class extends Controller {
   static values = { content: String }
   static targets = ["iconContainer"]
+  static classes = ["supported"]
+
+  connect() {
+    if ("clipboard" in navigator) {
+      this.element.classList.add(this.supportedClass);
+    }
+  }
 
   async copy() {
     const textToCopy = this.contentValue;
