@@ -31,7 +31,7 @@ class Triage::ConnectDuplicateIssueFromTriageJob < ApplicationJob
 
     @triage_zammad_client.create_system_note!(
       ticket_id,
-      "[[ops portal]][[pre zodpovedny subjekt]]Podnet bol označený ako duplicitný. Jeho obsah bol pridaný ako komentár k pôvodnému podnetu: <a href=\"#{parent_ticket[:portal_url]}\" target=\"_blank\">##{parent_ticket[:ops_issue_identifier]} #{parent_ticket[:title]}</a>",
+      "[[ops portal]][[pre zodpovedny subjekt]] Podnet bol označený ako duplicitný. Jeho obsah bol pridaný ako komentár k pôvodnému podnetu: <a href=\"#{parent_ticket[:portal_url]}\" target=\"_blank\">##{parent_ticket[:ops_issue_identifier]} #{parent_ticket[:title]}</a>",
       content_type: "text/html",
       internal: false,
       sender: "Agent"
