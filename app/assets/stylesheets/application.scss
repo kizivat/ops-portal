@@ -2442,7 +2442,17 @@ section.podnet .podnet-information span.value,{
   padding: 6px 11px;
   @include rounded(25px);
 }
-
+section.podnet .podnet-information .clipboard-button {
+  vertical-align: middle;
+  line-height: 1em;
+  margin-left: 5px;
+  color: $black;
+  display: initial;
+  visibility: hidden;
+}
+section.podnet .podnet-information .clipboard--supported:hover .clipboard-button {
+  visibility: visible;
+}
 
 //Rotate button and close button
 section.podnet .podnet-discussion .add-comment-form figure {
