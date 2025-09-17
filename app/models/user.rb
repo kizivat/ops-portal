@@ -174,7 +174,6 @@ class User < ApplicationRecord
       resident: nil,
       sex: nil,
       birth: nil,
-      email_notifiable: false,
       display_name: nil,
       anonymous: true
     )
