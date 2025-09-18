@@ -161,13 +161,15 @@ class User < ApplicationRecord
   def anonymize!
     avatar.purge if avatar.attached?
 
+    login = "anonymized#{id}_#{SecureRandom.hex(8)}"
+
     update!(
-      email: "anonymized#{id}@close.gdpr",
+      email: "#{login}@close.gdpr",
       firstname: "anonymized",
       lastname: nil,
-      login: nil,
+      login: login,
       phone: nil,
-      password_hash: RodauthApp.rodauth.allocate.password_hash(SecureRandom.base58(16)),
+      password_hash: RodauthApp.rodauth.allocate.password_hash(SecureRandom.hex(16)),
       about: nil,
       organization: nil,
       signature: nil,

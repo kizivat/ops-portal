@@ -83,12 +83,17 @@ class UserTest < ActiveSupport::TestCase
 
     user.anonymize!
 
-    %i[lastname login phone about organization signature resident sex birth].each do |attr|
+    %i[lastname phone about organization signature resident sex birth].each do |attr|
       assert_nil user.public_send(attr), "#{attr} should be nil after anonymize!"
     end
 
     assert_not_equal user.password_hash, old_password_hash
     assert user.anonymous, "Anonymous should be true"
     assert_not user.avatar.attached?, "Avatar should be purged after anonymize"
+
+    # check login and email format
+    expected_prefix = "anonymized#{user.id}_"
+    assert_match(/^#{expected_prefix}[0-9a-f]{16}$/, user.login, "Login should be anonymized with id + hex sequence")
+    assert_equal "#{user.login}@close.gdpr", user.email, "Email should match anonymized login format"
   end
 end
