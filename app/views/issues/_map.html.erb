@@ -7,6 +7,7 @@
        data-search-map-base-search-url-value="<%= issues_path(@search_results.search_params.merge(tab: :list)) %>"
        data-search-map-bbox-filter-value="<%= @search_results.search_params[:oblast] %>"
        data-search-map-geo-filter-param-value="oblast"
+       data-search-map-pin-value="<%= @search_results.search_params[:pin] %>"
   >
     <div class="container-map" id="map"></div>
     <div style="position: absolute; bottom: 1rem; width: 100%; z-index: 1000;">

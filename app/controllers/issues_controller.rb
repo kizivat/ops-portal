@@ -341,7 +341,7 @@ class IssuesController < ApplicationController
 
         SearchEngine::Controls::Sort.new(
           name: :vzd,
-          label: "Vzdialenosť",
+          label: "Najbližšie",
           visible_if: ->(params) { params[:pin].present? },
           apply_if: ->(params) do
             return false unless params[:sort].nil? || params[:sort] == "vzd"

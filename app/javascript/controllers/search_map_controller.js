@@ -3,7 +3,7 @@ import L from 'leaflet';
 
 export default class extends Controller {
     static targets = ["map"]
-    static values = {geoJsonUrl: String, baseSearchUrl: String, bboxFilter: String, geoFilterParam: String}
+    static values = {geoJsonUrl: String, baseSearchUrl: String, bboxFilter: String, geoFilterParam: String, pin: String}
 
     connect() {
         const map = L.map(this.mapTarget, {dragging: !L.Browser.mobile, maxZoom: 19}).setView([48.1478, 17.1072], 10);
@@ -30,6 +30,28 @@ export default class extends Controller {
                     fillOpacity: 0.1,
                     dashArray: '5, 5'
                 }).addTo(map);
+            }
+        }
+
+        // Display pin as blue circle if present
+        if (this.pinValue && this.pinValue.trim()) {
+            const coords = this.pinValue.split(',').map(coord => parseFloat(coord.trim()));
+            if (coords.length === 2) {
+                const [lat, lng] = coords;
+
+                const pinIcon = L.divIcon({
+                    html: `<div style="color: #000;">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="currentColor">
+                               <circle cx="10" cy="10" r="1.5"></circle>
+                               <path d="M19.75,9.25h-2.04c-.35-3.68-3.29-6.61-6.96-6.96V.25h-1.5v2.04c-3.68.35-6.61,3.29-6.96,6.96H.25v1.5h2.04c.35,3.68,3.29,6.61,6.96,6.96v2.04h1.5v-2.04c3.68-.35,6.61-3.29,6.96-6.96h2.04v-1.5ZM10.75,16.2v-1.95h-1.5v1.95c-2.85-.34-5.11-2.6-5.45-5.45h1.95v-1.5h-1.95c.34-2.85,2.6-5.11,5.45-5.45v1.95h1.5v-1.95c2.85.34,5.11,2.6,5.45,5.45h-1.95v1.5h1.95c-.34,2.85-2.6,5.11-5.45,5.45Z"></path>
+                             </svg>
+                           </div>`,
+                    className: 'custom-pin-icon',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                L.marker([lat, lng], { icon: pinIcon }).addTo(map);
             }
         }
 
