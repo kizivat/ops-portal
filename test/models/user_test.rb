@@ -72,4 +72,28 @@ class UserTest < ActiveSupport::TestCase
     user.phone_verification_code_attempts = 9
     assert user.valid?(:phone_verification_code), "Should allow with fewer code attempts"
   end
+
+  test "should anonymize user" do
+    user = users(:one)
+
+    user.avatar.attach(io: StringIO.new("fake image"), filename: "avatar.png", content_type: "image/png")
+    assert user.avatar.attached?, "Avatar should be attached before anonymize"
+
+    old_password_hash = user.password_hash
+
+    user.anonymize!
+
+    %i[lastname phone about organization signature resident sex birth].each do |attr|
+      assert_nil user.public_send(attr), "#{attr} should be nil after anonymize!"
+    end
+
+    assert_not_equal user.password_hash, old_password_hash
+    assert user.anonymous, "Anonymous should be true"
+    assert_not user.avatar.attached?, "Avatar should be purged after anonymize"
+
+    # check login and email format
+    expected_prefix = "anonymized#{user.id}_"
+    assert_match(/^#{expected_prefix}[0-9a-f]{16}$/, user.login, "Login should be anonymized with id + hex sequence")
+    assert_equal "#{user.login}@close.gdpr", user.email, "Email should match anonymized login format"
+  end
 end

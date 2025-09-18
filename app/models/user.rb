@@ -158,6 +158,28 @@ class User < ApplicationRecord
     draft
   end
 
+  def anonymize!
+    avatar.purge if avatar.attached?
+
+    login = "anonymized#{id}_#{SecureRandom.hex(8)}"
+
+    update!(
+      email: "#{login}@close.gdpr",
+      firstname: "anonymized",
+      lastname: nil,
+      login: login,
+      phone: nil,
+      password_hash: RodauthApp.rodauth.allocate.password_hash(SecureRandom.hex(16)),
+      about: nil,
+      organization: nil,
+      signature: nil,
+      resident: nil,
+      sex: nil,
+      birth: nil,
+      anonymous: true
+    )
+  end
+
   private
 
   def set_email_global_unsubscribe_token
