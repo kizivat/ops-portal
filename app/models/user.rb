@@ -167,7 +167,7 @@ class User < ApplicationRecord
       lastname: nil,
       login: nil,
       phone: nil,
-      password_hash: nil,
+      password_hash: RodauthApp.rodauth.allocate.password_hash(SecureRandom.base58(16)),
       about: nil,
       organization: nil,
       signature: nil,
