@@ -3030,13 +3030,6 @@ CREATE INDEX index_issues_on_category_id ON public.issues USING btree (category_
 
 
 --
--- Name: index_issues_on_effective_date; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_issues_on_effective_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at));
-
-
---
 -- Name: index_issues_on_legacy_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3069,13 +3062,6 @@ CREATE INDEX index_issues_on_municipality_id ON public.issues USING btree (munic
 --
 
 CREATE INDEX index_issues_on_owner_id ON public.issues USING btree (owner_id);
-
-
---
--- Name: index_issues_on_resolution_started_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_issues_on_resolution_started_at ON public.issues USING btree (resolution_started_at);
 
 
 --
@@ -4067,7 +4053,6 @@ ALTER TABLE ONLY public.cms_categories
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20250911092356'),
 ('20250910125432'),
 ('20250909101218'),
 ('20250717093710'),
