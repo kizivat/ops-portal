@@ -13,19 +13,69 @@ class IssuesController < ApplicationController
   def index
     @tab = params[:tab].in?(%w[map stats]) ? params[:tab] : "list"
 
-    scope = Issue.publicly_visible.includes(:state)
-
-    # do not allow searching for archived municipalities
-    scope = scope.where.not(municipality_id: Municipality.archived.pluck(:id))
-    scope = scope.where.not(municipality_district_id: MunicipalityDistrict.archived.pluck(:id))
+    scope = Issue.searchable.includes(:state)
 
     case @tab
     when "list"
         scope = scope.with_attached_photos
-
         @search_results = search_engine.search(scope, params)
     when "stats"
-        @search_results = search_engine.stats(scope, params)
+        @search_results = search_engine.stats(scope, params) do |scope, results|
+          results.stats = {
+            by_state: scope.group("state").order("count_all DESC").async_count,
+            by_category: scope.group("category").order("count_all DESC").async_count,
+            by_responsible_subject: scope.group("responsible_subject").order("count_all DESC").async_count
+          }
+        end
+    when "map"
+        @search_results = search_engine.search(scope, params)
+    end
+  end
+
+  def geo
+    scope = Issue.searchable.includes(:state)
+
+    @search_results = search_engine.stats(scope, params) do |scope, results|
+      target_zoom = case params[:z].to_i
+      when 1..5
+          2
+      when 6..7
+          3
+      when 8..10
+          4
+      when 11..12
+          5
+      when 13..15
+          6
+      when 16..17
+          7
+      when 18..20
+          18
+      else
+          4
+      end
+
+      issues_groups_scope = scope
+        .select("avg(latitude) avg_latitude, avg(longitude) as avg_longitude,
+                min(latitude) as min_latitude, max(latitude) as max_latitude,
+                min(longitude) as min_longitude, max(longitude) as max_longitude,
+                count(*) as count")
+        .group("st_geohash(st_point(issues.longitude, issues.latitude, 4326), #{target_zoom})")
+        .where("st_point(longitude, latitude, 4326) && st_makeenvelope(?, ?, ?, ?, 4326)", *params[:bbox].split(",").map(&:to_f))
+        .reorder("").to_sql
+
+      lateral_join_scope = scope.unscoped
+        .where("st_point(longitude, latitude, 4326) && st_point(issue_groups.avg_longitude, issue_groups.avg_latitude, 4326)")
+        .limit(1)
+
+      scope = scope.unscoped
+        .select("i.*, issue_groups.*")
+        .joins("LEFT JOIN LATERAL (#{lateral_join_scope.to_sql}) AS i ON true")
+        .from("(#{issues_groups_scope}) issue_groups")
+
+      results.stats = {
+        aggs_by_geohash: scope.includes(:municipality, :municipality_district)
+      }
     end
   end
 
@@ -170,6 +220,18 @@ class IssuesController < ApplicationController
           end
         ),
 
+        SearchEngine::Controls::Hidden.new(
+          param_name: :oblast,
+          filter_label: "Oblasť na mape",
+          filter: ->(scope, params) do
+            return scope unless params[:oblast].present?
+
+            bbox = params[:oblast].split(",", 4).map(&:to_f)
+
+            scope.within_bbox(bbox)
+          end
+        ),
+
         SearchEngine::Controls::Dropdown.new(
           param_name: :obec,
           label: "Obec",
@@ -279,7 +341,7 @@ class IssuesController < ApplicationController
 
         SearchEngine::Controls::Sort.new(
           name: :vzd,
-          label: "Vzdialenosť",
+          label: "Najbližšie",
           visible_if: ->(params) { params[:pin].present? },
           apply_if: ->(params) do
             return false unless params[:sort].nil? || params[:sort] == "vzd"
