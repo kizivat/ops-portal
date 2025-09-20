@@ -1765,6 +1765,7 @@ section.account .account-info-con .item-title {
   font-size: em(16,16);
   font-weight: $medium;
   line-height: em(24,16);
+  word-break: break-word;
 }
 section.account .button {
   margin-top: 0 !important;
