@@ -6,6 +6,12 @@ export default class extends Zoombox {
   connect() {
     super.connect();
     this.currentIndex = 0;
+    this.startX = 0;
+
+    this.imageTarget.addEventListener("touchstart", this.handleTouchStart.bind(this), { passive: true });
+    this.imageTarget.addEventListener("touchend", this.handleTouchEnd.bind(this), { passive: true });
+
+    this.threshold = 50;
   }
 
   open(event) {
@@ -27,8 +33,8 @@ export default class extends Zoombox {
     this.updateArrows();
   }
 
-  prevImage(event) {
-    event.stopPropagation();
+  prevImage(event = null) {
+    if (event) event.stopPropagation();
     if (this.currentIndex > 0) {
       this.currentIndex--;
       this.updateImage();
@@ -36,8 +42,8 @@ export default class extends Zoombox {
     this.dialogTarget.focus();
   }
 
-  nextImage(event) {
-    event.stopPropagation();
+  nextImage(event = null) {
+    if (event) event.stopPropagation();
     if (this.currentIndex < this.images.length - 1) {
       this.currentIndex++;
       this.updateImage();
@@ -58,10 +64,36 @@ export default class extends Zoombox {
     const prevButton = this.dialogTarget.querySelector('.left-arrow');
     const nextButton = this.dialogTarget.querySelector('.right-arrow');
 
+    if (this.images.length <= 1) {
+      prevButton.style.display = "none";
+      nextButton.style.display = "none";
+      return;
+    }
+
+    prevButton.style.display = "block";
+    nextButton.style.display = "block";
+
     prevButton.disabled = this.currentIndex === 0;
     nextButton.disabled = this.currentIndex === this.images.length - 1;
 
     prevButton.style.opacity = this.currentIndex === 0 ? '0.3' : '1';
     nextButton.style.opacity = this.currentIndex === this.images.length - 1 ? '0.3' : '1';
+  }
+
+  handleTouchStart(event) {
+    this.startX = event.changedTouches[0].screenX;
+  }
+
+  handleTouchEnd(event) {
+    const endX = event.changedTouches[0].screenX;
+    const deltaX = endX - this.startX;
+
+    if (Math.abs(deltaX) > this.threshold) {
+      if (deltaX > 0) {
+        this.prevImage();
+      } else {
+        this.nextImage();
+      }
+    }
   }
 }
