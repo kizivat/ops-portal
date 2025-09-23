@@ -1,4 +1,4 @@
-class Issues::RemapIssuesCategoriesJob < ApplicationJob
+class Issues::RemapIssuesCategoryJob < ApplicationJob
   queue_as :default
 
   def perform
