@@ -1,4 +1,6 @@
 class CategoryMapper
+  EVERYTHING_ELSE_CATEGORY = [ "Ostatné", "iné", nil ]
+
   CATEGORY_MAPPING = {
     [ "Cesty a chodníky", "schody", "poškodené" ] => [ "Komunikácie", "schody", "poškodená" ], # TODO nesedí rod subtypu
     [ "Cesty a chodníky", "schody", "neodhrnuté" ] => [ "Komunikácie", "schody", "neodhrnutá" ], # TODO nesedí rod subtypu
@@ -32,7 +34,7 @@ class CategoryMapper
     [ "Cesty a chodníky", "oplotenie", "chýbajúce" ] => [ "Mobiliár", "zábradlie/oplotenie", "chýbajúce" ],
     [ "Cesty a chodníky", "oplotenie", "poškodené" ] => [ "Mobiliár", "zábradlie/oplotenie", "poškodené" ],
     [ "Cesty a chodníky", "oplotenie", "zhrdzavené" ] => [ "Mobiliár", "zábradlie/oplotenie", "zhrdzavené" ],
-    [ "Cesty a chodníky", "iné", nil ] => [], # TODO
+    [ "Cesty a chodníky", "iné", nil ] => EVERYTHING_ELSE_CATEGORY,
     [ "Zeleň a životné prostredie", "neporiadok a odpadky", "neodpratané lístie" ] => [ "Verejný poriadok", "neporiadok vo verejnom priestranstve", "neodpratané lístie" ],
     [ "Zeleň a životné prostredie", "neporiadok a odpadky", "čierne skládky" ] => [ "Skládky a vraky", "nelegálne skládky", nil ],
     [ "Zeleň a životné prostredie", "neporiadok a odpadky", "neporiadok vo verejnom priestranstve" ] => [ "Verejný poriadok", "neporiadok vo verejnom priestranstve", "neporiadok vo verejnom priestore" ],
@@ -44,8 +46,8 @@ class CategoryMapper
     [ "Zeleň a životné prostredie", "strom", "invazívna rastlina" ] => [ "Zeleň a znečisťovanie", "strom", "invazívna rastlina" ],
     [ "Zeleň a životné prostredie", "strom", "poškodená podpera" ] => [ "Zeleň a znečisťovanie", "strom", "poškodená podpera" ],
     [ "Zeleň a životné prostredie", "trávnatá plocha", "nepokosená" ] => [ "Zeleň a znečisťovanie", "kosenie", "nepravidelne" ],
-    [ "Zeleň a životné prostredie", "trávnatá plocha", "vyschnutá" ] => [ "Ostatné", "iné", nil ],
-    [ "Zeleň a životné prostredie", "trávnatá plocha", "vyjazdené koľaje" ] => [ "Ostatné", "iné", nil ],
+    [ "Zeleň a životné prostredie", "trávnatá plocha", "vyschnutá" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Zeleň a životné prostredie", "trávnatá plocha", "vyjazdené koľaje" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Zeleň a životné prostredie", "krík", "suchý" ] => [ "Zeleň a znečisťovanie", "krík", "suchý" ],
     [ "Zeleň a životné prostredie", "krík", "neostrihaný" ] => [ "Zeleň a znečisťovanie", "krík", "neorezaný" ],
     [ "Zeleň a životné prostredie", "krík", "chýbajúci" ] => [ "Zeleň a znečisťovanie", "krík", "chýbajúci" ],
@@ -55,7 +57,7 @@ class CategoryMapper
     [ "Zeleň a životné prostredie", "znečisťovanie", "ovzdušia" ] => [ "Zeleň a znečisťovanie", "znečisťovanie", "voda, pôda, ovzdušie" ],
     [ "Zeleň a životné prostredie", "znečisťovanie", "vody" ] => [ "Zeleň a znečisťovanie", "znečisťovanie", "voda, pôda, ovzdušie" ],
     [ "Zeleň a životné prostredie", "znečisťovanie", "pôdy" ] => [ "Zeleň a znečisťovanie", "znečisťovanie", "voda, pôda, ovzdušie" ],
-    [ "Zeleň a životné prostredie", "iné", nil ] => [ "Ostatné", "iné", nil ],
+    [ "Zeleň a životné prostredie", "iné", nil ] => EVERYTHING_ELSE_CATEGORY,
     [ "Dopravné značenie", "priechod pre chodcov", "chýbajúci" ] => [ "Značenie", "priechod pre chodcov", "chýbajúci" ],
     [ "Dopravné značenie", "priechod pre chodcov", "zle viditeľný" ] => [ "Značenie", "priechod pre chodcov", "zle viditeľný" ],
     [ "Dopravné značenie", "semafor", "nefunkčný" ] => [ "Značenie", "semafor", "nefunkčný" ],
@@ -69,7 +71,7 @@ class CategoryMapper
     [ "Dopravné značenie", "vodorovná značka", "zle viditeľná" ] => [ "Značenie", "vodorovné dopravné značenie", "zle viditeľné" ],
     [ "Dopravné značenie", "riešenie dopravnej situácie", "nebezpečné" ] => [ "Dopravné riešenie", "nebezpečné", "návrh na riešenie" ],
     [ "Dopravné značenie", "riešenie dopravnej situácie", "dopravu spomaľujúce" ] => [ "Dopravné riešenie", "dopravu spomaľujúce", "návrh na riešenie" ],
-    [ "Dopravné značenie", "riešenie dopravnej situácie", "nedodržiavanie dopravných predpisov" ] => [ "Ostatné", "iné", nil ],
+    [ "Dopravné značenie", "riešenie dopravnej situácie", "nedodržiavanie dopravných predpisov" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Dopravné značenie", "zvislá značka", "poškodená" ] => [ "Značenie", "zvislé dopravné značenie", "poškodené" ],
     [ "Dopravné značenie", "zvislá značka", "neaktuálna" ] => [ "Značenie", "zvislé dopravné značenie", "neaktuálne" ],
     [ "Dopravné značenie", "zvislá značka", "chýbajúca" ] => [ "Značenie", "zvislé dopravné značenie", "chýbajúce" ],
@@ -82,8 +84,8 @@ class CategoryMapper
     [ "Dopravné značenie", "betónová zábrana (biskupský klobúk)", "poškodená" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "poškodená" ],
     [ "Dopravné značenie", "stĺpik", "chýbajúci" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "chýbajúca" ],
     [ "Dopravné značenie", "stĺpik", "poškodený" ] => [ "Značenie", "protiparkovacia zábrana/stĺpik/biskupský klobúk", "poškodená" ],
-    [ "Dopravné značenie", "stĺpik", "nadbytočný" ] => [ "Ostatné", "iné", nil ],
-    [ "Dopravné značenie", "iné", nil ] => [ "Ostatné", "iné", nil ],
+    [ "Dopravné značenie", "stĺpik", "nadbytočný" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Dopravné značenie", "iné", nil ] => EVERYTHING_ELSE_CATEGORY,
     [ "Mestský mobiliár", "lavička", "chýbajúca" ] => [ "Mobiliár", "lavička", "chýbajúca" ],
     [ "Mestský mobiliár", "lavička", "poškodená" ] => [ "Mobiliár", "lavička", "poškodená" ],
     [ "Mestský mobiliár", "lavička", "znečistená" ] => [ "Mobiliár", "lavička", "znečistená" ],
@@ -114,18 +116,18 @@ class CategoryMapper
     [ "Mestský mobiliár", "kvetináč", "posunutý" ] => [ "Mobiliár", "kvetináč", "posunutý" ],
     [ "Mestský mobiliár", "kvetináč", "zanedbaný" ] => [ "Mobiliár", "kvetináč", "zanedbaný" ],
     [ "Mestský mobiliár", "kvetináč", "chýbajúci" ] => [ "Mobiliár", "kvetináč", "chýbajúci" ],
-    [ "Mestský mobiliár", "iné", nil ] => [ "Ostatné", "iné", nil ],
+    [ "Mestský mobiliár", "iné", nil ] => EVERYTHING_ELSE_CATEGORY,
     [ "Automobily", "dlhodobo odstavené vozidlá", "vozidlo s EČV, s platnou TK a EK" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
     [ "Automobily", "dlhodobo odstavené vozidlá", "vozidlo bez EČV, bez platnej TK a EK" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
     [ "Automobily", "dlhodobo odstavené vozidlá", "vozidlo s EČV, bez platnej TK a EK" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
     [ "Automobily", "dlhodobo odstavené vozidlá", "nezistené EČV a TK a EK" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
     [ "Automobily", "dlhodobo odstavené vozidlá", "zahraničné vozidlo" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
     [ "Automobily", "dlhodobo odstavené vozidlá", "vozidlo bez EČV, s platnou TK a EK" ] => [ "Skládky a vraky", "vraky motorových vozidiel", nil ],
-    [ "Automobily", "parkovanie", "problémové" ] => [ "Ostatné", "iné", nil ],
-    [ "Automobily", "parkovanie", "chýbajúce miesta" ] => [ "Ostatné", "iné", nil ],
-    [ "Automobily", "parkovanie", "nevyznačené miesta" ] => [ "Ostatné", "iné", nil ],
-    [ "Automobily", "iné", nil ] => [ "Ostatné", "iné", nil ],
-    [ "Verejné služby", "MHD", "technické problémy" ] => [ "Ostatné", "iné", nil ],
+    [ "Automobily", "parkovanie", "problémové" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Automobily", "parkovanie", "chýbajúce miesta" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Automobily", "parkovanie", "nevyznačené miesta" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Automobily", "iné", nil ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Verejné služby", "MHD", "technické problémy" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Verejné služby", "MHD", "meškanie spojov" ] => [ "Mestská hromadná doprava", "služby hromadnej dopravy", "meškanie spojov" ],
     [ "Verejné služby", "MHD", "poškodené vozidlo" ] => [ "Mestská hromadná doprava", "grafikon / zlé nastavenie cestovného poriadku", "poškodenie vozidla" ],
     [ "Verejné služby", "MHD", "zlé nastavenie cestovného poriadku" ] => [ "Mestská hromadná doprava", "grafikon / zlé nastavenie cestovného poriadku", nil ],
@@ -139,18 +141,18 @@ class CategoryMapper
     [ "Verejné služby", "osvetlenie", "nevhodné (silné a pod.)" ] => [ "Osvetlenie", "osvetlenie", "nevhodné (silné a pod.)" ],
     [ "Verejné služby", "webová stránka mesta", "chýbajúce informácie" ] => [ "Kontakt so samosprávou", "webová stránka mesta", "chýbajúca informácia" ],
     [ "Verejné služby", "webová stránka mesta", "neaktuálne informácie" ] => [ "Kontakt so samosprávou", "webová stránka mesta", "neaktuálne informácie" ],
-    [ "Verejné služby", "webová stránka mesta", "nesprávne informácie" ] => [ "Ostatné", "iné", nil ],
+    [ "Verejné služby", "webová stránka mesta", "nesprávne informácie" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Verejné služby", "webová stránka mesta", "nefunkčná stránka" ] => [ "Kontakt so samosprávou", "webová stránka mesta", "nefunkčná stránka" ],
     [ "Verejné služby", "rozvodné siete", "poškodená rozvodná skriňa" ] => [ "Mobiliár", "rozvodná skriňa", "poškodená rozvodná skriňa" ],
     [ "Verejné služby", "rozvodné siete", "nebezpečný kábel" ] => [ "Mobiliár", "rozvodná skriňa", "nebezpečný kábel" ],
     [ "Verejné služby", "zdieľaná mobilita", "nevhodne zaparkovaný dopravný prostriedok" ] => [ "Zdieľaná mikromobilita", "bicykle", "nevhodne zaparkovaný dopravný prostriedok" ],
     [ "Verejné služby", "zdieľaná mobilita", "nevhodne umiestnené parkovisko" ] => [ "Zdieľaná mikromobilita", "bicykle", "nevhodne umiestnené parkovisko" ],
-    [ "Verejné služby", "zdieľaná mobilita", "obmedzenie rýchlosti v zóne" ] => [ "Ostatné", "iné", nil ],
-    [ "Verejné služby", "zdieľaná mobilita", "iné" ] => [ "Ostatné", "iné", nil ],
+    [ "Verejné služby", "zdieľaná mobilita", "obmedzenie rýchlosti v zóne" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Verejné služby", "zdieľaná mobilita", "iné" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Verejné služby", "iné", nil ] => [ "Verejné služby", "iné", nil ],
-    [ "Verejný poriadok", "stavby a budovy", "neohlásené stavebné úpravy" ] => [ "Ostatné", "iné", nil ],
-    [ "Verejný poriadok", "stavby a budovy", "prekračovanie limitov hluku" ] => [ "Ostatné", "iné", nil ],
-    [ "Verejný poriadok", "stavby a budovy", "prekračovanie limitov prašnosti" ] => [ "Ostatné", "iné", nil ],
+    [ "Verejný poriadok", "stavby a budovy", "neohlásené stavebné úpravy" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Verejný poriadok", "stavby a budovy", "prekračovanie limitov hluku" ] => EVERYTHING_ELSE_CATEGORY,
+    [ "Verejný poriadok", "stavby a budovy", "prekračovanie limitov prašnosti" ] => EVERYTHING_ELSE_CATEGORY,
     [ "Verejný poriadok", "stavby a budovy", "opustená budova" ] => [ "Stavby", "budova", "nevyužívaná" ],
     [ "Verejný poriadok", "stavby a budovy", "zlý stav budovy" ] => [ "Stavby", "budova", "poškodená" ],
     [ "Verejný poriadok", "vandalizmus", "graffiti" ] => [ "Stavby", "budova", "grafiti" ],
@@ -161,13 +163,12 @@ class CategoryMapper
     [ "Verejný poriadok", "reklama", "vylepené plagáty" ] => [ "Verejný poriadok", "reklama", "nelegálna reklama" ],
     [ "Verejný poriadok", "reklama", "nebezpečná (na spadnutie a pod.)" ] => [ "Verejný poriadok", "reklama", "nebezpečná (na spadnutie a pod)" ],
     [ "Verejný poriadok", "iné", nil ] => [ "Verejný poriadok", "iné", nil ],
-    [ "Všetko ostatné", nil, nil ] => [ "Ostatné", "iné", nil ]
+    [ "Všetko ostatné", nil, nil ] => EVERYTHING_ELSE_CATEGORY
   }
 
   def self.map_legacy_categories_to_new(legacy_category, legacy_subcategory, legacy_subtype)
     legacy_key = [ legacy_category&.name, legacy_subcategory&.name, legacy_subtype&.name ]
-    new_names = CATEGORY_MAPPING[legacy_key]
-    raise "Unable to do the mapping!" unless new_names
+    new_names = CATEGORY_MAPPING[legacy_key].presence || EVERYTHING_ELSE_CATEGORY
 
     category = Issues::Category.where(legacy_id: nil).find_by(name: new_names[0])
     raise "Unable to map category!" unless category

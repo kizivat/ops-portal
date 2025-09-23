@@ -4,8 +4,7 @@ class Issues::RemapCategoriesJob < ApplicationJob
   def perform
     Issue.transaction do
       Issue.where.not(legacy_id: nil).find_each do |issue|
-        next if issue.archived? # TODO overit ci sa archivovane nemusia premapovat
-        next unless issue.category.legacy_id.present?
+        next unless issue.category&.legacy_id.present?
 
         issue.legacy_data["legacy_category_id"] = issue.category&.legacy_id
         issue.legacy_data["legacy_subcategory_id"] = issue.subcategory&.legacy_id
