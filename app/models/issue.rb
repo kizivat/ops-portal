@@ -20,6 +20,7 @@
 #  fulltext_extra                      :string
 #  imported_at                         :datetime
 #  issue_type                          :integer          default("issue")
+#  last_activity_at                    :datetime
 #  last_synced_at                      :datetime
 #  latitude                            :float
 #  legacy_data                         :jsonb
@@ -187,6 +188,8 @@ class Issue < ApplicationRecord
       .joins(activity: :issue)
       .where(issues: { id: id })
       .maximum(:created_at)
+
+    self.last_activity_at = activities.maximum(:created_at)
 
     self.comments_count = visible_activity_objects.count
 

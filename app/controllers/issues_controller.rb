@@ -13,7 +13,7 @@ class IssuesController < ApplicationController
   def index
     @tab = params[:tab].in?(%w[map stats]) ? params[:tab] : "list"
 
-    scope = Issue.searchable.includes(:state)
+    scope = Issue.searchable.includes(:state, :municipality_district, :municipality)
 
     case @tab
     when "list"
@@ -328,6 +328,14 @@ class IssuesController < ApplicationController
           name: :komentare,
           label: "Najkomentovanejšie",
           order: ->(scope, _) { scope.order(comments_count: :desc, created_at: :desc) }
+        ),
+
+        SearchEngine::Controls::Sort.new(
+          name: :komentovane,
+          label: "Naposledy komentované",
+          order: ->(scope, _) do
+            scope.order("last_activity_at DESC NULLS LAST")
+          end
         ),
 
         SearchEngine::Controls::Sort.new(
