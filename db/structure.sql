@@ -1,7 +1,7 @@
-\restrict m3KdBHd8IpFwBKzpFXFN8PL7yWGkHbcpfexP0lXF6y7RH6LBIlYGrSuSTFtMsu8
+\restrict TCxtWmdX1rwDM5PHElWIBYBeNmtBosJLDMQAjuAzfSFaWl0rDvahSTpXGOydL6u
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg110+2)
--- Dumped by pg_dump version 18beta3 (Ubuntu 18~beta3-1.pgdg25.04+1)
+-- Dumped by pg_dump version 18rc1 (Ubuntu 18~rc1-1.pgdg25.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -690,7 +690,8 @@ CREATE TABLE public.issues (
     comments_count integer DEFAULT 0 NOT NULL,
     fulltext_extra character varying,
     discussion_closed boolean DEFAULT false,
-    archived_state_id bigint
+    archived_state_id bigint,
+    last_activity_at timestamp(6) without time zone
 );
 
 
@@ -3035,6 +3036,13 @@ CREATE INDEX index_issues_on_category_id ON public.issues USING btree (category_
 
 
 --
+-- Name: index_issues_on_last_activity_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_on_last_activity_at ON public.issues USING btree (last_activity_at);
+
+
+--
 -- Name: index_issues_on_lat_lon_point; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4062,7 +4070,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 -- PostgreSQL database dump complete
 --
 
-\unrestrict m3KdBHd8IpFwBKzpFXFN8PL7yWGkHbcpfexP0lXF6y7RH6LBIlYGrSuSTFtMsu8
+\unrestrict TCxtWmdX1rwDM5PHElWIBYBeNmtBosJLDMQAjuAzfSFaWl0rDvahSTpXGOydL6u
 
 SET search_path TO "$user", public;
 
@@ -4242,6 +4250,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250128112655'),
 ('20250128105716'),
 ('20250128101339'),
+('20250127000000'),
 ('20250118093741'),
 ('20250116194129'),
 ('20250116162955'),
