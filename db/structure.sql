@@ -1,4 +1,4 @@
-\restrict TCxtWmdX1rwDM5PHElWIBYBeNmtBosJLDMQAjuAzfSFaWl0rDvahSTpXGOydL6u
+\restrict u6GH3g1PGBHaSguupDamr5TseKnUwxkA6FDmdrn7gZfRaTdJKSlObicL5LTl5Bu
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg110+2)
 -- Dumped by pg_dump version 18rc1 (Ubuntu 18~rc1-1.pgdg25.04+1)
@@ -3039,7 +3039,7 @@ CREATE INDEX index_issues_on_category_id ON public.issues USING btree (category_
 -- Name: index_issues_on_last_activity_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_on_last_activity_at ON public.issues USING btree (last_activity_at);
+CREATE INDEX index_issues_on_last_activity_at ON public.issues USING btree (last_activity_at DESC NULLS LAST);
 
 
 --
@@ -4070,7 +4070,7 @@ ALTER TABLE ONLY public.legacy_issues_communications
 -- PostgreSQL database dump complete
 --
 
-\unrestrict TCxtWmdX1rwDM5PHElWIBYBeNmtBosJLDMQAjuAzfSFaWl0rDvahSTpXGOydL6u
+\unrestrict u6GH3g1PGBHaSguupDamr5TseKnUwxkA6FDmdrn7gZfRaTdJKSlObicL5LTl5Bu
 
 SET search_path TO "$user", public;
 
