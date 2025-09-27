@@ -156,9 +156,13 @@ class IssuesController < ApplicationController
           label: "Kategória",
           items: -> { Issues::Category.non_legacy.order(:name).distinct.pluck(:name) },
           filter: ->(scope, params) do
-            # push down ids as constants so optimizer can use stats
-            ids = Issues::Category.non_legacy.where(name: params[:kategoria]).pluck(:id)
-            scope.where(category_id: ids)
+            if params[:kategoria] == "Bez kategórie"
+              scope.where(category_id: nil)
+            else
+              # push down ids as constants so optimizer can use stats
+              ids = Issues::Category.non_legacy.where(name: params[:kategoria]).pluck(:id)
+              scope.where(category_id: ids)
+            end
           end,
         ),
 
