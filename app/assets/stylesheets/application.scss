@@ -42,7 +42,7 @@ $zaslane: rgba(57, 232, 255, 1);
 $riesene: rgba(57, 232, 255, 1);
 $vyriesene: rgba(0, 229, 158, 1);
 $neriesene: rgba(255, 171, 201, 1);
-$zamietnute: rgba(0, 0, 0, 0.2);
+$zamietnuty: rgba(0, 0, 0, 0.2);
 $odstupene: rgba(151, 71, 255, 0.7);
 $cakajuce: rgba(255, 203, 37, 1);
 $uzavrete: rgba(220, 188, 189, 1);
@@ -198,12 +198,12 @@ a.button-transparent:hover {
 .state-oznaceny-za-vyrieseny { background: $vyriesene; }
 .state-vyrieseny { background: $vyriesene; }
 .state-nerieseny { background: $neriesene; }
-.state-zamietnute { background: $zamietnute; }
+.state-zamietnuty { background: $zamietnuty; }
 .state-odstupeny { background: $odstupene; }
 .state-cakajuci { background: $cakajuce; }
 .state-uzavrety { background: $uzavrete; }
 .state-archivovany { background: $uzavrete; }
-.state-duplicitny { background: $zamietnute; }
+.state-duplicitny { background: $zamietnuty; }
 
 .statistics-block-category-komunikacie,
 .statistics-block-category-cesty-a-chodniky { background: #C4F8FF; }
