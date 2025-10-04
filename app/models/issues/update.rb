@@ -8,6 +8,7 @@
 #  hidden             :boolean          default(FALSE)
 #  imported_at        :datetime
 #  ip                 :inet
+#  issue_resolved     :string
 #  name               :string
 #  published          :boolean
 #  text               :string
