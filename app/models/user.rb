@@ -167,7 +167,7 @@ class User < ApplicationRecord
   end
 
   def stats
-    super || create_stats
+    super || build_stats
   end
 
   def anonymize!
