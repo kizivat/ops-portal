@@ -2,8 +2,6 @@ class UserStats::RefreshCountsAllJob < ApplicationJob
   queue_as :low_priority
 
   def perform
-    private_state_keys = Issues::State::PRIVATE_KEYS
-
     sql = <<-SQL
       INSERT INTO user_stats (user_id, issues_count, comments_count, verified_issues_count, created_at, updated_at)
       SELECT
@@ -36,6 +34,6 @@ class UserStats::RefreshCountsAllJob < ApplicationJob
         updated_at = EXCLUDED.updated_at;
     SQL
 
-    ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql_array([ sql, private_state_keys ]))
+    ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql_array([ sql, Issues::State::PRIVATE_KEYS ]))
   end
 end
