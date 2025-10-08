@@ -23,7 +23,7 @@ class Triage::CreateIssueResolutionProcessTicketJob < ApplicationJob
 
     triage_zammad_client.create_system_note!(
       issue.triage_external_id,
-      "Triáž podnetu bola ukončená a bol vytvorený nový tiket <a href=\"/#ticket/zoom/#{resolution_external_id}\">##{resolution_external_issue_number}</a> na jeho vyriešenie.",
+      "Triáž podnetu bola ukončená a bol vytvorený nový tiket <a href=\"/#ticket/zoom/#{resolution_external_id}\">#{resolution_external_issue_number}</a> na jeho vyriešenie.",
       content_type: "text/html"
     )
 
