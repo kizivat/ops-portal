@@ -17,7 +17,7 @@ class SyncIssueToTriageJob < ApplicationJob
     else
       begin
         process_type = ISSUE_STATE_TO_PROCESS_TYPE.fetch(issue.state.name)
-        ticket_id = create_new_triage_ticket(issue, triage_group: triage_group, process_type: process_type, client: client, import: import)
+        ticket_id = create_new_triage_ticket(issue, triage_group: triage_group, process_type: process_type, client: client, import: import).id
         raise unless ticket_id
 
         issue.last_synced_at = Time.now
