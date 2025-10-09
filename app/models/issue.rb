@@ -154,11 +154,9 @@ class Issue < ApplicationRecord
 
   def should_create_rejection_note_in_triage?
     return false if issue_type == "praise"
+    return false unless saved_change_to_state_id?
 
-    # TODO: revise this logic
-    return true if state.name == "Neprijatý" && saved_change_to_state_id?
-
-    false
+    state.key == "rejected"
   end
 
   def should_create_resolution_process?
