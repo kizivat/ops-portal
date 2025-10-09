@@ -61,7 +61,7 @@
           <div class="label">Podnet podal:</div>
           <%= tag.div do %>
             <div class="subject-con">
-              <%= user_subject(issue.author, avatar_variant: :medium) %>
+              <%= link_to_user_profile(issue.author, avatar_variant: :medium) %>
             </div>
           <% end %>
         </div>

@@ -1,10 +1,10 @@
 module UsersHelper
-  def user_subject(user, avatar_variant: :normal)
+  def link_to_user_profile(user, avatar_variant: :normal)
     avatar = content_tag(:figure) do
       if user.anonymous?
         content_tag(:picture) { user_avatar(user, variant: avatar_variant) }
       else
-        link_to "/pouzivatelia/#{user.id}", data: { turbo: false } do
+        link_to user, data: { turbo_frame: "_top" } do
           content_tag(:picture) { user_avatar(user, variant: avatar_variant) }
         end
       end
