@@ -4076,7 +4076,6 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20250910125432'),
 ('20250925161849'),
 ('20250910125432'),
 ('20250910120000'),
