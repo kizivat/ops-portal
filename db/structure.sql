@@ -686,6 +686,7 @@ CREATE TABLE public.issues (
     fulltext_extra character varying,
     discussion_closed boolean DEFAULT false,
     archived_state_id bigint,
+    resolution_started_at timestamp(6) without time zone,
     last_activity_at timestamp(6) without time zone
 );
 
@@ -3087,6 +3088,13 @@ CREATE INDEX index_issues_on_owner_id ON public.issues USING btree (owner_id);
 
 
 --
+-- Name: index_issues_on_resolution_started_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_on_resolution_started_at ON public.issues USING btree (resolution_started_at);
+
+
+--
 -- Name: index_issues_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4076,6 +4084,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250925161849'),
+('20250910125432'),
 ('20250910120000'),
 ('20250909101218'),
 ('20250717093710'),
