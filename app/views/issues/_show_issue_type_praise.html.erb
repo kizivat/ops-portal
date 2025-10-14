@@ -19,10 +19,12 @@
     </div>
 
     <div class="info-block">
-      <div class="info-block-item">
-        <div class="info-block-description">Dátum</div>
-        <div class="info-block-value"><%= l issue.resolution_started_at.to_date %></div>
-      </div>
+      <% if issue.resolution_started_at.present? %>
+        <div class="info-block-item">
+          <div class="info-block-description">Dátum</div>
+          <div class="info-block-value"><%= l issue.resolution_started_at.to_date %></div>
+        </div>
+      <% end %>
       <div class="info-block-item">
         <div class="info-block-description">Obec</div>
         <div class="info-block-value"><%= issue.municipality.name %></div>
