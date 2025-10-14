@@ -22,7 +22,7 @@ class MunicipalityDistrict < ApplicationRecord
 
   scope :archived, -> { where(archived: true) }
 
-  def self.find_by_address(city:, municipality:, suburb:, district:)
+  def self.find_by_address(city:, municipality:, suburb:)
     result = MunicipalityDistrict.joins(:municipality)
       .where("municipalities.active = true")
       .where("? = ANY(municipalities.aliases)", city)
