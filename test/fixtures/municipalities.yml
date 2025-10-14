@@ -311,7 +311,7 @@ Trstené pri Hornáde:
   active_on_old_portal: false
   archived: true
 
-Trenčín:
+trencin:
   id: 18
   name: Trenčín
   district_id: 6
@@ -2136,7 +2136,7 @@ Trenčianske Bohuslavice:
   active_on_old_portal: false
   archived: true
 
-Bratislava:
+bratislava:
   id: 1
   name: Bratislava
   district_id: 2
@@ -3121,7 +3121,7 @@ Tešedíkovo:
   active_on_old_portal: false
   archived: true
 
-Banská Bystrica:
+banska_bystrica:
   id: 2
   name: Banská Bystrica
   district_id: 1

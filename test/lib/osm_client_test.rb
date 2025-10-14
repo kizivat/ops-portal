@@ -6,7 +6,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Centrum" do
@@ -14,7 +14,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Fončorda" do
@@ -22,7 +22,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Sásová, Rudlová" do
@@ -30,7 +30,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Spišská Nová Ves Novoveská Huta" do
@@ -94,7 +94,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Senica - special case" do
@@ -102,7 +102,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Iliaš, Rakytovce, Kremnička, Podháj" do
@@ -110,7 +110,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Banská Bystrica Podlavice, Skubín, Uľanka, Jakub, Karlovo" do
@@ -118,7 +118,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Banská Bystrica"), nil ], [ m, d ]
+    assert_equal [ municipalities("banska_bystrica"), nil ], [ m, d ]
   end
 
   test "builds correct address details for Piešťany" do
@@ -686,7 +686,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, _ = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal municipalities("Banská Bystrica"), m
+    assert_equal municipalities("banska_bystrica"), m
   end
 
   test "builds correct address details for Holíč" do
@@ -926,7 +926,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Čunovo") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Čunovo") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Devín" do
@@ -934,7 +934,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Devín") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Devín") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Devínska Nová Ves" do
@@ -942,7 +942,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Devínska Nová Ves") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Devínska Nová Ves") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Dúbravka" do
@@ -950,7 +950,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Dúbravka") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Dúbravka") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Jarovce" do
@@ -958,7 +958,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Jarovce") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Jarovce") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Karlova Ves" do
@@ -966,7 +966,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Karlova Ves") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Karlova Ves") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Lamač" do
@@ -974,7 +974,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Lamač") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Lamač") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Nové Mesto" do
@@ -982,7 +982,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Nové Mesto") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Nové Mesto") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Petržalka" do
@@ -990,7 +990,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Petržalka") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Petržalka") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Podunajské Biskupice" do
@@ -998,7 +998,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Podunajské Biskupice") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Podunajské Biskupice") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Podunajské Biskupice on Vrakuna edge" do
@@ -1006,7 +1006,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Podunajské Biskupice") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Podunajské Biskupice") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Rača" do
@@ -1014,7 +1014,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Rača") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Rača") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Rusovce" do
@@ -1022,7 +1022,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Rusovce") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Rusovce") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Ružinov" do
@@ -1030,7 +1030,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Ružinov") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Ružinov") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Staré Mesto" do
@@ -1038,7 +1038,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("stare_mesto_ba") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("stare_mesto_ba") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Vajnory" do
@@ -1046,7 +1046,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Vajnory") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Vajnory") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Vrakuňa" do
@@ -1054,7 +1054,7 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Vrakuňa") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Vrakuňa") ], [ m, d ]
   end
 
   test "builds correct address details for Bratislava Záhorská Bystrica" do
@@ -1062,6 +1062,6 @@ class OsmClientTest < ActiveSupport::TestCase
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb)
 
-    assert_equal [ municipalities("Bratislava"), municipality_districts("Záhorská Bystrica") ], [ m, d ]
+    assert_equal [ municipalities("bratislava"), municipality_districts("Záhorská Bystrica") ], [ m, d ]
   end
 end
