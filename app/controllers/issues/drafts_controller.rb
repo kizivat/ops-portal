@@ -1,9 +1,11 @@
 class Issues::DraftsController < ApplicationController
   before_action :require_full_access_user
   before_action :ensure_user_onboarded
+  before_action :check_rate_limit, only: [ :new, :new_question, :create ]
   before_action :load_draft, except: [ :new, :new_question, :create, :thanks ]
 
   def new
+    @previous_draft = current_user.current_draft
     @draft = Issues::Draft.new(issue_type: :issue)
   end
 
@@ -48,10 +50,20 @@ class Issues::DraftsController < ApplicationController
     redirect_to edit_issues_draft_path(@draft, next: params[:next])
   end
 
+  def duplicates
+    @draft.update(duplicates_shown: true)
+
+    redirect_to issues_path(pin: "#{@draft.latitude},#{@draft.longitude}", kategoria: @draft.category&.name, podkategoria: @draft.subcategory&.name, typ: @draft.subtype&.name)
+  end
+
   def thanks
   end
 
   private
+
+  def check_rate_limit
+    redirect_to please_wait_profile_path if current_user.create_issue_limit_exceeded?
+  end
 
   def draft_params
     params.expect(issues_draft: [ :issue_type, { photos: [] } ])

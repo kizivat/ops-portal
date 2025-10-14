@@ -60,6 +60,7 @@ class User < ApplicationRecord
   has_many :issue_subscriptions, foreign_key: :subscriber_id
   has_many :watched_issues, through: :issue_subscriptions, source: :issue
   has_many :issues_comments, class_name: "Issues::Comment", foreign_key: :user_author_id
+  has_many :issues_updates, class_name: "Issues::Update", foreign_key: :author_id
   has_one_attached :avatar do |avatar|
     avatar.variant :tiny, resize_to_fill: [ 36, 36 ]
     avatar.variant :normal, resize_to_fill: [ 65, 65 ], preprocessed: true
@@ -85,6 +86,7 @@ class User < ApplicationRecord
   validates_numericality_of :phone_verification_code_attempts, less_than: 10, on: :phone_verification_code
   validates_confirmation_of :phone_verification_code, on: :phone_verification_code
   validates_presence_of :phone_verification_code_confirmation, on: :phone_verification_code
+  validate :birth_year_within_range, if: :birth_year, on: [ :onboarding, :update ]
 
   def name
     [ firstname, lastname ].compact.join(" ")
@@ -142,12 +144,55 @@ class User < ApplicationRecord
     update!(phone_verification_code: code)
   end
 
+  def create_issue_limit_exceeded?
+    issues.where(created_at: 1.month.ago..).count >= 10
+  end
+
+  def create_issue_update_limit_exceeded?
+    issues_updates.where(created_at: 1.day.ago...).count >= 5
+  end
+
+  def current_draft
+    draft = issues_drafts.where(created_at: 2.hours.ago..).order(created_at: :desc).first # find recent draft
+    return nil if draft.nil? || draft.submitted?
+
+    draft
+  end
+
+  def anonymize!
+    avatar.purge if avatar.attached?
+
+    login = "anonymized#{id}_#{SecureRandom.hex(8)}"
+
+    update!(
+      email: "#{login}@close.gdpr",
+      firstname: "anonymized",
+      lastname: nil,
+      login: login,
+      phone: nil,
+      password_hash: RodauthApp.rodauth.allocate.password_hash(SecureRandom.hex(16)),
+      about: nil,
+      organization: nil,
+      signature: nil,
+      resident: nil,
+      sex: nil,
+      birth: nil,
+      anonymous: true
+    )
+  end
+
   private
 
   def set_email_global_unsubscribe_token
     loop do
       self.email_global_unsubscribe_token = SecureRandom.urlsafe_base64(32)
       break unless User.exists?(email_global_unsubscribe_token: self.email_global_unsubscribe_token)
+    end
+  end
+
+  def birth_year_within_range
+    unless birth_year.between?(Date.current.year - 120, Date.current.year)
+      errors.add(:birth_year, I18n.t("activerecord.errors.models.user.attributes.birth_year.inclusion", min_year: Date.current.year - 120, max_year: Date.current.year))
     end
   end
 end

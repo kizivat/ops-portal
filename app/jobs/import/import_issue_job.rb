@@ -2,6 +2,8 @@ module Import
   class ImportIssueJob < ApplicationJob
     queue_with_priority 100
 
+    ARCHIVE_THRESHOLD = Date.parse("2020-01-01").beginning_of_day
+
     include ImportMethods
 
     def perform(
@@ -14,15 +16,28 @@ module Import
       import_likes_job: Issues::ImportIssueLikesJob
     )
       municipality = Municipality.find_by(legacy_id: legacy_record.mesto)
-      subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
-      subcategory = subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
-      category = subcategory&.category || ::Issues::Category.find_by(legacy_id: legacy_record.kategoria)
+      municipality_district = municipality&.municipality_districts.find_by(legacy_id: legacy_record.mestska_cast)
+
+      legacy_subtype = ::Issues::Subtype.find_by(legacy_id: legacy_record.kategoria)
+      legacy_subcategory = legacy_subtype&.subcategory || ::Issues::Subcategory.find_by(legacy_id: legacy_record.kategoria)
+      legacy_category = legacy_subcategory&.category || ::Issues::Category.find_by(legacy_id: legacy_record.kategoria)
+      category, subcategory, subtype = CategoryMapper.map_legacy_categories_to_new(legacy_category, legacy_subcategory, legacy_subtype)
+
       owner = if legacy_record.riesitel_new.nil? || legacy_record.riesitel_new == 0
         Legacy::User.find_or_create_agent(legacy_record.riesitel)
       else
         Legacy::User.find_or_create_agent(legacy_record.riesitel_new)
       end
       backoffice_owners = Legacy::Alerts::MunicipalityUser.where(alert_id: legacy_record.id).order(:id)
+
+      state = ::Issues::State.find_by(legacy_id: legacy_record.status)
+      archived_state = nil
+
+      if convert_timestamp_value(legacy_record.posted_time) < ARCHIVE_THRESHOLD ||
+         municipality.archived? || municipality_district&.archived?
+        archived_state = state
+        state = ::Issues::State.find_by(key: "archived")
+      end
 
       issue = Issue.find_or_create_by(
         id: legacy_record.id,
@@ -36,6 +51,9 @@ module Import
         discussion_closed: legacy_record.allow_discussion == 0,
         latitude: legacy_record.map_x,
         legacy_data: {
+          legacy_category_id: legacy_category.legacy_id,
+          legacy_subcategory_id: legacy_subcategory.legacy_id,
+          legacy_subtype_id: legacy_subtype.legacy_id,
           embed: legacy_record.embed,
           map_zoom: legacy_record.map_zoom,
           accuracy: legacy_record.accuracy,
@@ -72,6 +90,7 @@ module Import
           parent_id: legacy_record.parent_id,
           organization_unit_id2: legacy_record.organizational_unit_id2,
           legacy_responsible_subject_id: legacy_record.zodpovednost,
+          legacy_municipality_district_id: legacy_record.mestska_cast,
           backoffice_owner_legacy_id: backoffice_owners&.last&.municipality_user_id,
           other_backoffice_owners_legacy_ids: backoffice_owners[0..-2]&.map(&:municipality_user_id)
         },
@@ -84,9 +103,10 @@ module Import
         subcategory: subcategory,
         subtype: subtype,
         municipality: municipality,
-        municipality_district: municipality&.municipality_districts.find_by(legacy_id: legacy_record.mestska_cast),
+        municipality_district: municipality_district,
         responsible_subject: Legacy::ResponsibleSubject.find_or_create_responsible_subject(legacy_record.zodpovednost),
-        state: ::Issues::State.find_by(legacy_id: legacy_record.status)
+        state: state,
+        archived_state: archived_state
       ).tap do |issue|
         issue.imported_at = Time.now
         issue.updated_at = convert_timestamp_value(legacy_record.modified_time) if legacy_record.modified_time

@@ -31,6 +31,7 @@ $pink: rgba(255, 210, 230, 1); // #ffd2e6
 $pink-fifty: rgba(255, 210, 230, 0.5); // #ffd2e6
 $red: rgba(255, 71, 97, 1); // #ff4761
 $yellow: rgba(255, 212, 0, 1); // #ffd400
+$yellow-light: rgba(255, 239, 190, 0.5); // #ffefbe
 $yellow-middle: rgba(255, 224, 124, 1); // #ffd400
 $white: rgba(255, 255, 255, 1); // #FFFFFF
 
@@ -41,10 +42,11 @@ $zaslane: rgba(57, 232, 255, 1);
 $riesene: rgba(57, 232, 255, 1);
 $vyriesene: rgba(0, 229, 158, 1);
 $neriesene: rgba(255, 171, 201, 1);
-$zamietnute: rgba(0, 0, 0, 0.2);
+$zamietnuty: rgba(0, 0, 0, 0.2);
 $odstupene: rgba(151, 71, 255, 0.7);
 $cakajuce: rgba(255, 203, 37, 1);
 $uzavrete: rgba(220, 188, 189, 1);
+$duplicitny: rgba(220, 188, 189, 1);
 
 
 // General
@@ -196,10 +198,12 @@ a.button-transparent:hover {
 .state-oznaceny-za-vyrieseny { background: $vyriesene; }
 .state-vyrieseny { background: $vyriesene; }
 .state-nerieseny { background: $neriesene; }
-.state-zamietnute { background: $zamietnute; }
+.state-zamietnuty { background: $zamietnuty; }
 .state-odstupeny { background: $odstupene; }
 .state-cakajuci { background: $cakajuce; }
 .state-uzavrety { background: $uzavrete; }
+.state-archivovany { background: $uzavrete; }
+.state-duplicitny { background: $zamietnuty; }
 
 .statistics-block-category-komunikacie,
 .statistics-block-category-cesty-a-chodniky { background: #C4F8FF; }
@@ -208,7 +212,8 @@ a.button-transparent:hover {
 .statistics-block-category-znacenie { background: #39E8FF; }
 .statistics-block-category-osvetlenie { background: #B3F7E2; }
 .statistics-block-category-kanalizacia { background: #66EFC5; }
-.statistics-block-category-mhd { background: #00E59E; }
+.statistics-block-category-mhd,
+.statistics-block-category-mestska-hromadna-doprava { background: #00E59E; }
 .statistics-block-category-ihrisko { background: #FFEFBE; }
 .statistics-block-category-verejny-poriadok,
 .statistics-block-category-verejne-sluzby { background: #FFE07C; }
@@ -222,7 +227,8 @@ a.button-transparent:hover {
 .statistics-block-category-skladky-a-vraky,
 .statistics-block-category-automobily { background: #FFCDDF; }
 .statistics-block-category-kontakt-so-samospravou { background: #FFABC9; }
-.statistics-block-category-ine { background: #EAD7D7; }
+.statistics-block-category-ine,
+.statistics-block-category-ostatne { background: #EAD7D7; }
 .statistics-block-category-napad-na-zlepsenie { background: #DCBCBD; }
 
 
@@ -913,6 +919,7 @@ section.profile .profile-wrapper .profile-name {
   font-size: em(22,16);
   font-weight: $semibold;
   line-height: em(30,22);
+  word-break: break-word;
 }
 section.profile .profile-wrapper .profile-since {
   color: $black-light;
@@ -1316,8 +1323,13 @@ section.report .report-warning .description {
 section.report .button-transparent {
   background: transparent !important;
 }
-section.report .button-transparent:hover {
+section.report .button-transparent:hover,
+section.report .report-warning .button:hover
+{
   background: $blue !important;
+}
+section.report .report-warning .button {
+  background: $yellow;
 }
 
 
@@ -1756,6 +1768,7 @@ section.account .account-info-con .item-title {
   font-size: em(16,16);
   font-weight: $medium;
   line-height: em(24,16);
+  word-break: break-word;
 }
 section.account .button {
   margin-top: 0 !important;
@@ -2131,8 +2144,12 @@ a.podnet-block .state-nerieseny {
   background: $neriesene;
 }
 a.podnet-block .state-uzavrety,
-a.podnet-block .state-neprijaty {
+a.podnet-block .state-neprijaty,
+a.podnet-block .state-archivovany {
   background: $uzavrete;
+}
+a.podnet-block .state-duplicitny {
+  background: $duplicitny;
 }
 a.podnet-block .icon-con {
   align-items: center;
@@ -2429,7 +2446,17 @@ section.podnet .podnet-information span.value,{
   padding: 6px 11px;
   @include rounded(25px);
 }
-
+section.podnet .podnet-information .clipboard-button {
+  vertical-align: middle;
+  line-height: 1em;
+  margin-left: 5px;
+  color: $black;
+  display: initial;
+  visibility: hidden;
+}
+section.podnet .podnet-information .clipboard--supported:hover .clipboard-button {
+  visibility: visible;
+}
 
 //Rotate button and close button
 section.podnet .podnet-discussion .add-comment-form figure {
@@ -2482,13 +2509,16 @@ section.podnet .podnet-discussion .comment {
   padding: 30px 20px;
   word-break: break-word;
 }
+section.podnet .podnet-discussion .duplicate {
+  background: $green-light;
+}
 section.podnet .podnet-discussion .government {
   background: $blue-light;
 }
-section.podnet .podnet-discussion .confirm-commnet {
+section.podnet .podnet-discussion .confirm-comment {
   background: $green-light;
 }
-section.podnet .podnet-discussion .confirm-commnet .confirm-status {
+section.podnet .podnet-discussion .confirm-comment .confirm-status {
   background: $green;
   align-items: center;
   box-sizing: border-box;
@@ -2507,7 +2537,7 @@ section.podnet .podnet-discussion .confirm-commnet .confirm-status {
   @include rounded(25px);
   @include transition(all);
 }
-section.podnet .podnet-discussion .confirm-commnet .confirm-status svg {
+section.podnet .podnet-discussion .confirm-comment .confirm-status svg {
   width: 18px;
 }
 section.podnet .podnet-discussion .comment,
@@ -3201,6 +3231,81 @@ body.error-server-body {
   font-size: em(18,16);
   font-weight: $semibold;
   line-height: em(28,18);
+}
+
+.wrapper-map .container-map {
+  padding-bottom: 100%;
+}
+
+// Mapa Popup
+.map-popup {
+  background: $white;
+  box-shadow: 0px 0px 5px 1px $black-ten;
+  display: flex;
+  flex-direction: column;
+  gap: 4px 0;
+  max-width: 200px;
+  padding: 10px 12px;
+  @include rounded(6px);
+}
+.map-popup .title {
+  color: $black;
+  font-family: $general;
+  font-size: em(14,16) * 1.2;
+  font-weight: $semibold;
+  line-height: em(20,14);
+}
+.map-popup .location, .map-popup .date {
+  color: $black;
+  font-family: $general;
+  font-size: em(12,16) * 1.2;
+  font-weight: $medium;
+  line-height: em(18,12);
+}
+
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+.leaflet-popup-close-button {
+  display: none !important;
+}
+
+.custom-cluster-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.cluster-marker {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: #ff4761;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cluster-marker:hover {
+  transform: scale(1.1);
+}
+
+.cluster-marker-inner {
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: center;
+  line-height: 1;
 }
 
 

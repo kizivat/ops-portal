@@ -59,6 +59,7 @@ class Issue < ApplicationRecord
   belongs_to :municipality_district, optional: true
   belongs_to :responsible_subject, optional: true
   belongs_to :state, class_name: "Issues::State", optional: true
+  belongs_to :archived_state, class_name: "Issues::State", optional: true
 
   has_many :activities, class_name: "Issues::Activity", dependent: :destroy
   has_many :comment_activities, class_name: "Issues::CommentActivity", dependent: :destroy
@@ -76,7 +77,7 @@ class Issue < ApplicationRecord
   end
 
   validates :triage_external_id, uniqueness: true, allow_nil: true
-  validates :category_id, presence: true, unless: ->(issue) { issue.issue_type == "praise" }
+  validates :category_id, presence: true, unless: ->(issue) { issue.issue_type == "praise" || issue.archived? }
   validates_presence_of :title, :description, unless: :imported?
   validates_presence_of :photos, unless: -> { :imported? || issue_type == "praise" }
   validates_length_of :title, minimum: 10, maximum: 80, allow_blank: true, unless: :imported?
@@ -87,6 +88,11 @@ class Issue < ApplicationRecord
   scope :currently_viewable_by, ->(user) do
     joins(:state).where("issues_states.key NOT IN(?) OR issues.author_id = ?", Issues::State::PRIVATE_KEYS, user.id)
   end
+  scope :not_archived, -> do
+    where.not(municipality_id: Municipality.archived.pluck(:id))
+      .where.not(municipality_district_id: MunicipalityDistrict.archived.pluck(:id))
+  end
+  scope :searchable, -> { publicly_visible.not_archived }
 
   before_save :recalculate_computed_fields
   after_update :notify_subscribers
@@ -138,8 +144,19 @@ class Issue < ApplicationRecord
     state.key == "waiting"
   end
 
+  def archived?
+    state.key == "archived" || municipality.archived? || municipality_district&.archived?
+  end
+
   def showing_comments_count?
     issue_type.in?(%w[issue question]) && comments_count.nonzero?
+  end
+
+  def should_create_rejection_note_in_triage?
+    return false if issue_type == "praise"
+    return false unless saved_change_to_state_id?
+
+    state.key == "rejected"
   end
 
   def should_create_resolution_process?
@@ -162,6 +179,10 @@ class Issue < ApplicationRecord
     where("ST_DWithin(ST_Point(issues.longitude, issues.latitude, 4326)::geography, ST_Point(?, ?, 4326)::geography, ?)", lon, lat, distance)
   end
 
+  def self.within_bbox(bbox)
+    where("ST_Point(longitude, latitude, 4326) && ST_MakeEnvelope(?, ?, ?, ?, 4326)", *bbox.first(4))
+  end
+
   def self.order_by_distance_from_point(lat, lon)
     select_sql = sanitize_sql([ Arel.sql("issues.*, ST_Distance(ST_Point(issues.longitude, issues.latitude)::geography, ST_Point(:lon, :lat, 4326)::geography) as distance"), { lon: lon, lat: lat } ])
     order_sql = sanitize_sql_for_order([ Arel.sql("ST_Point(issues.longitude, issues.latitude, 4326)::geography <-> ST_Point(?, ?, 4326)::geography"), lon, lat ])
@@ -174,6 +195,8 @@ class Issue < ApplicationRecord
       .joins(activity: :issue)
       .where(issues: { id: id })
       .maximum(:created_at)
+
+    self.last_activity_at = activities.maximum(:created_at)
 
     self.comments_count = visible_activity_objects.count
 
