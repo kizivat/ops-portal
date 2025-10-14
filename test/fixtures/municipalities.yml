@@ -2157,7 +2157,7 @@ bratislava:
   aliases:
   - bratislava
   - Bratislava
-  active_on_old_portal: true
+  active_on_old_portal: false
   archived: false
 
 Nové Zámky:

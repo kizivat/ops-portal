@@ -3,7 +3,7 @@ class Issues::Draft::FetchAddressDetailsJob < ApplicationJob
   queue_with_priority ASAP
 
   def perform(draft)
-    address_details = OsmClient.new.get_address_details(lat: draft.latitude, lon: draft.longitude)
+    address_details = OsmClient.get_address_details(lat: draft.latitude, lon: draft.longitude)
 
     draft.update!(
       address_house_number: address_details.house_number,
