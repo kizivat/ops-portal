@@ -6,10 +6,10 @@ class Connector::Legacy::MagistratSetGroupAndOwnersJob < ApplicationJob
     tenant_issue = tenant.issues.find_by(triage_external_id: triage_issue_id)
 
     group = find_or_create_zammad_group(issue, zammad_client)
-    zammad_client.add_ticket_to_group(issue, group.name)
+    zammad_client.add_ticket_to_group(issue, group.name) if group
 
     backoffice_owner = [ResponsibleSubjects::User.find_by(legacy_id: 714), ResponsibleSubjects::User.find_by(legacy_id: 1168)].sample
-    zammad_client.add_agent_to_group(backoffice_owner, group.name)
+    zammad_client.add_agent_to_group(backoffice_owner, group.name) if group
     zammad_client.set_ticket_owner(issue, owner: backoffice_owner)
 
     backoffice_owner_zammad_id = zammad_client.create_or_find_agent(backoffice_owner)
@@ -18,7 +18,7 @@ class Connector::Legacy::MagistratSetGroupAndOwnersJob < ApplicationJob
       subtask_owner = ResponsibleSubjects::User.find_by(legacy_id: alert_municipality_user.municipality_user_id)
       subtask_owner_zammad_id = zammad_client.create_or_find_agent(subtask_owner)
 
-      zammad_client.add_user_to_group_read_only(subtask_owner_zammad_id, group.name)
+      zammad_client.add_user_to_group_read_only(subtask_owner_zammad_id, group.name) if group
 
       zammad_client.create_subtask(tenant_issue.backoffice_external_id, backoffice_owner_zammad_id, alert_municipality_user.municipality_user_id, issue.title, subtask_owner_zammad_id)
     end
