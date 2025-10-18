@@ -7,7 +7,8 @@ class UserStats::RefreshCountsAllJob < ApplicationJob
         SELECT
           u.id AS user_id,
           COALESCE(COUNT(DISTINCT i.id), 0) AS total_issues,
-          COALESCE(COUNT(DISTINCT c.id), 0) AS total_comments
+          COALESCE(COUNT(DISTINCT c.id), 0) AS total_comments,
+          COALESCE(COUNT(DISTINCT iu.id), 0) AS total_verified_issues
         FROM
           users u
         LEFT JOIN
@@ -16,6 +17,8 @@ class UserStats::RefreshCountsAllJob < ApplicationJob
           )
         LEFT JOIN
           issues_comments c ON u.id = c.user_author_id
+        LEFT JOIN 
+          issues_updates iu ON u.id = iu.author_id AND iu.confirmed = TRUE
         GROUP BY
           u.id
       )
@@ -24,7 +27,7 @@ class UserStats::RefreshCountsAllJob < ApplicationJob
       SET
         stats_issues_count = stats.total_issues,
         stats_comments_count = stats.total_comments,
-        stats_verified_issues_count = 0,
+        stats_verified_issues_count = stats.total_verified_issues,
         updated_at = CURRENT_TIMESTAMP
       FROM
         stats
