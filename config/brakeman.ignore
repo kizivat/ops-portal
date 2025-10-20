@@ -71,7 +71,7 @@
     {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
-      "fingerprint": "5c9249cd090f8e9155c5ce4ec287503e8a80cb2d8122969a9b04bf374ea6bc05",
+      "fingerprint": "dac8e954d96493d6c25143d50fcebdaee4fba8192826b4c963a90e48b5c2ca01",
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/profiles/show.html.erb",
