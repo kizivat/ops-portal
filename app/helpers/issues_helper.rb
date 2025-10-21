@@ -20,4 +20,8 @@ module IssuesHelper
   def praise_image_tag(issue)
     image_tag "pochvala-#{(issue.id % 6) + 1}.png", alt: "Pochvala"
   end
+
+  def effective_date(issue)
+    issue.resolution_started_at || issue.created_at
+  end
 end

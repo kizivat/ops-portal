@@ -73,7 +73,7 @@
 
         <div class="information-wrapper">
           <div class="label">Dátum:</div>
-          <div class="value"><%= l issue.display_date.to_date, format: :long %></div>
+          <div class="value"><%= l effective_date(issue).to_date, format: :long %></div>
         </div>
 
         <div class="information-wrapper">
