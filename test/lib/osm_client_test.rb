@@ -1043,7 +1043,6 @@ class OsmClientTest < ActiveSupport::TestCase
 
   test "builds correct address details for Bratislava Staré Mesto if inactive and street is whitelisted for Bratislava" do
     details = file_fixture("osm_client_details/bratislava_staré_mesto.json").read
-    municipalities("bratislava").update(whitelisted_streets: [ "Primaciálne námestie" ])
     municipality_districts("stare_mesto_ba").update(active: false)
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb, street: address.street)
@@ -1054,6 +1053,7 @@ class OsmClientTest < ActiveSupport::TestCase
   test "builds correct address details for Bratislava Staré Mesto if inactive and street is not whitelisted for Bratislava" do
     details = file_fixture("osm_client_details/bratislava_staré_mesto.json").read
     municipality_districts("stare_mesto_ba").update(active: false)
+    streets("ba_primacialne_namestie").update(whitelisted: false)
     address = OsmClient.build_address_details(JSON.parse(details))
     m, d = Municipality.find_by_address(city: address.city, municipality: address.municipality, suburb: address.suburb, street: address.street)
 

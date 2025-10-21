@@ -88,7 +88,7 @@ class MunicipalityTest < ActiveSupport::TestCase
     municipality = municipalities("bratislava")
     district = municipality_districts("Ružinov")
     district.update!(active: false)
-    municipality.update!(whitelisted_streets: [ "Cesta mládeže", "Búdková" ])
+    municipality.streets.create(name: "Cesta mládeže", whitelisted: true)
 
     assert_equal [ municipality, district ], Municipality.find_by_address(
       city: "Bratislava",
@@ -102,7 +102,7 @@ class MunicipalityTest < ActiveSupport::TestCase
     municipality = municipalities("bratislava")
     district = municipality_districts("Ružinov")
     district.update!(active: false)
-    municipality.update!(whitelisted_streets: [ "Búdková" ])
+    municipality.streets.create(name: "Búdková", whitelisted: false)
 
     assert_equal [ nil, district ], Municipality.find_by_address(
       city: "Bratislava",

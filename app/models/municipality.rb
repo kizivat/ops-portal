@@ -19,7 +19,6 @@
 #  name                       :string
 #  population                 :integer
 #  sub                        :string
-#  whitelisted_streets        :string           default([]), is an Array
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  district_id                :bigint
@@ -42,7 +41,7 @@ class Municipality < ApplicationRecord
     if municipality_district
       return [ municipality_district.municipality, municipality_district ] if municipality_district.active?
 
-      if street.present? && municipality_district.municipality.whitelisted_streets.include?(street)
+      if street.present? && municipality_district.municipality.streets.whitelisted.find_by_name(street)
         return [ municipality_district.municipality, municipality_district ]
       end
 
