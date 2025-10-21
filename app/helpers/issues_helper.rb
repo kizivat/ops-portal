@@ -21,7 +21,8 @@ module IssuesHelper
     image_tag "pochvala-#{(issue.id % 6) + 1}.png", alt: "Pochvala"
   end
 
-  def effective_date(issue)
-    issue.resolution_started_at || issue.created_at
+  def issue_effective_date(issue, **options)
+    date = issue.resolution_started_at || issue.created_at
+    l(date.to_date, **options)
   end
 end
