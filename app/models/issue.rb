@@ -27,6 +27,7 @@
 #  likes_count                         :integer          default(0), not null
 #  longitude                           :float
 #  public                              :boolean          default(FALSE), not null
+#  resolution_started_at               :datetime
 #  responsible_subject_last_contact_at :datetime
 #  title                               :string           not null
 #  created_at                          :datetime         not null
@@ -88,6 +89,7 @@ class Issue < ApplicationRecord
   scope :currently_viewable_by, ->(user) do
     joins(:state).where("issues_states.key NOT IN(?) OR issues.author_id = ?", Issues::State::PRIVATE_KEYS, user.id)
   end
+
   scope :not_archived, -> do
     where("municipality_id NOT IN (?) OR municipality_id IS NULL", Municipality.archived.pluck(:id))
       .where("municipality_district_id NOT IN (?) OR municipality_district_id IS NULL", MunicipalityDistrict.archived.pluck(:id))
