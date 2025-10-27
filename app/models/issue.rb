@@ -96,6 +96,8 @@ class Issue < ApplicationRecord
   end
   scope :searchable, -> { publicly_visible.not_archived }
 
+  scope :resolution_process, -> { where.not(resolution_external_id: nil) }
+
   before_save :recalculate_computed_fields
   after_update :notify_subscribers
 
