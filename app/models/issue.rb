@@ -91,8 +91,12 @@ class Issue < ApplicationRecord
   end
 
   scope :not_archived, -> do
-    where("municipality_id NOT IN (?) OR municipality_id IS NULL", Municipality.archived.pluck(:id))
-      .where("municipality_district_id NOT IN (?) OR municipality_district_id IS NULL", MunicipalityDistrict.archived.pluck(:id))
+    archived_municipality_ids = Municipality.archived.pluck(:id)
+    archived_responsible_subject_ids = ResponsibleSubject.archived.pluck(:id)
+    scope = self
+    scope = scope.where("municipality_id NOT IN (?) OR municipality_id IS NULL", archived_municipality_ids) if archived_municipality_ids.any?
+    scope = scope.where("responsible_subject_id NOT IN (?) OR responsible_subject_id IS NULL", archived_responsible_subject_ids) if archived_responsible_subject_ids.any?
+    scope
   end
   scope :searchable, -> { publicly_visible.not_archived }
 

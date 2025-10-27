@@ -28,6 +28,7 @@ class ResponsibleSubject < ApplicationRecord
   belongs_to :municipality_district, optional: true
 
   scope :active, -> { where(active: true) }
+  scope :archived, -> { where(active: false) }
 
   def archived?
     active == false
