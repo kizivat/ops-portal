@@ -16,7 +16,7 @@ class ZammadApiClient
   }
   RESPONSIBLE_SUBJECT_ARTICLE_TAG = TriageZammadEnvironment::RESPONSIBLE_SUBJECT_ARTICLE_TAG
   OPS_PORTAL_ARTICLE_TAG = TriageZammadEnvironment::OPS_PORTAL_ARTICLE_TAG
-  MARKED_AS_RESOLVED_TAGS = [ "[[vyriesene]]", "[[vyriešené]]", "vyrieseny", "vyriešený" ]
+  MARKED_AS_RESOLVED_TAGS = [ "[[vyriesene]]", "[[vyriešené]]", "[[vyrieseny]]", "[[vyriešený]]" ]
   REFERRED_TAGS = [ "[[odstupene]]", "[[odstúpené]]", "[[odstupeny]]", "[[odstúpený]]" ]
 
   ATTACHMENTS_UPDATE_ARTICLE_BODY = "Aktualizované prílohy"
