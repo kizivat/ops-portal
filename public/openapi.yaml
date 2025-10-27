@@ -28,6 +28,79 @@ tags:
     description: Operations related to responsible subjects
 
 paths:
+  /api/v1/issues:
+    get:
+      summary: List issues
+      description: Retrieve a list of issues assigned to the responsible subject of the integration
+      operationId: listIssues
+      tags:
+        - Issues
+      security:
+        - JWT: []
+      parameters:
+        - name: all
+          in: query
+          required: false
+          description: Return all issues (including old ones not available in API)
+          schema:
+            type: boolean
+        - name: ops_state
+          in: query
+          required: false
+          description: Filter issues by OPS state
+          schema:
+            type: string
+            enum:
+              - sent_to_responsible
+              - referred
+              - resolved_private
+              - marked_as_resolved
+              - resolved
+              - unresolved
+              - in_progress
+              - rejected
+              - closed
+              - archived
+              - duplicate
+      responses:
+        '200':
+          description: List of issues retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    triage_identifier:
+                      type: string
+                      description: Issue identifier
+                      example: "123"
+                    ops_issue_identifier:
+                      type: string
+                      description: OPS issue identifier
+                      example: "456"
+                    ops_state:
+                      type: string
+                      description: Current OPS state of the issue
+                      enum:
+                        - sent_to_responsible
+                        - referred
+                        - resolved_private
+                        - marked_as_resolved
+                        - resolved
+                        - unresolved
+                        - in_progress
+                        - rejected
+                        - closed
+                        - archived
+                        - duplicate
+                  required:
+                    - ops_issue_identifier
+                    - ops_state
+        '401':
+          description: Unauthorized - invalid or missing token
+
   /api/v1/issues/{id}:
     get:
       summary: Get issue details
@@ -215,6 +288,23 @@ paths:
         '401':
           description: Unauthorized - invalid or missing token
 
+  /api/v1/responsible_subjects:
+    get:
+      summary: List responsible subjects
+      description: Retrieve a list of all responsible subjects
+      operationId: listResponsibleSubjects
+      tags:
+        - Responsible Subjects
+      responses:
+        '200':
+          description: List of responsible subjects retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponsibleSubject'
+  
   /api/v1/responsible_subjects/search:
     get:
       summary: Search responsible subjects
@@ -237,8 +327,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResponsibleSubject'
-        '401':
-          description: Unauthorized - invalid or missing token
 
 webhooks:
   issueCreated:
@@ -446,7 +534,6 @@ components:
             - referred
             - resolved_private
             - marked_as_resolved
-            - waiting
             - resolved
             - unresolved
             - in_progress
@@ -614,7 +701,6 @@ components:
     ActivityCreate:
       type: object
       required:
-        - author
         - content_type
         - body
         - type
@@ -680,6 +766,34 @@ components:
           type: string
           description: Responsible subject name
 
+    OpsState:
+      type: string
+      description: >
+        OPS issue state:
+          - `sent_to_responsible` - Zaslaný zodpovednému
+          - `referred` - Odstúpený
+          - `resolved_private` - Vyriešený (skrytý)
+          - `marked_as_resolved` - Označený za vyriešený
+          - `resolved` - Vyriešený
+          - `unresolved` - Neriešený
+          - `in_progress` - V riešení
+          - `rejected` - Zamietnutý
+          - `closed` - Uzavretý
+          - `archived` - Archivovaný
+          - `duplicate` - Duplicitný
+      enum:
+        - sent_to_responsible
+        - referred
+        - resolved_private
+        - marked_as_resolved
+        - resolved
+        - unresolved
+        - in_progress
+        - rejected
+        - closed
+        - archived
+        - duplicate
+    
     WebhookEvent:
       type: object
       required:
