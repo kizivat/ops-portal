@@ -27,6 +27,7 @@
 #  likes_count                         :integer          default(0), not null
 #  longitude                           :float
 #  public                              :boolean          default(FALSE), not null
+#  resolution_started_at               :datetime
 #  responsible_subject_last_contact_at :datetime
 #  title                               :string           not null
 #  created_at                          :datetime         not null
@@ -83,16 +84,24 @@ class Issue < ApplicationRecord
   validates_length_of :title, minimum: 10, maximum: 80, allow_blank: true, unless: :imported?
   validates_length_of :description, minimum: 25, maximum: 1800, allow_blank: true, unless: :imported?
 
-  scope :newest, -> { order(created_at: :desc) }
+  scope :newest, -> { order(resolution_started_at: :desc) }
+  scope :newest_by_effective_date, -> { order(Arel.sql("COALESCE(issues.resolution_started_at, issues.created_at) DESC")) }
   scope :publicly_visible, -> { where.not(state_id: Issues::State.not_visible.pluck(:id)) }
   scope :currently_viewable_by, ->(user) do
     joins(:state).where("issues_states.key NOT IN(?) OR issues.author_id = ?", Issues::State::PRIVATE_KEYS, user.id)
   end
+
   scope :not_archived, -> do
-    where.not(municipality_id: Municipality.archived.pluck(:id))
-      .where.not(municipality_district_id: MunicipalityDistrict.archived.pluck(:id))
+    archived_municipality_ids = Municipality.archived.pluck(:id)
+    archived_responsible_subject_ids = ResponsibleSubject.archived.pluck(:id)
+    scope = self
+    scope = scope.where("municipality_id NOT IN (?) OR municipality_id IS NULL", archived_municipality_ids) if archived_municipality_ids.any?
+    scope = scope.where("responsible_subject_id NOT IN (?) OR responsible_subject_id IS NULL", archived_responsible_subject_ids) if archived_responsible_subject_ids.any?
+    scope
   end
   scope :searchable, -> { publicly_visible.not_archived }
+
+  scope :resolution_process, -> { where.not(resolution_external_id: nil) }
 
   before_save :recalculate_computed_fields
   after_update :notify_subscribers
@@ -145,7 +154,7 @@ class Issue < ApplicationRecord
   end
 
   def archived?
-    state.key == "archived" || municipality.archived? || municipality_district&.archived?
+    state.key == "archived" || municipality.archived? || responsible_subject&.archived?
   end
 
   def showing_comments_count?

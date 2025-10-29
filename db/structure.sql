@@ -692,6 +692,7 @@ CREATE TABLE public.issues (
     fulltext_extra character varying,
     discussion_closed boolean DEFAULT false,
     archived_state_id bigint,
+    resolution_started_at timestamp(6) without time zone,
     last_activity_at timestamp(6) without time zone
 );
 
@@ -1060,8 +1061,7 @@ CREATE TABLE public.issues_updates (
     uuid uuid,
     confirmed boolean DEFAULT false,
     external_id character varying,
-    hidden boolean DEFAULT false,
-    issue_resolved character varying
+    hidden boolean DEFAULT false
 );
 
 
@@ -1630,7 +1630,8 @@ CREATE TABLE public.streets (
     tested boolean,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    legacy_id integer
+    legacy_id integer,
+    whitelisted boolean DEFAULT false
 );
 
 
@@ -3024,6 +3025,13 @@ CREATE INDEX index_issues_drafts_on_subtype_id ON public.issues_drafts USING btr
 
 
 --
+-- Name: index_issues_municipality_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.issues USING btree (municipality_id, resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
+
+
+--
 -- Name: index_issues_municipality_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3049,6 +3057,20 @@ CREATE INDEX index_issues_on_author_id ON public.issues USING btree (author_id);
 --
 
 CREATE INDEX index_issues_on_category_id ON public.issues USING btree (category_id);
+
+
+--
+-- Name: index_issues_on_display_date; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_on_display_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at) DESC);
+
+
+--
+-- Name: index_issues_on_effective_date; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_on_effective_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at));
 
 
 --
@@ -3101,6 +3123,13 @@ CREATE INDEX index_issues_on_owner_id ON public.issues USING btree (owner_id);
 
 
 --
+-- Name: index_issues_on_resolution_started_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_on_resolution_started_at ON public.issues USING btree (resolution_started_at);
+
+
+--
 -- Name: index_issues_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3133,6 +3162,13 @@ CREATE INDEX index_issues_on_subcategory_id ON public.issues USING btree (subcat
 --
 
 CREATE INDEX index_issues_on_subtype_id ON public.issues USING btree (subtype_id);
+
+
+--
+-- Name: index_issues_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_resolution_started_at_hot_path ON public.issues USING btree (resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
 
 
 --
@@ -4089,10 +4125,15 @@ ALTER TABLE ONLY public.cms_categories
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251021111854'),
+('20251021083200'),
+('20251020135223'),
+('20251020123548'),
 ('20251017073059'),
 ('20251004142110'),
 ('20250925161849'),
 ('20250923093835'),
+('20250910125432'),
 ('20250910120000'),
 ('20250909101218'),
 ('20250717093710'),

@@ -254,13 +254,13 @@ class IssuesController < ApplicationController
             return [] unless params[:obec].present?
 
             MunicipalityDistrict.joins(:municipality)
-              .where(municipalities: { name: params[:obec], active: true }, archived: false)
+              .where(municipalities: { name: params[:obec], active: true })
               .order(Arel.sql("municipality_districts.name COLLATE unicode"))
               .pluck(:name)
           end,
           filter: ->(scope, params) do
             # push down ids as constants so optimizer can use stats
-            ids = MunicipalityDistrict.where(name: params[:cast], archived: false).pluck(:id)
+            ids = MunicipalityDistrict.where(name: params[:cast]).pluck(:id)
             scope.where(municipality_district_id: ids)
           end
         ),
@@ -279,11 +279,11 @@ class IssuesController < ApplicationController
           filter: ->(scope, params) do
             case params[:obdobie]
             when "Posledných 30 dní"
-                scope = scope.where(created_at: 30.days.ago..)
+              scope = scope.where(resolution_started_at: 30.days.ago..)
             when "Tento rok"
-                scope = scope.where(created_at: Date.current.beginning_of_year..)
+              scope = scope.where(resolution_started_at: Date.current.beginning_of_year..)
             when "Minulý rok"
-                scope = scope.where(created_at: 1.year.ago.beginning_of_year..1.year.ago.end_of_year)
+              scope = scope.where(resolution_started_at: 1.year.ago.beginning_of_year..1.year.ago.end_of_year)
             end
 
             scope
@@ -346,13 +346,13 @@ class IssuesController < ApplicationController
         SearchEngine::Controls::Sort.new(
           name: :oblubene,
           label: "Najobľúbenejšie",
-          order: ->(scope, _) { scope.order(likes_count: :desc, created_at: :desc) }
+          order: ->(scope, _) { scope.order(likes_count: :desc, resolution_started_at: :desc) }
         ),
 
         SearchEngine::Controls::Sort.new(
           name: :komentare,
           label: "Najkomentovanejšie",
-          order: ->(scope, _) { scope.order(comments_count: :desc, created_at: :desc) }
+          order: ->(scope, _) { scope.order(comments_count: :desc, resolution_started_at: :desc) }
         ),
 
         SearchEngine::Controls::Sort.new(
