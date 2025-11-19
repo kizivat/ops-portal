@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -686,7 +687,8 @@ CREATE TABLE public.issues (
     discussion_closed boolean DEFAULT false,
     archived_state_id bigint,
     last_activity_at timestamp(6) without time zone,
-    resolution_started_at timestamp(6) without time zone
+    resolution_started_at timestamp(6) without time zone,
+    effective_at timestamp(6) without time zone GENERATED ALWAYS AS (COALESCE(resolution_started_at, created_at)) STORED
 );
 
 
@@ -2985,7 +2987,7 @@ CREATE UNIQUE INDEX index_issues_comments_on_uuid ON public.issues_comments USIN
 -- Name: index_issues_default_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
+CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
 
 
 --
@@ -3017,6 +3019,13 @@ CREATE INDEX index_issues_drafts_on_subtype_id ON public.issues_drafts USING btr
 
 
 --
+-- Name: index_issues_municipality_effective_at_hot_path; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_municipality_effective_at_hot_path ON public.issues USING btree (municipality_id, effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+
+
+--
 -- Name: index_issues_municipality_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3027,7 +3036,7 @@ CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.
 -- Name: index_issues_municipality_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
+CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
 
 
 --
@@ -3052,17 +3061,17 @@ CREATE INDEX index_issues_on_category_id ON public.issues USING btree (category_
 
 
 --
--- Name: index_issues_on_display_date; Type: INDEX; Schema: public; Owner: -
+-- Name: index_issues_on_effective_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_on_display_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at) DESC);
+CREATE INDEX index_issues_on_effective_at ON public.issues USING btree (effective_at);
 
 
 --
 -- Name: index_issues_on_effective_date; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_on_effective_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at));
+CREATE INDEX index_issues_on_effective_date ON public.issues USING btree (COALESCE(resolution_started_at, created_at) DESC);
 
 
 --
@@ -4117,6 +4126,8 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251118171856'),
+('20251118000000'),
 ('20251114160144'),
 ('20251027105858'),
 ('20251025165300'),
