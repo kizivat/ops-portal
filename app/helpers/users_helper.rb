@@ -10,7 +10,15 @@ module UsersHelper
       end
     end
 
-    name = content_tag(:div, user.present? ? user.display_name : "Neznámy autor", class: "name")
+    display_name = user.present? ? user.display_name : "Neznámy autor"
+
+    name = if user.anonymous?
+             content_tag(:div, display_name, class: "name")
+    else
+             link_to user, data: { turbo_frame: "_top" } do
+               content_tag(:div, display_name, class: "name")
+             end
+    end
 
     safe_join([ avatar, name ])
   end
