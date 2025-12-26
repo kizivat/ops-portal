@@ -1856,6 +1856,12 @@ CREATE TABLE public.users (
     phone_verification_code_attempts integer DEFAULT 0 NOT NULL,
     phone_verification_attempted_at timestamp(6) without time zone,
     email_global_unsubscribe_token character varying NOT NULL,
+    stats_issues_count integer DEFAULT 0,
+    stats_comments_count integer DEFAULT 0,
+    stats_verified_issues_count integer DEFAULT 0,
+    stats_issues_percentile numeric(5,4) DEFAULT 0.0,
+    stats_comments_percentile numeric(5,4) DEFAULT 0.0,
+    stats_verified_issues_percentile numeric(5,4) DEFAULT 0.0,
     imported_at timestamp(6) without time zone,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
@@ -4141,6 +4147,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20251020135223'),
 ('20251020123548'),
 ('20251017073059'),
+('20251004142110'),
 ('20250925161849'),
 ('20250910125432'),
 ('20250910120000'),

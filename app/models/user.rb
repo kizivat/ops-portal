@@ -35,6 +35,12 @@
 #  resident                         :boolean
 #  sex                              :integer
 #  signature                        :string
+#  stats_comments_count             :integer          default(0)
+#  stats_comments_percentile        :decimal(5, 4)    default(0.0)
+#  stats_issues_count               :integer          default(0)
+#  stats_issues_percentile          :decimal(5, 4)    default(0.0)
+#  stats_verified_issues_count      :integer          default(0)
+#  stats_verified_issues_percentile :decimal(5, 4)    default(0.0)
 #  status                           :integer          default("unverified"), not null
 #  timestamp                        :datetime
 #  uuid                             :uuid             not null
@@ -163,6 +169,14 @@ class User < ApplicationRecord
     return nil if draft.nil? || draft.submitted?
 
     draft
+  end
+
+  def recalculate_computed_fields
+    update!(
+      stats_issues_count: issues.publicly_visible.count,
+      stats_comments_count: issues_comments.count,
+      stats_verified_issues_count: issues_updates.where(verification_status: :approved).count
+    )
   end
 
   def anonymize!
