@@ -47,24 +47,6 @@ export default class extends Controller {
         if (label.startsWith(query)) return 0
         if (label.includes(query)) return 5
 
-        const d = this.levenshtein(label, query)
-        return d <= 3 ? 10 + d : Infinity
-    }
-
-    levenshtein(a, b) {
-        const m = []
-        for (let i = 0; i <= b.length; i++) m[i] = [i]
-        for (let j = 1; j <= a.length; j++) m[0][j] = j
-
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                m[i][j] =
-                    b[i - 1] === a[j - 1]
-                        ? m[i - 1][j - 1]
-                        : 1 + Math.min(m[i - 1][j], m[i][j - 1], m[i - 1][j - 1])
-            }
-        }
-
-        return m[b.length][a.length]
+        return Infinity
     }
 }
