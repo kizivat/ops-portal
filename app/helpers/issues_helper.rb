@@ -25,4 +25,14 @@ module IssuesHelper
     date = issue.resolution_started_at || issue.created_at
     l(date.to_date, **options)
   end
+
+  def issue_state_badge(issue, custom_class: "")
+    state = if issue.archived?
+              @archived_state ||= Issues::State.archived.first
+    else
+              issue.state
+    end
+
+    tag.div(state.name, class: "state state-#{state.name.parameterize} #{custom_class}")
+  end
 end
