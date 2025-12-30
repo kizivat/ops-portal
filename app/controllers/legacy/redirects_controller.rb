@@ -39,6 +39,12 @@ class Legacy::RedirectsController < ApplicationController
     redirect_to cms_page_path("vitajte-na-novom-portali-odkaz-pre-starostu")
   end
 
+  def show_user
+    user = User.find_by!(legacy_id: params[:legacy_id])
+
+    redirect_to user
+  end
+
   private
 
   def set_legacy_visit_cookie
