@@ -663,9 +663,9 @@ CREATE TABLE public.issues (
     legacy_id integer,
     municipality_district_id bigint,
     responsible_subject_id bigint,
+    owner_id bigint,
     subcategory_id bigint,
     subtype_id bigint,
-    owner_id bigint,
     address_region character varying,
     address_city character varying,
     address_municipality character varying,
@@ -673,12 +673,12 @@ CREATE TABLE public.issues (
     address_house_number character varying,
     address_postcode character varying,
     issue_type integer DEFAULT 1,
+    resolution_external_id integer,
     address_country character varying,
     address_country_code character varying,
     address_district character varying,
-    resolution_external_id integer,
-    likes_count integer DEFAULT 0 NOT NULL,
     imported_at timestamp(6) without time zone,
+    likes_count integer DEFAULT 0 NOT NULL,
     public boolean DEFAULT false NOT NULL,
     responsible_subject_last_contact_at timestamp(6) without time zone,
     address_suburb character varying,
@@ -1659,7 +1659,7 @@ ALTER SEQUENCE public.streets_id_seq OWNED BY public.streets.id;
 --
 
 CREATE TABLE public.user_email_auth_keys (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     key character varying NOT NULL,
     deadline timestamp(6) without time zone NOT NULL,
     email_last_sent timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -1671,7 +1671,6 @@ CREATE TABLE public.user_email_auth_keys (
 --
 
 CREATE SEQUENCE public.user_email_auth_keys_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3042,7 +3041,7 @@ CREATE UNIQUE INDEX index_issues_comments_on_uuid ON public.issues_comments USIN
 -- Name: index_issues_default_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
@@ -3084,21 +3083,21 @@ CREATE INDEX index_issues_drafts_on_subtype_id ON public.issues_drafts USING btr
 -- Name: index_issues_municipality_effective_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_effective_at_hot_path ON public.issues USING btree (municipality_id, effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_municipality_effective_at_hot_path ON public.issues USING btree (municipality_id, effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
 -- Name: index_issues_municipality_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.issues USING btree (municipality_id, resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
+CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.issues USING btree (municipality_id, resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint])) AND (resolution_started_at IS NOT NULL));
 
 
 --
 -- Name: index_issues_municipality_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
@@ -3231,7 +3230,7 @@ CREATE INDEX index_issues_on_subtype_id ON public.issues USING btree (subtype_id
 -- Name: index_issues_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_resolution_started_at_hot_path ON public.issues USING btree (resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
+CREATE INDEX index_issues_resolution_started_at_hot_path ON public.issues USING btree (resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint])) AND (resolution_started_at IS NOT NULL));
 
 
 --
