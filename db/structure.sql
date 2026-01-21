@@ -1655,6 +1655,38 @@ ALTER SEQUENCE public.streets_id_seq OWNED BY public.streets.id;
 
 
 --
+-- Name: user_email_auth_keys; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_email_auth_keys (
+    id integer NOT NULL,
+    key character varying NOT NULL,
+    deadline timestamp(6) without time zone NOT NULL,
+    email_last_sent timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: user_email_auth_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_email_auth_keys_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_email_auth_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_email_auth_keys_id_seq OWNED BY public.user_email_auth_keys.id;
+
+
+--
 -- Name: user_identities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1864,6 +1896,7 @@ CREATE TABLE public.users (
     stats_comments_percentile numeric(5,4) DEFAULT 0.0,
     stats_verified_issues_percentile numeric(5,4) DEFAULT 0.0,
     imported_at timestamp(6) without time zone,
+    responsible_subject_id bigint,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
 ]+\.[^,@; 
@@ -2147,6 +2180,13 @@ ALTER TABLE ONLY public.responsible_subjects_users ALTER COLUMN id SET DEFAULT n
 --
 
 ALTER TABLE ONLY public.streets ALTER COLUMN id SET DEFAULT nextval('public.streets_id_seq'::regclass);
+
+
+--
+-- Name: user_email_auth_keys id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys ALTER COLUMN id SET DEFAULT nextval('public.user_email_auth_keys_id_seq'::regclass);
 
 
 --
@@ -2541,6 +2581,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 ALTER TABLE ONLY public.streets
     ADD CONSTRAINT streets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_email_auth_keys user_email_auth_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys
+    ADD CONSTRAINT user_email_auth_keys_pkey PRIMARY KEY (id);
 
 
 --
@@ -4103,6 +4151,14 @@ ALTER TABLE ONLY public.issues_activities
 
 
 --
+-- Name: legacy_issues_communications fk_rails_f4db0cf30b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_issues_communications
+    ADD CONSTRAINT fk_rails_f4db0cf30b FOREIGN KEY (activity_id) REFERENCES public.issues_activities(id);
+
+
+--
 -- Name: issues_updates fk_rails_f6e3cb8d90; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4119,24 +4175,19 @@ ALTER TABLE ONLY public.cms_categories
 
 
 --
--- Name: legacy_issues_communications fk_rails_f9284d111d; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.legacy_issues_communications
-    ADD CONSTRAINT fk_rails_f9284d111d FOREIGN KEY (responsible_subjects_user_author_id) REFERENCES public.responsible_subjects_users(id);
-
-
---
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260121170436'),
+('20260121170411'),
 ('20251229150246'),
 ('20251226102461'),
 ('20251226102460'),
 ('20251226102459'),
+('20251213182025'),
 ('20251128215525'),
 ('20251118171856'),
 ('20251118000000'),
@@ -4164,8 +4215,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250605200853'),
 ('20250605192922'),
 ('20250605190746'),
-('20250522185556'),
-('20250522184502'),
 ('20250522111247'),
 ('20250522105736'),
 ('20250522105410'),
