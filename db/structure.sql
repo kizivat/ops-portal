@@ -3060,6 +3060,13 @@ CREATE INDEX index_issues_drafts_on_category_id ON public.issues_drafts USING bt
 
 
 --
+-- Name: index_issues_drafts_on_issue_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_issues_drafts_on_issue_id ON public.issues_drafts USING btree (issue_id);
+
+
+--
 -- Name: index_issues_drafts_on_subcategory_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3641,6 +3648,13 @@ CREATE INDEX index_users_on_municipality_id ON public.users USING btree (municip
 
 
 --
+-- Name: index_users_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_responsible_subject_id ON public.users USING btree (responsible_subject_id);
+
+
+--
 -- Name: index_users_on_street_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3700,6 +3714,14 @@ ALTER TABLE ONLY public.issues_subcategories
 
 ALTER TABLE ONLY public.user_password_reset_keys
     ADD CONSTRAINT fk_rails_14f8ce8b45 FOREIGN KEY (id) REFERENCES public.users(id);
+
+
+--
+-- Name: user_email_auth_keys fk_rails_1a2acb61d1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys
+    ADD CONSTRAINT fk_rails_1a2acb61d1 FOREIGN KEY (id) REFERENCES public.users(id);
 
 
 --
@@ -3772,6 +3794,14 @@ ALTER TABLE ONLY public.issues_drafts
 
 ALTER TABLE ONLY public.issues_updates
     ADD CONSTRAINT fk_rails_493cf6c7c3 FOREIGN KEY (activity_id) REFERENCES public.issues_activities(id);
+
+
+--
+-- Name: issues_drafts fk_rails_4a07ddfeff; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_drafts
+    ADD CONSTRAINT fk_rails_4a07ddfeff FOREIGN KEY (issue_id) REFERENCES public.issues(id);
 
 
 --
@@ -4182,12 +4212,10 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260121170436'),
-('20260121170411'),
-('20251229150246'),
+('20260121170411'),('20251229150246'),
 ('20251226102461'),
 ('20251226102460'),
 ('20251226102459'),
-('20251213182025'),
 ('20251128215525'),
 ('20251118171856'),
 ('20251118000000'),
@@ -4214,6 +4242,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250605200853'),
 ('20250605192922'),
 ('20250605190746'),
+('20250522185556'),
+('20250522184502'),
 ('20250522111247'),
 ('20250522105736'),
 ('20250522105410'),
