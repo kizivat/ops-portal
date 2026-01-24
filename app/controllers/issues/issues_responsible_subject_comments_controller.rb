@@ -1,7 +1,7 @@
-class Issues::IssuesUserCommentsController < ApplicationController
+class Issues::IssuesResponsibleSubjectCommentsController < ApplicationController
   include IssueScoped
   before_action :require_user, only: [ :create, :edit, :update ]
-  before_action :citizen
+  before_action :responsible_subject
   before_action :check_permissions
 
   def show
@@ -13,7 +13,7 @@ class Issues::IssuesUserCommentsController < ApplicationController
   end
 
   def new
-    @comment = @issue.triage_process? ? Issues::UserPrivateComment.new : Issues::UserComment.new
+    @comment = Issues::ResponsibleSubjectComment.new
   end
 
   def edit
@@ -31,9 +31,9 @@ class Issues::IssuesUserCommentsController < ApplicationController
   end
 
   def create
-    @comment = @issue.triage_process? ? Issues::UserPrivateComment.new(comment_params) : Issues::UserComment.new(comment_params)
+    @comment = Issues::ResponsibleSubjectComment.new(comment_params)
     @comment.build_activity(issue: @issue, type: Issues::CommentActivity)
-    @comment.user_author = current_user
+    @comment.responsible_subject_author = current_user.responsible_subject
 
     if @comment.save
       respond_to do |format|
@@ -49,15 +49,11 @@ class Issues::IssuesUserCommentsController < ApplicationController
   private
 
   def comment_params
-    if @issue.triage_process?
-      params.require(:issues_user_private_comment).permit(:text, attachments: [])
-    else
-      params.require(:issues_user_comment).permit(:text, attachments: [])
-    end
+    params.require(:issues_responsible_subject_comment).permit(:text, attachments: [])
   end
 
-  def citizen
-    render status: :unauthorized, body: nil unless current_user.is_a?(User::Citizen)
+  def responsible_subject
+    render status: :unauthorized, body: nil unless current_user.is_a?(User::ResponsibleSubject) && current_user.responsible_subject == @issue.responsible_subject
   end
 
   def check_permissions

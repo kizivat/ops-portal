@@ -28,6 +28,8 @@ class Issues::ResponsibleSubjectComment < Issues::Comment
   validates :agent_author_id, absence: true
   validates :user_author_id, absence: true
 
+  validates :text, presence: true, if: -> { attachments.empty? }, unless: -> { legacy_id }
+
   after_create_commit :notify_subscribers, unless: -> { legacy_id }
 
   def author
