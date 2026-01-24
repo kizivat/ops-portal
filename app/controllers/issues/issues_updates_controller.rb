@@ -1,6 +1,7 @@
 class Issues::IssuesUpdatesController < ApplicationController
   include IssueScoped
   before_action :require_user, only: [ :create, :edit, :update ]
+  before_action :citizen
   before_action :check_permissions
   before_action :check_rate_limit, only: [ :new, :create ]
 
@@ -53,8 +54,12 @@ class Issues::IssuesUpdatesController < ApplicationController
 
   private
 
+  def citizen
+    render status: :unauthorized, body: nil unless current_user.is_a?(User::Citizen)
+  end
+
   def check_permissions
-    render status: :unauthorized, body: nil if !current_user.can_view?(@issue) || @issue.discussion_closed? || @issue.archived? || !current_user.is_a?(User::Citizen)
+    render status: :unauthorized, body: nil if !current_user.can_view?(@issue) || @issue.discussion_closed? || @issue.archived?
   end
 
   def update_params
