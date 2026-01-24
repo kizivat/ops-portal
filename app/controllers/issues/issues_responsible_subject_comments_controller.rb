@@ -17,11 +17,11 @@ class Issues::IssuesResponsibleSubjectCommentsController < ApplicationController
   end
 
   def edit
-    @comment = current_user.issues_comments.find(params[:id])
+    @comment = Issues::ResponsibleSubjectComment.where(responsible_subject_author: current_user.responsible_subject).find(params[:id])
   end
 
   def update
-    @comment = current_user.issues_comments.find(params[:id])
+    @comment = Issues::ResponsibleSubjectComment.where(responsible_subject_author: current_user.responsible_subject).find(params[:id])
     @comment.assign_attributes(comment_params)
     if @comment.save(context: :edit)
       render @comment
