@@ -100,7 +100,7 @@ class AccountsTest < ApplicationSystemTestCase
 
     visit "/email-auth?key=invalid_key"
 
-    assert_text "Neplatný, expirovaný alebo už použitý prihlasovací odkaz."
+    assert_text "Neplatný prihlasovací odkaz."
     assert_selector "h1", text: "Prihlásenie"
   end
 

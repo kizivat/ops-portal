@@ -36,8 +36,8 @@ module AuthHelper
 
     visit link
 
-    assert_selector "h1", text: "Dokončiť prihlásenie"
-    click_on "Vstúpiť do portálu"
+    assert_selector "h1", text: "Prihlásenie na portál"
+    click_button "Prihlásiť"
 
     assert_text "Prihlásenie bolo úspešné"
   end
