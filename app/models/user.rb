@@ -43,6 +43,7 @@
 #  stats_verified_issues_percentile :decimal(5, 4)    default(0.0)
 #  status                           :integer          default("unverified"), not null
 #  timestamp                        :datetime
+#  type                             :string
 #  uuid                             :uuid             not null
 #  verification                     :string
 #  verified                         :boolean          default(FALSE)
@@ -52,6 +53,7 @@
 #  external_id                      :integer
 #  legacy_id                        :integer
 #  municipality_id                  :bigint
+#  responsible_subject_id           :bigint
 #  street_id                        :bigint
 #
 class User < ApplicationRecord
@@ -59,6 +61,7 @@ class User < ApplicationRecord
 
   attr_accessor :phone_verification_number
 
+  belongs_to :responsible_subject, class_name: "::ResponsibleSubject", optional: true
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
   has_many :issues, foreign_key: :author_id

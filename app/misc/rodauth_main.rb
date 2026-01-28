@@ -8,6 +8,8 @@ class RodauthMain < Rodauth::Rails::Auth
            :reset_password, :change_password, :change_login, :verify_login_change,
            :close_account
 
+    enable :email_auth
+
     # Omniauth
     enable :omniauth
 
@@ -108,6 +110,28 @@ class RodauthMain < Rodauth::Rails::Auth
       RodauthMailer.verify_login_change(self.class.configuration_name, account_id, verify_login_change_key_value)
     end
 
+    # ==> Email Auth
+    email_auth_table :user_email_auth_keys
+    email_auth_deadline_interval Hash[minutes: 10]
+
+    email_auth_session_key "email_auth_session_id"
+
+    create_email_auth_email do
+      RodauthMailer.email_auth(self.class.configuration_name, account_id, email_auth_key_value)
+    end
+
+    before_login_attempt do
+      user = User.find_by(email: param(login_param))
+
+      if user.is_a?(User::ResponsibleSubject)
+        set_field_error(login_param, I18n.t("rodauth.login_error_requires_email_auth"))
+        set_error_flash I18n.t("rodauth.login_error_requires_email_auth")
+        response.status = 403
+
+        throw_rodauth_error
+      end
+    end
+
     # ==> Flash
     # Match flash keys with ones already used in the Rails app.
     # flash_notice_key :success # default is :notice
@@ -161,6 +185,7 @@ class RodauthMain < Rodauth::Rails::Auth
     before_create_account {
       custom_params = build_custom_params
 
+      account[:type] = "User::Citizen"
       account[:email_global_unsubscribe_token] = generate_unsubscribe_token
 
       if validate_custom_params(custom_params)
