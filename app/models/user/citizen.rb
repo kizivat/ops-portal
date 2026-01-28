@@ -57,5 +57,4 @@
 #  street_id                        :bigint
 #
 class User::Citizen < User
-  validates :responsible_subject_id, absence: true
 end
