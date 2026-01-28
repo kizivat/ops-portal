@@ -2,8 +2,8 @@
 
 <section class="profile">
   <% if @user.responsible_subject %>
-    <%= render "responsible_subject_profile", user: @user %>
+    <%= render "responsible_subject_profile" %>
   <% else %>
-    <%= render "citizen_profile", user: @user %>
+    <%= render "citizen_profile" %>
   <% end %>
 </section>
