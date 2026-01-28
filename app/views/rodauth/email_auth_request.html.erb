@@ -3,8 +3,7 @@
 
   <div class="form-other-con">
     <div class="form-description prose">
-      <p>Zadajte vašu emailovú adresu. Pošleme vám dočasný odkaz, cez ktorý sa prihlásite.</p>
-      <p><strong>Upozornenie:</strong> Odkaz musíte otvoriť v tom istom prehliadači, v ktorom oň žiadate.</p>
+      <p>Zadajte vašu emailovú adresu a pošleme vám dočasný odkaz, cez ktorý sa prihlásite.</p>
     </div>
 
     <%= form_with url: rodauth.email_auth_request_path, method: :post, data: { turbo: false }, html: { novalidate: true } do |form| %>
@@ -18,9 +17,5 @@
         <%= form.submit rodauth.email_auth_request_button, class: "button" %>
       </div>
     <% end %>
-
-    <div style="text-align: center; margin-top: 1rem;">
-      <%= link_to "Späť na prihlásenie heslom", rodauth.login_path, class: "link" %>
-    </div>
   </div>
 </section>
