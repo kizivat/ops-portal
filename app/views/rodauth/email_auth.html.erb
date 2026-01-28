@@ -1,11 +1,11 @@
 <% content_for(:title, rodauth.email_auth_page_title) %>
 
 <section class="forms-container report">
-  <h1>Dokončiť prihlásenie</h1>
+  <h1>Prihlásenie na portál</h1>
 
   <div class="form-other-con">
     <div class="form-description">
-      Kliknutím na tlačidlo nižšie potvrdíte prihlásenie do účtu <strong><%= rodauth.account[:display_name].presence || rodauth.account[rodauth.login_column] %></strong>.
+      Prihlasujete sa cez emailový odkaz do účtu <strong><%= rodauth.account[:display_name].presence || rodauth.account[rodauth.login_column] %></strong>.
     </div>
 
     <%= form_with url: rodauth.email_auth_path, method: :post, data: { turbo: false } do |form| %>
