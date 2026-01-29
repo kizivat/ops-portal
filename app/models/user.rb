@@ -61,6 +61,7 @@ class User < ApplicationRecord
 
   attr_accessor :phone_verification_number
 
+  belongs_to :responsible_subject, class_name: "::ResponsibleSubject", optional: true
   belongs_to :municipality, optional: true
   belongs_to :street, optional: true
   has_many :issues, foreign_key: :author_id
@@ -84,11 +85,6 @@ class User < ApplicationRecord
   before_save do
     self.firstname = "Používateľ bez mena ##{self.id}" if !self.firstname.present? && !self.lastname.present?
     self.display_name = self.anonymous? ? "Anonym ##{self.id}" : [ self.firstname, self.lastname ].compact.join(" ")
-  end
-
-  after_update if: -> { saved_change_to_firstname? || saved_change_to_lastname? } do
-    SyncUserUpdateToTriageJob.perform_later(self)
-    SyncUserUpdateToBackofficeJob.perform_later(self)
   end
 
   validates :external_id, uniqueness: true, allow_nil: true

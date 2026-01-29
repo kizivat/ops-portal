@@ -2,7 +2,7 @@ class ProfilesController < ApplicationController
   before_action :require_user, except: [ :please_create ]
   before_action :set_user, except: [ :please_create, :please_verify ]
 
-  before_action :citizen_only, only: [ :edit, :update, :settings, :watched_issues ]
+  before_action :ensure_citizen, only: [ :edit, :update, :settings, :watched_issues ]
 
   def please_create
   end
@@ -14,11 +14,6 @@ class ProfilesController < ApplicationController
   end
 
   def show
-    if @user.is_a?(User::ResponsibleSubject)
-      render :show_responsible_subject
-      return
-    end
-
     @tab = :my
     @issues = current_user.issues.newest.page(params[:page]).per(8)
   end
@@ -57,8 +52,8 @@ class ProfilesController < ApplicationController
     params.require(:user).permit(:name, :anonymous, :municipality_id, :email_notifiable, :birth_year, :terms_of_service, :newsletter_accepted, :gdpr_stats_accepted, :onboarded)
   end
 
-  def citizen_only
-    unless @user.is_a?(User::Citizen)
+  def ensure_citizen
+    if @user.responsible_subject
       redirect_to profile_path, alert: "Túto akciu nemôžete vykonať s vaším typom účtu."
     end
   end

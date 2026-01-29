@@ -5,9 +5,9 @@ class IssuesController < ApplicationController
   before_action :check_edit_permissions, only: %i[ edit update ]
 
   def relevant
-    path = if current_user.is_a?(User::Citizen) && current_user.municipality
+    path = if current_user.municipality
       issues_path(obec: current_user.municipality.name)
-    elsif current_user.is_a?(User::ResponsibleSubject)
+    elsif current_user.responsible_subject
       issues_path(zodpovedny: current_user.responsible_subject.subject_name)
     else
       issues_path

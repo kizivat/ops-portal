@@ -57,7 +57,9 @@
 #  street_id                        :bigint
 #
 class User::ResponsibleSubject < User
-  belongs_to :responsible_subject
+  after_create do
+    SyncUserResponsibleSubjectToTriageJob.perform_later(self)
+  end
 
   validates :responsible_subject, presence: true
 end

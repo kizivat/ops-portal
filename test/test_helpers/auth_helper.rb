@@ -29,15 +29,15 @@ module AuthHelper
 
     perform_enqueued_jobs
     email = ActionMailer::Base.deliveries.last
-    assert_match(/Prihlásenie do profilu/, email.subject)
+    assert_match(/Prihlasovací odkaz/, email.subject)
 
     link = email.body.encoded.match(/href="([^"]+)"/)[1]
     link = link.sub(%r{http://example.com}, "")
 
     visit link
 
-    assert_selector "h1", text: "Dokončiť prihlásenie"
-    click_on "Vstúpiť do portálu"
+    assert_selector "h1", text: "Prihlásenie na portál"
+    click_button "Prihlásiť"
 
     assert_text "Prihlásenie bolo úspešné"
   end
