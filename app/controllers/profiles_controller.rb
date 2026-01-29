@@ -54,7 +54,7 @@ class ProfilesController < ApplicationController
 
   def ensure_citizen
     if @user.responsible_subject
-      redirect_to profile_path, alert: "Túto akciu nemôžete vykonať s vaším typom účtu."
+      redirect_to profile_path, alert: "Túto akciu nemôžete vykonať."
     end
   end
 end
