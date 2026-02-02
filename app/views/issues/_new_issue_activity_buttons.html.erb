@@ -18,8 +18,14 @@
                 class: "button button-transparent",
                 data: { turbo_frame: "activity_form_content" } %>
 
-    <%= link_to "Označiť za vyriešený", new_issue_issues_responsible_subject_comment_path(@issue, resolves: true),
-                class: "button button-transparent",
-                data: { turbo_frame: "activity_form_content" } %>
+    <% unless @issue.resolved? %>
+      <%= link_to "Označiť za vyriešený", new_issue_issues_responsible_subject_comment_path(@issue, resolves: true),
+                  class: "button button-transparent",
+                  data: { turbo_frame: "activity_form_content" } %>
+
+      <%= link_to "Zmeniť zodpovedný subjekt", new_issue_issues_responsible_subject_assignment_path(@issue),
+                  class: "button button-transparent",
+                  data: { turbo_frame: "activity_form_content" } %>
+    <% end %>
   <% end %>
 </div>
