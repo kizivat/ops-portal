@@ -34,7 +34,7 @@ class Triage::UpdatePortalUserFromTriageJob < ApplicationJob
       end
     elsif user.responsible_subject
       user.anonymize!
-      user.update!(active: false, external_id: nil, responsible_subject: nil)
+      user.update!(active: false, external_id: nil)
     end
 
     return unless triage_user.origin == "portal"
