@@ -17,6 +17,10 @@ class Legacy::WidgetsController < ApplicationController
     @feed = fetch_feed
     @statistics = calculate_statistics if @width > 250
 
+    # Allow widget to be embedded in iframes from any domain and enable JavaScript
+    response.headers["X-Frame-Options"] = "ALLOWALL"
+    response.headers["Content-Security-Policy"] = "frame-ancestors *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; img-src 'self' https: http: data: blob:"
+
     render layout: false
   end
 

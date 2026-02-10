@@ -178,4 +178,18 @@ class Legacy::WidgetsControllerTest < ActionDispatch::IntegrationTest
     podnets = css_select(".podnet")
     assert_operator podnets.count, :<=, 16
   end
+
+  test "should allow iframe embedding with X-Frame-Options set to ALLOWALL" do
+    get "/widget"
+
+    assert_response :success
+    assert_equal "ALLOWALL", response.headers["X-Frame-Options"]
+  end
+
+  test "should set Content-Security-Policy for iframe embedding" do
+    get "/widget"
+
+    assert_response :success
+    assert_match /frame-ancestors/, response.headers["Content-Security-Policy"]
+  end
 end
