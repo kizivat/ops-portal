@@ -26,6 +26,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   teardown do
     Capybara.reset_sessions!
+    ActiveRecord::Base.connection.execute("DELETE FROM user_remember_keys")
   end
 
   def click_on(locator, **options)
