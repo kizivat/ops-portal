@@ -27,6 +27,8 @@ class RodauthMain < Rodauth::Rails::Auth
                       ENV.fetch("GOOGLE_CLIENT_SECRET"),
                       name: "google" # Using a string instead of symbol
 
+    use_multi_phase_login? false
+
     # See the Rodauth documentation for the list of available config options:
     # http://rodauth.jeremyevans.net/documentation.html
 
