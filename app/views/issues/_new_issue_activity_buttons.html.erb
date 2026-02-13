@@ -14,16 +14,16 @@
     <% end %>
 
   <% elsif current_user.is_a?(User::ResponsibleSubject) && @issue.responsible_subject == current_user.responsible_subject %>
-    <%= link_to "Odpovedať", new_issue_issues_responsible_subject_comment_path(@issue),
+    <%= link_to "Pridať komentár", new_issue_issues_responsible_subject_comment_path(@issue),
                 class: "button button-transparent",
                 data: { turbo_frame: "activity_form_content" } %>
 
     <% unless @issue.resolved? %>
-      <%= link_to "Označiť za vyriešený", new_issue_issues_responsible_subject_comment_path(@issue, resolves: true),
+      <%= link_to "Odstúpiť podnet", new_issue_issues_responsible_subject_assignment_path(@issue),
                   class: "button button-transparent",
                   data: { turbo_frame: "activity_form_content" } %>
 
-      <%= link_to "Zmeniť zodpovedný subjekt", new_issue_issues_responsible_subject_assignment_path(@issue),
+      <%= link_to "Označiť za vyriešený", new_issue_issues_responsible_subject_comment_path(@issue, resolves: true),
                   class: "button button-transparent",
                   data: { turbo_frame: "activity_form_content" } %>
     <% end %>
