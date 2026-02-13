@@ -1,5 +1,7 @@
 import {Controller} from "@hotwired/stimulus"
 
+// Connects to data-controller="remote-autocomplete"
+
 export default class extends Controller {
     static targets = ["input", "results", "hidden", "template"]
     static values = { url: String }
@@ -9,11 +11,15 @@ export default class extends Controller {
         this.timeout = null
     }
 
-    search() {
+    search(event) {
+        if (event?.isComposing) {
+            return
+        }
+
         clearTimeout(this.timeout)
         const query = this.inputTarget.value.trim()
 
-        if (query.length < 2) {
+        if (query.length < 1) {
             this.hideResults()
             return
         }

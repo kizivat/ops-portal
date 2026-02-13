@@ -5,7 +5,14 @@
         <% if @resolves %>
           Označiť za vyriešený
         <% else %>
-          Odpovedať
+          Pridať komentár
+        <% end %>
+      </div>
+      <div class="description">
+        <% if @resolves %>
+          Po označení podnetu za vyriešený sa uzavrie diskusia.
+        <% else %>
+          Po pridaní prvého komentára sa automaticky zmení stav podnetu.
         <% end %>
       </div>
       <%= render "form", issue: @issue, comment: @comment %>

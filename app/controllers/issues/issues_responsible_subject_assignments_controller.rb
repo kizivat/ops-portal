@@ -21,18 +21,27 @@ class Issues::IssuesResponsibleSubjectAssignmentsController < ApplicationControl
     @comment.build_activity(issue: @issue, type: Issues::CommentActivity)
     @comment.responsible_subject_author = current_user.responsible_subject
 
+    assignment_type = referral_params[:assignment_type]
     new_subject_id = referral_params[:new_responsible_subject_id]
 
-    if new_subject_id.blank? || new_subject_id.to_i == @issue.responsible_subject_id
-      @comment.errors.add(:base, "Musíte vybrať iný zodpovedný subjekt.")
-      render :new, status: :unprocessable_entity and return
+    if assignment_type == "change_subject"
+      if new_subject_id.blank? || new_subject_id.to_i == @issue.responsible_subject_id
+        @comment.errors.add(:base, "Musíte vybrať iný zodpovedný subjekt.")
+        render :new, status: :unprocessable_entity and return
+      end
     end
 
     Issue.transaction do
       if @comment.save
-        @issue.update!(
-          responsible_subject_id: new_subject_id,
-        )
+        if assignment_type == "change_subject"
+          @issue.update!(
+            responsible_subject_id: new_subject_id,
+          )
+        elsif assignment_type == "refer"
+          @issue.update!(
+            state: Issues::State.find_by!(key: "referred")
+          )
+        end
 
         respond_to do |format|
           format.turbo_stream
@@ -50,7 +59,7 @@ class Issues::IssuesResponsibleSubjectAssignmentsController < ApplicationControl
   private
 
   def referral_params
-    params.require(:referral).permit(:new_responsible_subject_id, comment: [ :text ])
+    params.require(:referral).permit(:new_responsible_subject_id, :assignment_type, comment: [ :text ])
   end
 
   def ensure_responsible_subject
