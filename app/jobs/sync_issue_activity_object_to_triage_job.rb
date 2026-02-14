@@ -58,7 +58,7 @@ class SyncIssueActivityObjectToTriageJob < ApplicationJob
     if user.is_a?(User::Citizen)
       user.update!(external_id: client.create_customer!(user))
     elsif user.is_a?(User::ResponsibleSubject)
-      external_id = client.create_responsible_subject!(user)
+      external_id = client.create_responsible_subject!(user.responsible_subject)
 
       user.update!(external_id: external_id)
       user.responsible_subject.update!(external_id: external_id)

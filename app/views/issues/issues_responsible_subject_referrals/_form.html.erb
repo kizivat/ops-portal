@@ -1,3 +1,7 @@
+<%
+  current_type = params.dig(:issues_responsible_subject_referral, :assignment_type) || "change_subject"
+%>
+
 <%= form_with scope: :issues_responsible_subject_referral, url: issue_issues_responsible_subject_referrals_path(issue), method: :post, model: [ issue, comment ] do |f| %>
   <% if comment.errors[:base].any? %>
     <% comment.errors[:base].each do |error| %>
@@ -10,12 +14,11 @@
       <div class="form-radio-button-wrapper" style="flex-direction: column; align-items: flex-start; gap: 10px;">
 
         <div class="form-radio-button-con">
-          <%= f.radio_button :assignment_type, "change_subject",
-                             checked: true,
-                             id: "assignment_type_change",
+          <%= f.radio_button :referral_type, "change_subject",
+                             id: "referral_type_change",
                              data: { action: "change->toggle#show" } %>
 
-          <%= f.label :assignment_type_change, "Preposlať inému zodpovednému subjektu", for: "assignment_type_change" %>
+          <%= f.label :referral_type_change, "Preposlať inému zodpovednému subjektu", for: "referral_type_change" %>
         </div>
 
         <div class="form-notice" style="margin-top: -5px; margin-bottom: 10px; margin-left: 28px; font-size: 0.85rem; color: #666;">
@@ -23,11 +26,11 @@
         </div>
 
         <div class="form-radio-button-con">
-          <%= f.radio_button :assignment_type, "refer",
-                             id: "assignment_type_refer",
+          <%= f.radio_button :referral_type, "refer",
+                             id: "referral_type_refer",
                              data: { action: "change->toggle#hide" } %>
 
-          <%= f.label :assignment_type_refer, "Odstúpiť podnet", for: "assignment_type_refer" %>
+          <%= f.label :referral_type_refer, "Odstúpiť podnet", for: "referral_type_refer" %>
         </div>
 
         <div class="form-notice" style="margin-top: -5px; margin-bottom: 10px; margin-left: 28px; font-size: 0.85rem; color: #666;">
