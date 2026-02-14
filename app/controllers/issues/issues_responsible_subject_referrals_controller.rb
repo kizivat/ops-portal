@@ -26,9 +26,14 @@ class Issues::IssuesResponsibleSubjectReferralsController < ApplicationControlle
 
     if assignment_type == "change_subject"
       if new_subject_id.blank? || new_subject_id.to_i == @issue.responsible_subject_id
-        @comment.errors.add(:base, "Musíte vybrať iný zodpovedný subjekt.")
+        @comment.errors.add(:new_responsible_subject_id, "Musíte vybrať iný zodpovedný subjekt.")
         render :new, status: :unprocessable_entity and return
       end
+    end
+
+    unless %w[change_subject refer].include?(assignment_type)
+      @comment.errors.add(:assignment_type, "Neplatný typ akcie.")
+      render :new, status: :unprocessable_entity and return
     end
 
     Issue.transaction do
@@ -45,7 +50,14 @@ class Issues::IssuesResponsibleSubjectReferralsController < ApplicationControlle
 
         respond_to do |format|
           format.turbo_stream
-          format.html { redirect_to @issue, notice: "Zodpovedný subjekt bol úspešne zmenený." }
+          format.html {
+            redirect_to @issue,
+                        notice: if assignment_type == "change_subject"
+                                  "Zodpovedný subjekt bol úspešne zmenený."
+                                else
+                                  "Podnet bol úspešne odstúpený."
+                                end
+          }
         end
 
         SyncIssueToTriageJob.perform_later(@issue, sync_activities: false)
@@ -59,7 +71,7 @@ class Issues::IssuesResponsibleSubjectReferralsController < ApplicationControlle
   private
 
   def referral_params
-    params.require(:issues_responsible_subject_referral).permit(:new_responsible_subject_id, :assignment_type, comment: [ :text, attachments: [] ])
+    params.require(:issues_responsible_subject_referral).permit(:new_responsible_subject_id, :referral_type, comment: [ :text, attachments: [] ])
   end
 
   def ensure_responsible_subject
