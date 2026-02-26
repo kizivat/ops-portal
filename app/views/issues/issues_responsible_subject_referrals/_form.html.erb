@@ -10,39 +10,45 @@
   <% end %>
 
   <div class="form-other-con" data-controller="toggle">
-    <div class="form-items-con" style="margin-bottom: 1.5rem;">
+    <div class="form-items-con">
       <div class="form-radio-button-wrapper" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-
-        <div class="form-radio-button-con">
+        <div class="form-radio-button-con" style="align-items: start;">
           <%= f.radio_button :referral_type, "change_subject",
                              checked: current_type == "change_subject",
                              id: "referral_type_change",
                              data: { action: "change->toggle#show" } %>
 
-          <%= f.label :referral_type_change, "Preposlať inému zodpovednému subjektu", for: "referral_type_change" %>
+          <div style="padding-left: 10px; display: flex; flex-direction: column;">
+            <%= f.label :referral_type_change, "Preposlať inému zodpovednému subjektu",
+                        for: "referral_type_change",
+                        style: "padding-left: 0; margin-bottom: 5px; cursor: pointer;" %>
+
+            <div class="form-notice">
+              Uveďte do komentára, akej samospráve alebo subjektu je potrebné podnet preposlať.
+            </div>
+          </div>
         </div>
 
-        <div class="form-notice" style="margin-top: -5px; margin-bottom: 10px; margin-left: 28px; font-size: 0.85rem; color: #666;">
-          Uveďte do komentára, akej samospráve alebo subjektu je potrebné podnet preposlať.
-        </div>
-
-        <div class="form-radio-button-con">
+        <div class="form-radio-button-con" style="align-items: start;">
           <%= f.radio_button :referral_type, "refer",
                              checked: current_type == "refer",
                              id: "referral_type_refer",
                              data: { action: "change->toggle#hide" } %>
 
-          <%= f.label :referral_type_refer, "Odstúpiť podnet", for: "referral_type_refer" %>
-        </div>
+          <div style="padding-left: 10px; display: flex; flex-direction: column;">
+            <%= f.label :referral_type_refer, "Odstúpiť podnet",
+                        for: "referral_type_refer",
+                        style: "padding-left: 0; margin-bottom: 5px; cursor: pointer;" %>
 
-        <div class="form-notice" style="margin-top: -5px; margin-bottom: 10px; margin-left: 28px; font-size: 0.85rem; color: #666;">
-          Podnet budete riešiť s iným zodpovedným subjektom a budete informovať cez portál o ďalšom postupe.
+            <div class="form-notice">
+              Podnet budete riešiť s iným zodpovedným subjektom a budete informovať cez portál o ďalšom postupe.
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
 
-    <div data-toggle-target="toggleable" data-toggle-class="none">
+    <div data-toggle-target="toggleable" data-toggle-class="none" class="<%= 'none' if current_type == 'refer' %>">
       <div class="form-item-wrapper"
            id="new-subject-wrapper"
            data-controller="remote-autocomplete"
