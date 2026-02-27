@@ -11,15 +11,15 @@
       <div class="form-radio-button-wrapper" style="flex-direction: column; align-items: flex-start; gap: 10px;">
 
         <div class="form-radio-button-con" style="align-items: start;">
-          <%= f.radio_button :change_type, "change_subject",
-                             id: "type_change",
+          <%= f.radio_button :change_type, "reassignment",
+                             id: "type_reassignment",
                              data: { action: "click->toggle#show" }
           %>
 
           <div style="padding-left: 10px; display: flex; flex-direction: column;">
             <%= f.label :change_type, "Preposlať inému zodpovednému subjektu",
-                        value: "change_subject",
-                        for: "type_change",
+                        value: "reassignment",
+                        for: "type_reassignment",
                         style: "padding-left: 0; margin-bottom: 5px; cursor: pointer;" %>
 
             <div class="form-notice">

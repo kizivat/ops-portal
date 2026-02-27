@@ -25,10 +25,10 @@ class Issues::ResponsibleSubjectChange < ApplicationRecord
   include Issues::ActivityObjectAttachments
 
   validates :text, presence: true
-  validates :responsible_subject, presence: true, if: :change_subject?
-  validate :responsible_subject_must_be_different, if: :change_subject?
+  validates :responsible_subject, presence: true, if: :reassignment?
+  validate :responsible_subject_must_be_different, if: :reassignment?
 
-  enum :change_type, { change_subject: 0, refer: 1 }, default: :change_subject
+  enum :change_type, { reassignment: 0, refer: 1 }, default: :reassignment
 
   before_create -> { self.uuid = SecureRandom.uuid }
 
