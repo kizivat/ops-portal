@@ -25,7 +25,7 @@ class Issues::IssuesResponsibleSubjectChangesController < ApplicationController
 
     Issue.transaction do
       if @change.save
-        if @change.change_subject?
+        if @change.reassignment?
           @issue.update!(
             responsible_subject: @change.responsible_subject,
             state: Issues::State.find_by!(key: "sent_to_responsible")
@@ -40,7 +40,7 @@ class Issues::IssuesResponsibleSubjectChangesController < ApplicationController
           format.turbo_stream
           format.html {
             redirect_to @issue,
-                        notice: if @change.change_subject?
+                        notice: if @change.reassignment?
                                   "Zodpovedný subjekt bol úspešne zmenený."
                                 else
                                   "Podnet bol úspešne odstúpený."
