@@ -63,6 +63,6 @@ class Issues::IssuesResponsibleSubjectChangesController < ApplicationController
   end
 
   def check_permissions
-    render status: :unauthorized, body: nil if !current_user.can_view?(@issue) || @issue.discussion_closed? || @issue.archived?
+    render status: :unauthorized, body: nil if !current_user.can_view?(@issue) || @issue.discussion_closed? || @issue.archived? || @issue.resolved?
   end
 end
