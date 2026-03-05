@@ -1,7 +1,7 @@
 class IssuesController < ApplicationController
   before_action :ensure_user_onboarded
   before_action :set_issue, only: %i[ show edit update ]
-  before_action :force_rs_login, only: :show
+  before_action :force_responsible_subject_login, only: :show, if: -> { params.key?(:force_rs_login) }
   before_action :check_show_permissions, only: :show
   before_action :check_edit_permissions, only: %i[ edit update ]
 
@@ -115,9 +115,7 @@ class IssuesController < ApplicationController
     params.expect(issue: [ :title, :description, photos: [] ])
   end
 
-  def force_rs_login
-    return unless params.key?(:force_rs_login)
-
+  def force_responsible_subject_login
     if current_user.responsible_subject
       redirect_to request.path
     else
