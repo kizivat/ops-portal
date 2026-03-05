@@ -87,6 +87,19 @@ class IssuesController < ApplicationController
 
   # GET /issues/1 or /issues/1.json
   def show
+    if params.key?(:force_rs_login)
+      if !current_user.responsible_subject
+        session[:login_redirect] = request.path
+        session[:force_rs_login] = true
+
+        redirect_to rodauth.email_auth_request_path
+        return
+      else
+        session.delete(:force_rs_login)
+        redirect_to request.path
+      end
+    end
+
     @activity_objects = @issue.visible_activity_objects
   end
 
