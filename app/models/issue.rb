@@ -63,6 +63,8 @@ class Issue < ApplicationRecord
   belongs_to :state, class_name: "Issues::State", optional: true
   belongs_to :archived_state, class_name: "Issues::State", optional: true
 
+  has_one :draft, class_name: "Issues::Draft", dependent: :destroy
+
   has_many :activities, class_name: "Issues::Activity", dependent: :destroy
   has_many :comment_activities, class_name: "Issues::CommentActivity", dependent: :destroy
   has_many :legacy_communication_activities, class_name: "Legacy::Issues::CommunicationActivity", dependent: :destroy
@@ -146,7 +148,7 @@ class Issue < ApplicationRecord
   end
 
   def publicly_visible?
-    !state.key.in? %w[waiting rejected resolved_private]
+    !state.key.in? Issues::State::PRIVATE_KEYS
   end
 
   def editable?
@@ -154,7 +156,7 @@ class Issue < ApplicationRecord
   end
 
   def archived?
-    state.key == "archived" || municipality.archived? || responsible_subject&.archived?
+    state.key == "archived" || municipality&.archived? || responsible_subject&.archived?
   end
 
   def resolved?
@@ -222,6 +224,8 @@ class Issue < ApplicationRecord
       address_city, address_municipality, address_street,
       state&.name
     ].compact.join(" ")
+
+    self.author.recalculate_computed_fields if self.author
   end
 
   def reset_counters

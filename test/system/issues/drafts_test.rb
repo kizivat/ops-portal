@@ -9,14 +9,14 @@ class Issues::DraftsTest < ApplicationSystemTestCase
 
     stub_json_request(
       :post,
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=",
       body: /checks prompt/,
       response: "webmock/gemini/checks-confirmable.json"
     )
 
     stub_json_request(
       :post,
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=",
       body: /suggestions prompt/,
       response: "webmock/gemini/suggestions-graffiti.json"
     )
@@ -32,6 +32,10 @@ class Issues::DraftsTest < ApplicationSystemTestCase
       "https://nominatim.openstreetmap.org/details?addressdetails=1&format=json&osmid=25298061&osmtype=W",
       response: "webmock/nominatim/pusta-details.json"
     )
+  end
+
+  teardown do
+    WebMock.reset!
   end
 
   test "full issue creation with checks" do

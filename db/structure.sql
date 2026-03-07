@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -9,6 +8,13 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
 
 --
 -- Name: citext; Type: EXTENSION; Schema: -; Owner: -
@@ -382,7 +388,8 @@ CREATE TABLE public.connector_tenants (
     backoffice_api_token character varying,
     backoffice_webhook_secret character varying,
     receive_customer_activities boolean DEFAULT false NOT NULL,
-    migrate_legacy_labels boolean DEFAULT true
+    migrate_legacy_labels boolean DEFAULT true,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -617,7 +624,8 @@ CREATE TABLE public.issue_subscriptions (
     subscriber_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    email_unsubscribe_token character varying NOT NULL
+    email_unsubscribe_token character varying NOT NULL,
+    active boolean DEFAULT true NOT NULL
 );
 
 
@@ -663,9 +671,9 @@ CREATE TABLE public.issues (
     legacy_id integer,
     municipality_district_id bigint,
     responsible_subject_id bigint,
+    owner_id bigint,
     subcategory_id bigint,
     subtype_id bigint,
-    owner_id bigint,
     address_region character varying,
     address_city character varying,
     address_municipality character varying,
@@ -673,12 +681,12 @@ CREATE TABLE public.issues (
     address_house_number character varying,
     address_postcode character varying,
     issue_type integer DEFAULT 1,
+    resolution_external_id integer,
     address_country character varying,
     address_country_code character varying,
     address_district character varying,
-    resolution_external_id integer,
-    likes_count integer DEFAULT 0 NOT NULL,
     imported_at timestamp(6) without time zone,
+    likes_count integer DEFAULT 0 NOT NULL,
     public boolean DEFAULT false NOT NULL,
     responsible_subject_last_contact_at timestamp(6) without time zone,
     address_suburb character varying,
@@ -881,7 +889,8 @@ CREATE TABLE public.issues_drafts (
     address_suburb character varying,
     zoom integer,
     issue_type character varying DEFAULT 'issue'::character varying NOT NULL,
-    duplicates_shown boolean DEFAULT false NOT NULL
+    duplicates_shown boolean DEFAULT false NOT NULL,
+    issue_id bigint
 );
 
 
@@ -921,6 +930,45 @@ CREATE SEQUENCE public.issues_id_seq
 --
 
 ALTER SEQUENCE public.issues_id_seq OWNED BY public.issues.id;
+
+
+--
+-- Name: issues_responsible_subject_changes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.issues_responsible_subject_changes (
+    id bigint NOT NULL,
+    activity_id bigint NOT NULL,
+    user_author_id bigint,
+    responsible_subject_author_id bigint,
+    responsible_subject_id bigint,
+    text character varying,
+    hidden boolean DEFAULT false NOT NULL,
+    change_type integer NOT NULL,
+    uuid uuid NOT NULL,
+    triage_external_id integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: issues_responsible_subject_changes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.issues_responsible_subject_changes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: issues_responsible_subject_changes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.issues_responsible_subject_changes_id_seq OWNED BY public.issues_responsible_subject_changes.id;
 
 
 --
@@ -1046,7 +1094,6 @@ CREATE TABLE public.issues_updates (
     name character varying,
     email character varying,
     text character varying,
-    confirmed_by_id bigint,
     published boolean,
     ip inet,
     created_at timestamp(6) without time zone NOT NULL,
@@ -1060,7 +1107,8 @@ CREATE TABLE public.issues_updates (
     hidden boolean DEFAULT false,
     resolves_issue boolean DEFAULT false NOT NULL,
     verification_status integer DEFAULT 0 NOT NULL,
-    last_edited_at timestamp(6) without time zone
+    last_edited_at timestamp(6) without time zone,
+    confirmed_by_id bigint
 );
 
 
@@ -1654,6 +1702,37 @@ ALTER SEQUENCE public.streets_id_seq OWNED BY public.streets.id;
 
 
 --
+-- Name: user_email_auth_keys; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_email_auth_keys (
+    id bigint NOT NULL,
+    key character varying NOT NULL,
+    deadline timestamp(6) without time zone NOT NULL,
+    email_last_sent timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: user_email_auth_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_email_auth_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_email_auth_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_email_auth_keys_id_seq OWNED BY public.user_email_auth_keys.id;
+
+
+--
 -- Name: user_identities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1857,6 +1936,8 @@ CREATE TABLE public.users (
     phone_verification_attempted_at timestamp(6) without time zone,
     email_global_unsubscribe_token character varying NOT NULL,
     imported_at timestamp(6) without time zone,
+    responsible_subject_id bigint,
+    type character varying,
     CONSTRAINT valid_email CHECK ((email OPERATOR(public.~) '^[^,;@ 
 ]+@[^,@; 
 ]+\.[^,@; 
@@ -2017,6 +2098,13 @@ ALTER TABLE ONLY public.issues_drafts ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: issues_responsible_subject_changes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes ALTER COLUMN id SET DEFAULT nextval('public.issues_responsible_subject_changes_id_seq'::regclass);
+
+
+--
 -- Name: issues_states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2140,6 +2228,13 @@ ALTER TABLE ONLY public.responsible_subjects_users ALTER COLUMN id SET DEFAULT n
 --
 
 ALTER TABLE ONLY public.streets ALTER COLUMN id SET DEFAULT nextval('public.streets_id_seq'::regclass);
+
+
+--
+-- Name: user_email_auth_keys id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys ALTER COLUMN id SET DEFAULT nextval('public.user_email_auth_keys_id_seq'::regclass);
 
 
 --
@@ -2385,6 +2480,14 @@ ALTER TABLE ONLY public.issues
 
 
 --
+-- Name: issues_responsible_subject_changes issues_responsible_subject_changes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes
+    ADD CONSTRAINT issues_responsible_subject_changes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: issues_states issues_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2537,6 +2640,14 @@ ALTER TABLE ONLY public.streets
 
 
 --
+-- Name: user_email_auth_keys user_email_auth_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys
+    ADD CONSTRAINT user_email_auth_keys_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_identities user_identities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2585,10 +2696,24 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: idx_on_responsible_subject_author_id_fe1507ef42; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_on_responsible_subject_author_id_fe1507ef42 ON public.issues_responsible_subject_changes USING btree (responsible_subject_author_id);
+
+
+--
 -- Name: idx_on_responsible_subject_id_7ec5499a35; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_on_responsible_subject_id_7ec5499a35 ON public.responsible_subjects_categories USING btree (responsible_subject_id);
+
+
+--
+-- Name: idx_on_responsible_subject_id_eb9255125f; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_on_responsible_subject_id_eb9255125f ON public.issues_responsible_subject_changes USING btree (responsible_subject_id);
 
 
 --
@@ -2987,7 +3112,7 @@ CREATE UNIQUE INDEX index_issues_comments_on_uuid ON public.issues_comments USIN
 -- Name: index_issues_default_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_default_search_hot_path ON public.issues USING btree (effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
@@ -3002,6 +3127,13 @@ CREATE INDEX index_issues_drafts_on_author_id ON public.issues_drafts USING btre
 --
 
 CREATE INDEX index_issues_drafts_on_category_id ON public.issues_drafts USING btree (category_id);
+
+
+--
+-- Name: index_issues_drafts_on_issue_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_issues_drafts_on_issue_id ON public.issues_drafts USING btree (issue_id);
 
 
 --
@@ -3022,21 +3154,21 @@ CREATE INDEX index_issues_drafts_on_subtype_id ON public.issues_drafts USING btr
 -- Name: index_issues_municipality_effective_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_effective_at_hot_path ON public.issues USING btree (municipality_id, effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_municipality_effective_at_hot_path ON public.issues USING btree (municipality_id, effective_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
 -- Name: index_issues_municipality_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.issues USING btree (municipality_id, resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
+CREATE INDEX index_issues_municipality_resolution_started_at_hot_path ON public.issues USING btree (municipality_id, resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint])) AND (resolution_started_at IS NOT NULL));
 
 
 --
 -- Name: index_issues_municipality_search_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint]));
+CREATE INDEX index_issues_municipality_search_hot_path ON public.issues USING btree (municipality_id, created_at) WHERE (state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint]));
 
 
 --
@@ -3169,7 +3301,21 @@ CREATE INDEX index_issues_on_subtype_id ON public.issues USING btree (subtype_id
 -- Name: index_issues_resolution_started_at_hot_path; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_issues_resolution_started_at_hot_path ON public.issues USING btree (resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (14)::bigint])) AND (resolution_started_at IS NOT NULL));
+CREATE INDEX index_issues_resolution_started_at_hot_path ON public.issues USING btree (resolution_started_at) WHERE ((state_id <> ALL (ARRAY[(3)::bigint, (7)::bigint, (10)::bigint, (12)::bigint])) AND (resolution_started_at IS NOT NULL));
+
+
+--
+-- Name: index_issues_responsible_subject_changes_on_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_responsible_subject_changes_on_activity_id ON public.issues_responsible_subject_changes USING btree (activity_id);
+
+
+--
+-- Name: index_issues_responsible_subject_changes_on_user_author_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_issues_responsible_subject_changes_on_user_author_id ON public.issues_responsible_subject_changes USING btree (user_author_id);
 
 
 --
@@ -3586,10 +3732,24 @@ CREATE INDEX index_users_on_municipality_id ON public.users USING btree (municip
 
 
 --
+-- Name: index_users_on_responsible_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_responsible_subject_id ON public.users USING btree (responsible_subject_id);
+
+
+--
 -- Name: index_users_on_street_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_street_id ON public.users USING btree (street_id);
+
+
+--
+-- Name: index_users_on_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_type ON public.users USING btree (type);
 
 
 --
@@ -3648,19 +3808,19 @@ ALTER TABLE ONLY public.user_password_reset_keys
 
 
 --
+-- Name: user_email_auth_keys fk_rails_1a2acb61d1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_email_auth_keys
+    ADD CONSTRAINT fk_rails_1a2acb61d1 FOREIGN KEY (id) REFERENCES public.users(id);
+
+
+--
 -- Name: legacy_agents fk_rails_1b2b63ec59; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.legacy_agents
     ADD CONSTRAINT fk_rails_1b2b63ec59 FOREIGN KEY (municipality_id) REFERENCES public.municipalities(id);
-
-
---
--- Name: legacy_issues_communications fk_rails_1cf0f8a10b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.legacy_issues_communications
-    ADD CONSTRAINT fk_rails_1cf0f8a10b FOREIGN KEY (activity_id) REFERENCES public.issues_activities(id);
 
 
 --
@@ -3696,6 +3856,22 @@ ALTER TABLE ONLY public.issues_drafts
 
 
 --
+-- Name: legacy_issues_communications fk_rails_35b4962c3d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_issues_communications
+    ADD CONSTRAINT fk_rails_35b4962c3d FOREIGN KEY (responsible_subjects_user_author_id) REFERENCES public.responsible_subjects_users(id);
+
+
+--
+-- Name: issues_responsible_subject_changes fk_rails_3919e03351; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes
+    ADD CONSTRAINT fk_rails_3919e03351 FOREIGN KEY (responsible_subject_id) REFERENCES public.responsible_subjects(id);
+
+
+--
 -- Name: issues fk_rails_44771000d0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3720,19 +3896,19 @@ ALTER TABLE ONLY public.issues_updates
 
 
 --
+-- Name: issues_drafts fk_rails_4a07ddfeff; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_drafts
+    ADD CONSTRAINT fk_rails_4a07ddfeff FOREIGN KEY (issue_id) REFERENCES public.issues(id);
+
+
+--
 -- Name: issues fk_rails_4e60020611; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.issues
     ADD CONSTRAINT fk_rails_4e60020611 FOREIGN KEY (responsible_subject_id) REFERENCES public.responsible_subjects(id);
-
-
---
--- Name: legacy_issues_communications fk_rails_51ea2fa86c; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.legacy_issues_communications
-    ADD CONSTRAINT fk_rails_51ea2fa86c FOREIGN KEY (agent_author_id) REFERENCES public.legacy_agents(id);
 
 
 --
@@ -3749,6 +3925,14 @@ ALTER TABLE ONLY public.issues_subtypes
 
 ALTER TABLE ONLY public.streets
     ADD CONSTRAINT fk_rails_5410bc504c FOREIGN KEY (municipality_id) REFERENCES public.municipalities(id);
+
+
+--
+-- Name: issues_responsible_subject_changes fk_rails_5457923ea3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes
+    ADD CONSTRAINT fk_rails_5457923ea3 FOREIGN KEY (activity_id) REFERENCES public.issues_activities(id);
 
 
 --
@@ -3856,6 +4040,14 @@ ALTER TABLE ONLY public.user_login_change_keys
 
 
 --
+-- Name: issues_responsible_subject_changes fk_rails_761d55b5c7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes
+    ADD CONSTRAINT fk_rails_761d55b5c7 FOREIGN KEY (responsible_subject_author_id) REFERENCES public.responsible_subjects(id);
+
+
+--
 -- Name: responsible_subjects fk_rails_77e9cc3151; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3901,14 +4093,6 @@ ALTER TABLE ONLY public.issues_comments
 
 ALTER TABLE ONLY public.issue_likes
     ADD CONSTRAINT fk_rails_90e6ba2dd2 FOREIGN KEY (issue_id) REFERENCES public.issues(id);
-
-
---
--- Name: connector_activities fk_rails_90e9990402; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.connector_activities
-    ADD CONSTRAINT fk_rails_90e9990402 FOREIGN KEY (connector_tenant_id) REFERENCES public.connector_tenants(id);
 
 
 --
@@ -4000,11 +4184,27 @@ ALTER TABLE ONLY public.responsible_subjects
 
 
 --
+-- Name: legacy_issues_communications fk_rails_b3a0e7e7b7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.legacy_issues_communications
+    ADD CONSTRAINT fk_rails_b3a0e7e7b7 FOREIGN KEY (agent_author_id) REFERENCES public.legacy_agents(id);
+
+
+--
 -- Name: user_verification_keys fk_rails_b5d6b8f85b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_verification_keys
     ADD CONSTRAINT fk_rails_b5d6b8f85b FOREIGN KEY (id) REFERENCES public.users(id);
+
+
+--
+-- Name: issues_responsible_subject_changes fk_rails_bee7c2ed82; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues_responsible_subject_changes
+    ADD CONSTRAINT fk_rails_bee7c2ed82 FOREIGN KEY (user_author_id) REFERENCES public.users(id);
 
 
 --
@@ -4064,6 +4264,14 @@ ALTER TABLE ONLY public.issues_activity_votes
 
 
 --
+-- Name: connector_activities fk_rails_e5c13ad0c7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.connector_activities
+    ADD CONSTRAINT fk_rails_e5c13ad0c7 FOREIGN KEY (connector_tenant_id) REFERENCES public.connector_tenants(id);
+
+
+--
 -- Name: issues_updates fk_rails_e5ed276bbf; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4096,27 +4304,27 @@ ALTER TABLE ONLY public.issues_activities
 
 
 --
+-- Name: legacy_issues_communications fk_rails_f4db0cf30b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.legacy_issues_communications
+    ADD CONSTRAINT fk_rails_f4db0cf30b FOREIGN KEY (activity_id) REFERENCES public.issues_activities(id);
 
 
 --
--- Name: cms_categories fk_rails_f8cce9e30c; Type: FK CONSTRAINT; Schema: public; Owner: -
 -- Name: issues_updates fk_rails_f6e3cb8d90; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.cms_categories
-    ADD CONSTRAINT fk_rails_f8cce9e30c FOREIGN KEY (parent_category_id) REFERENCES public.cms_categories(id);
 ALTER TABLE ONLY public.issues_updates
     ADD CONSTRAINT fk_rails_f6e3cb8d90 FOREIGN KEY (confirmed_by_id) REFERENCES public.legacy_agents(id);
 
 
 --
--- Name: legacy_issues_communications fk_rails_f9284d111d; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: cms_categories fk_rails_f8cce9e30c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.legacy_issues_communications
-    ADD CONSTRAINT fk_rails_f9284d111d FOREIGN KEY (responsible_subjects_user_author_id) REFERENCES public.responsible_subjects_users(id);
+ALTER TABLE ONLY public.cms_categories
+    ADD CONSTRAINT fk_rails_f8cce9e30c FOREIGN KEY (parent_category_id) REFERENCES public.cms_categories(id);
 
 
 --
@@ -4126,6 +4334,17 @@ ALTER TABLE ONLY public.legacy_issues_communications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260227123031'),
+('20260210135328'),
+('20260210092444'),
+('20260122093440'),
+('20260121170436'),
+('20260121170411'),
+('20251229150246'),
+('20251226102461'),
+('20251226102460'),
+('20251226102459'),
+('20251213182025'),
 ('20251128215525'),
 ('20251118171856'),
 ('20251118000000'),
@@ -4152,8 +4371,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250605200853'),
 ('20250605192922'),
 ('20250605190746'),
-('20250522185556'),
-('20250522184502'),
 ('20250522111247'),
 ('20250522105736'),
 ('20250522105410'),

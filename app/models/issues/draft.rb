@@ -31,6 +31,7 @@
 #  updated_at              :datetime         not null
 #  author_id               :bigint           not null
 #  category_id             :bigint
+#  issue_id                :bigint
 #  subcategory_id          :bigint
 #  subtype_id              :bigint
 #
@@ -43,6 +44,7 @@ class Issues::Draft < ApplicationRecord
     photo.variant :small, resize_to_fill: [ 360, 360 ]
   end
 
+  belongs_to :issue, optional: true
   belongs_to :category, class_name: "Issues::Category", optional: true
   belongs_to :subcategory, class_name: "Issues::Subcategory", optional: true
   belongs_to :subtype, class_name: "Issues::Subtype", optional: true
@@ -58,8 +60,10 @@ class Issues::Draft < ApplicationRecord
   validate :photos_allowed_content_type, on: :photos_step
 
   validate :no_duplicates_nearby, on: :checks_step, unless: :duplicates_shown?
-  validate :municipality_supported, on: :checks_step
+  validate :municipality_supported, on: [ :suggestions_step, :details_step, :checks_step ]
   validate :checks_passed, on: :checks_step
+
+  before_save :reset_address_details, if: -> { will_save_change_to_latitude? || will_save_change_to_longitude? }
 
   def confirm
     municipality, municipality_district = Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb, street: address_street)
@@ -91,15 +95,14 @@ class Issues::Draft < ApplicationRecord
         municipality_district: municipality_district,
       )
 
-      # TODO delete draft after success
-      self.update_attribute(:submitted, true)
-
       photos.each do |photo|
         issue.photos.attach(photo.blob)
       end
 
       issue.save!
       issue.author.subscribe_to(issue)
+
+      self.update!(submitted: true, issue: issue)
 
       SyncIssueToTriageJob.perform_later(issue)
     end
@@ -154,6 +157,12 @@ class Issues::Draft < ApplicationRecord
     checks.all? { |check| check["action"] == "confirm" }
   end
 
+  def municipality_errors?
+    errors.added?(:base, :municipality_unsupported) ||
+      errors.added?(:base, :municipality_district_unsupported) ||
+      errors.added?(:base, :municipality_supported_on_old_portal)
+  end
+
   private
 
   def photos_allowed_content_type
@@ -179,10 +188,20 @@ class Issues::Draft < ApplicationRecord
   end
 
   def municipality_supported
+    return if address_data.blank?
+
     active_municipality, municipality_district = Municipality.find_by_address(city: address_city, municipality: address_municipality, suburb: address_suburb, street: address_street)
     errors.add(:base, :municipality_supported_on_old_portal) if active_municipality && active_municipality.active_on_old_portal?
     errors.add(:base, :municipality_unsupported) if active_municipality.nil? && municipality_district.nil?
     errors.add(:base, :municipality_district_unsupported) if active_municipality.nil? && municipality_district
+  end
+
+  def reset_address_details
+    self.address_data = nil
+    self.address_municipality = nil
+    self.address_district = nil
+    self.address_city = nil
+    self.address_street = nil
   end
 
   def gps_to_float(gps)
